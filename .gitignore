@@ -43,6 +43,7 @@ htmlcov/
 .ruff_cache/
 .mypy_cache/
 .pyright/
+.cache/
 
 # Node / Astro (Site)
 node_modules/

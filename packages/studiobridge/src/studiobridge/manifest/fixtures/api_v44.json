@@ -1,0 +1,2262 @@
+{
+  "schema": 1,
+  "manifest_schema": 1,
+  "api_version": 44,
+  "fl_version_hint": "26.1.3",
+  "generated": "2026-10-04",
+  "modules": {
+    "channels": {
+      "summary": "FL Studio channel rack control module.",
+      "functions": {
+        "channelCount": {
+          "since": 1,
+          "args": [
+            {
+              "name": "mode",
+              "type": "int",
+              "optional": true,
+              "default": 0
+            }
+          ],
+          "ret": "int",
+          "mutating": false,
+          "protected": false,
+          "summary": "Return the total count of generator and sampler channels."
+        },
+        "channelNumber": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            }
+          ],
+          "ret": "int",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve numeric index for channel."
+        },
+        "getChannelColor": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            }
+          ],
+          "ret": "int",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve display color code for channel."
+        },
+        "getChannelName": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            }
+          ],
+          "ret": "str",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve display name for channel."
+        },
+        "getChannelPan": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            }
+          ],
+          "ret": "float",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve stereo pan value for channel."
+        },
+        "getChannelPitch": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            }
+          ],
+          "ret": "float",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve pitch offset value for channel."
+        },
+        "getChannelVolume": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            }
+          ],
+          "ret": "float",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve volume level for channel."
+        },
+        "getTargetFxTrack": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            }
+          ],
+          "ret": "int",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve target mixer insert track routed for channel."
+        },
+        "incEventValue": {
+          "since": 1,
+          "args": [
+            {
+              "name": "eventId",
+              "type": "int"
+            },
+            {
+              "name": "value",
+              "type": "int"
+            },
+            {
+              "name": "step",
+              "type": "int",
+              "optional": true,
+              "default": 0
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Increment or decrement channel event automation parameter."
+        },
+        "isChannelMuted": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            }
+          ],
+          "ret": "bool",
+          "mutating": false,
+          "protected": false,
+          "summary": "Query whether channel audio generation is muted."
+        },
+        "isChannelSolo": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            }
+          ],
+          "ret": "bool",
+          "mutating": false,
+          "protected": false,
+          "summary": "Query whether channel is soloed in channel rack."
+        },
+        "muteChannel": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            },
+            {
+              "name": "value",
+              "type": "int",
+              "optional": true,
+              "default": -1
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Toggle or set mute state for channel."
+        },
+        "selectChannel": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            },
+            {
+              "name": "value",
+              "type": "int",
+              "optional": true,
+              "default": 1
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Select or focus channel in channel rack."
+        },
+        "selectedChannel": {
+          "since": 1,
+          "args": [],
+          "ret": "int",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve index of currently selected channel."
+        },
+        "setChannelColor": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            },
+            {
+              "name": "color",
+              "type": "int"
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Assign display color for channel."
+        },
+        "setChannelName": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            },
+            {
+              "name": "name",
+              "type": "str"
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "verify": {
+            "getter": "getChannelName",
+            "args": [
+              "$0"
+            ],
+            "compare": "exact",
+            "settle": "immediate"
+          },
+          "summary": "Assign name label for channel."
+        },
+        "setChannelPan": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            },
+            {
+              "name": "pan",
+              "type": "float",
+              "range": [
+                -1.0,
+                1.0
+              ]
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "verify": {
+            "getter": "getChannelPan",
+            "args": [
+              "$0"
+            ],
+            "compare": "approx",
+            "settle": "idle1",
+            "tol": 0.005
+          },
+          "summary": "Set stereo pan position for channel."
+        },
+        "setChannelPitch": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            },
+            {
+              "name": "pitch",
+              "type": "float"
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Set pitch tune offset for channel."
+        },
+        "setChannelVolume": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            },
+            {
+              "name": "volume",
+              "type": "float",
+              "range": [
+                0.0,
+                1.0
+              ]
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "verify": {
+            "getter": "getChannelVolume",
+            "args": [
+              "$0"
+            ],
+            "compare": "approx",
+            "settle": "idle1",
+            "tol": 0.005
+          },
+          "summary": "Set volume level for channel."
+        },
+        "setTargetFxTrack": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            },
+            {
+              "name": "track",
+              "type": "int",
+              "range": [
+                0,
+                126
+              ]
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Assign target mixer insert track for channel."
+        },
+        "soloChannel": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            },
+            {
+              "name": "value",
+              "type": "int",
+              "optional": true,
+              "default": -1
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Toggle or set solo state for channel."
+        }
+      }
+    },
+    "device": {
+      "summary": "FL Studio MIDI controller device interface module.",
+      "functions": {
+        "baseTrackSelect": {
+          "since": 1,
+          "args": [
+            {
+              "name": "offset",
+              "type": "int"
+            },
+            {
+              "name": "step",
+              "type": "int",
+              "optional": true,
+              "default": 0
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Offset active track bank on hardware controller."
+        },
+        "dispatch": {
+          "since": 1,
+          "args": [
+            {
+              "name": "messageId",
+              "type": "int"
+            },
+            {
+              "name": "value",
+              "type": "int"
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Dispatch internal hardware controller event message."
+        },
+        "forwardMIDICC": {
+          "since": 1,
+          "args": [
+            {
+              "name": "status",
+              "type": "int"
+            },
+            {
+              "name": "data1",
+              "type": "int"
+            },
+            {
+              "name": "data2",
+              "type": "int"
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Forward raw MIDI Continuous Controller message to host."
+        },
+        "getName": {
+          "since": 1,
+          "args": [],
+          "ret": "str",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve configured controller script device name."
+        },
+        "getPortNumber": {
+          "since": 1,
+          "args": [],
+          "ret": "int",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve MIDI port index assigned to controller script."
+        },
+        "isAssigned": {
+          "since": 1,
+          "args": [],
+          "ret": "bool",
+          "mutating": false,
+          "protected": false,
+          "summary": "Query whether controller script is linked to a valid port."
+        },
+        "midiOutMsg": {
+          "since": 1,
+          "args": [
+            {
+              "name": "message",
+              "type": "int"
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Send short 3-byte MIDI message to hardware output port."
+        },
+        "midiOutSysex": {
+          "since": 1,
+          "args": [
+            {
+              "name": "data",
+              "type": "bytes"
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Send raw SysEx byte sequence to hardware output port."
+        },
+        "processMIDICC": {
+          "since": 1,
+          "args": [
+            {
+              "name": "event",
+              "type": "int"
+            }
+          ],
+          "ret": "int",
+          "mutating": true,
+          "protected": false,
+          "summary": "Process incoming MIDI CC through active mapping table."
+        }
+      }
+    },
+    "general": {
+      "summary": "FL Studio general system and undo module.",
+      "functions": {
+        "clearChangedFlag": {
+          "since": 1,
+          "args": [],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Reset project modified dirty flag."
+        },
+        "getChangedFlag": {
+          "since": 1,
+          "args": [],
+          "ret": "int",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve project modified dirty bitmask."
+        },
+        "getRecPPQ": {
+          "since": 1,
+          "args": [],
+          "ret": "int",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve pulses-per-quarter-note resolution."
+        },
+        "getVersion": {
+          "since": 1,
+          "args": [],
+          "ret": "int",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve the host FL Studio API version integer."
+        },
+        "processRECEvent": {
+          "since": 1,
+          "args": [
+            {
+              "name": "eventId",
+              "type": "int"
+            },
+            {
+              "name": "value",
+              "type": "int"
+            },
+            {
+              "name": "flags",
+              "type": "int",
+              "optional": true,
+              "default": 0
+            }
+          ],
+          "ret": "int",
+          "mutating": true,
+          "protected": false,
+          "summary": "Dispatch automation recording event."
+        },
+        "redo": {
+          "since": 1,
+          "args": [],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Redo the last undone edit in history."
+        },
+        "restore": {
+          "since": 1,
+          "args": [],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Restore project to last clean save state."
+        },
+        "saveUndo": {
+          "since": 1,
+          "args": [
+            {
+              "name": "name",
+              "type": "str"
+            },
+            {
+              "name": "flags",
+              "type": "int",
+              "optional": true,
+              "default": 0
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Push a labeled transaction checkpoint into undo history."
+        },
+        "undo": {
+          "since": 1,
+          "args": [],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Undo the last edit action in history."
+        },
+        "undoUp": {
+          "since": 1,
+          "args": [],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Step upward through undo history stack."
+        }
+      }
+    },
+    "mixer": {
+      "summary": "FL Studio audio mixer control module.",
+      "functions": {
+        "armTrack": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                126
+              ]
+            },
+            {
+              "name": "value",
+              "type": "int",
+              "optional": true,
+              "default": -1
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Toggle or set recording arm status for mixer track."
+        },
+        "enableTrack": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                126
+              ]
+            },
+            {
+              "name": "value",
+              "type": "int",
+              "optional": true,
+              "default": -1
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Enable or disable audio processing for mixer track."
+        },
+        "enableTrackSlots": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                126
+              ]
+            },
+            {
+              "name": "value",
+              "type": "int",
+              "optional": true,
+              "default": -1
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Enable or disable effect slots on mixer track."
+        },
+        "getSongStepPos": {
+          "since": 1,
+          "args": [],
+          "ret": "int",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve current step position along the mixer timeline."
+        },
+        "getTrackColor": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                126
+              ]
+            }
+          ],
+          "ret": "int",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve RGB color code for mixer track."
+        },
+        "getTrackName": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                126
+              ]
+            }
+          ],
+          "ret": "str",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve display name for mixer track."
+        },
+        "getTrackNumber": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                126
+              ]
+            }
+          ],
+          "ret": "int",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve numeric index for mixer track."
+        },
+        "getTrackPan": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                126
+              ]
+            }
+          ],
+          "ret": "float",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve stereo panorama position for mixer track."
+        },
+        "getTrackSlotsEnabled": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                126
+              ]
+            }
+          ],
+          "ret": "bool",
+          "mutating": false,
+          "protected": false,
+          "summary": "Query whether effect slots are enabled on mixer track."
+        },
+        "getTrackVolume": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                126
+              ]
+            }
+          ],
+          "ret": "float",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve volume level for mixer track."
+        },
+        "isTrackArmed": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                126
+              ]
+            }
+          ],
+          "ret": "bool",
+          "mutating": false,
+          "protected": false,
+          "summary": "Query whether mixer track is armed for disk recording."
+        },
+        "isTrackEnabled": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                126
+              ]
+            }
+          ],
+          "ret": "bool",
+          "mutating": false,
+          "protected": false,
+          "summary": "Query whether mixer track is active and processing audio."
+        },
+        "isTrackMuted": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                126
+              ]
+            }
+          ],
+          "ret": "bool",
+          "mutating": false,
+          "protected": false,
+          "summary": "Query whether mixer track output is muted."
+        },
+        "isTrackSolo": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                126
+              ]
+            }
+          ],
+          "ret": "bool",
+          "mutating": false,
+          "protected": false,
+          "summary": "Query whether mixer track is soloed."
+        },
+        "linkTrackToChannel": {
+          "since": 1,
+          "args": [
+            {
+              "name": "mode",
+              "type": "int"
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Route active channel directly to selected mixer track."
+        },
+        "muteTrack": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                126
+              ]
+            },
+            {
+              "name": "value",
+              "type": "int",
+              "optional": true,
+              "default": -1
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "verify": {
+            "getter": "isTrackMuted",
+            "args": [
+              "$0"
+            ],
+            "compare": "exact",
+            "settle": "immediate"
+          },
+          "summary": "Toggle or set mute state for mixer track."
+        },
+        "setTrackColor": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                126
+              ]
+            },
+            {
+              "name": "color",
+              "type": "int"
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Assign display color for mixer track."
+        },
+        "setTrackName": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                126
+              ]
+            },
+            {
+              "name": "name",
+              "type": "str"
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "verify": {
+            "getter": "getTrackName",
+            "args": [
+              "$0"
+            ],
+            "compare": "exact",
+            "settle": "immediate"
+          },
+          "summary": "Assign descriptive label for mixer track."
+        },
+        "setTrackNumber": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                126
+              ]
+            },
+            {
+              "name": "number",
+              "type": "int"
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Assign track index routing for mixer track."
+        },
+        "setTrackPan": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                126
+              ]
+            },
+            {
+              "name": "pan",
+              "type": "float",
+              "range": [
+                -1.0,
+                1.0
+              ]
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "verify": {
+            "getter": "getTrackPan",
+            "args": [
+              "$0"
+            ],
+            "compare": "approx",
+            "settle": "idle1",
+            "tol": 0.005
+          },
+          "summary": "Set stereo pan position for mixer track."
+        },
+        "setTrackVolume": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                126
+              ]
+            },
+            {
+              "name": "volume",
+              "type": "float",
+              "range": [
+                0.0,
+                1.0
+              ]
+            },
+            {
+              "name": "pickupMode",
+              "type": "int",
+              "optional": true,
+              "default": 0,
+              "since": 16
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "verify": {
+            "getter": "getTrackVolume",
+            "args": [
+              "$0"
+            ],
+            "compare": "approx",
+            "settle": "idle1",
+            "tol": 0.005
+          },
+          "summary": "Set output volume level for mixer track."
+        },
+        "soloTrack": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                126
+              ]
+            },
+            {
+              "name": "value",
+              "type": "int",
+              "optional": true,
+              "default": -1
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Toggle or set solo state for mixer track."
+        },
+        "trackCount": {
+          "since": 1,
+          "args": [],
+          "ret": "int",
+          "mutating": false,
+          "protected": false,
+          "summary": "Return the total number of available mixer tracks."
+        }
+      }
+    },
+    "patterns": {
+      "summary": "FL Studio pattern arrangement module.",
+      "functions": {
+        "ensureValidPattern": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                1,
+                999
+              ]
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Ensure pattern exists and is initialized."
+        },
+        "getPatternColor": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                1,
+                999
+              ]
+            }
+          ],
+          "ret": "int",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve RGB color code for pattern."
+        },
+        "getPatternLength": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                1,
+                999
+              ]
+            }
+          ],
+          "ret": "int",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve total length in steps for pattern."
+        },
+        "getPatternName": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                1,
+                999
+              ]
+            }
+          ],
+          "ret": "str",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve title name for pattern."
+        },
+        "isPatternSelected": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                1,
+                999
+              ]
+            }
+          ],
+          "ret": "bool",
+          "mutating": false,
+          "protected": false,
+          "summary": "Query whether pattern is selected in picker."
+        },
+        "jumpToPattern": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                1,
+                999
+              ]
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Set active pattern and navigate to it in picker."
+        },
+        "patternCount": {
+          "since": 1,
+          "args": [],
+          "ret": "int",
+          "mutating": false,
+          "protected": false,
+          "summary": "Return the total count of active patterns."
+        },
+        "patternNumber": {
+          "since": 1,
+          "args": [],
+          "ret": "int",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve current active pattern index."
+        },
+        "selectPattern": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                1,
+                999
+              ]
+            },
+            {
+              "name": "value",
+              "type": "int",
+              "optional": true,
+              "default": 1
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Select pattern in playlist and picker."
+        },
+        "setPatternColor": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                1,
+                999
+              ]
+            },
+            {
+              "name": "color",
+              "type": "int"
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Assign display color for pattern."
+        },
+        "setPatternLength": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                1,
+                999
+              ]
+            },
+            {
+              "name": "length",
+              "type": "int"
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Set total length in steps for pattern."
+        },
+        "setPatternName": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                1,
+                999
+              ]
+            },
+            {
+              "name": "name",
+              "type": "str"
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "verify": {
+            "getter": "getPatternName",
+            "args": [
+              "$0"
+            ],
+            "compare": "exact",
+            "settle": "immediate"
+          },
+          "summary": "Assign name label for pattern."
+        }
+      }
+    },
+    "plugins": {
+      "summary": "FL Studio generator and effect plugin module.",
+      "functions": {
+        "getColor": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            },
+            {
+              "name": "slot",
+              "type": "int",
+              "optional": true,
+              "default": -1
+            }
+          ],
+          "ret": "int",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve color code for plugin instance."
+        },
+        "getColorName": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            },
+            {
+              "name": "slot",
+              "type": "int",
+              "optional": true,
+              "default": -1
+            }
+          ],
+          "ret": "str",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve color name string for plugin instance."
+        },
+        "getName": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            },
+            {
+              "name": "slot",
+              "type": "int",
+              "optional": true,
+              "default": -1
+            }
+          ],
+          "ret": "str",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve display name of loaded plugin."
+        },
+        "getParamCount": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            },
+            {
+              "name": "slot",
+              "type": "int",
+              "optional": true,
+              "default": -1
+            }
+          ],
+          "ret": "int",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve total count of automatable parameters in plugin."
+        },
+        "getParamName": {
+          "since": 1,
+          "args": [
+            {
+              "name": "paramIndex",
+              "type": "int"
+            },
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            },
+            {
+              "name": "slot",
+              "type": "int",
+              "optional": true,
+              "default": -1
+            }
+          ],
+          "ret": "str",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve name of automatable parameter."
+        },
+        "getParamValue": {
+          "since": 1,
+          "args": [
+            {
+              "name": "paramIndex",
+              "type": "int"
+            },
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            },
+            {
+              "name": "slot",
+              "type": "int",
+              "optional": true,
+              "default": -1
+            }
+          ],
+          "ret": "float",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve normalized value (0.0-1.0) of automatable parameter."
+        },
+        "getPluginName": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            },
+            {
+              "name": "slot",
+              "type": "int",
+              "optional": true,
+              "default": -1
+            }
+          ],
+          "ret": "str",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve generator or effect type identifier."
+        },
+        "getPresetCount": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            },
+            {
+              "name": "slot",
+              "type": "int",
+              "optional": true,
+              "default": -1
+            }
+          ],
+          "ret": "int",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve total count of factory and user presets."
+        },
+        "getPresetName": {
+          "since": 1,
+          "args": [
+            {
+              "name": "presetIndex",
+              "type": "int"
+            },
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            },
+            {
+              "name": "slot",
+              "type": "int",
+              "optional": true,
+              "default": -1
+            }
+          ],
+          "ret": "str",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve preset title for given preset index."
+        },
+        "isValid": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            },
+            {
+              "name": "slot",
+              "type": "int",
+              "optional": true,
+              "default": -1
+            }
+          ],
+          "ret": "bool",
+          "mutating": false,
+          "protected": false,
+          "summary": "Query whether plugin slot contains a valid, loaded plugin."
+        },
+        "setParamValue": {
+          "since": 1,
+          "args": [
+            {
+              "name": "value",
+              "type": "float",
+              "range": [
+                0.0,
+                1.0
+              ]
+            },
+            {
+              "name": "paramIndex",
+              "type": "int"
+            },
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            },
+            {
+              "name": "slot",
+              "type": "int",
+              "optional": true,
+              "default": -1
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Assign normalized automation value for plugin parameter."
+        },
+        "showEditor": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int",
+              "range": [
+                0,
+                999
+              ]
+            },
+            {
+              "name": "slot",
+              "type": "int",
+              "optional": true,
+              "default": -1
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Toggle display of graphical user interface editor for plugin."
+        }
+      }
+    },
+    "transport": {
+      "summary": "FL Studio transport control module.",
+      "functions": {
+        "continuousMove": {
+          "since": 1,
+          "args": [
+            {
+              "name": "value",
+              "type": "int"
+            },
+            {
+              "name": "step",
+              "type": "int",
+              "optional": true,
+              "default": 0
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Move the song playback position continuously."
+        },
+        "fastForward": {
+          "since": 1,
+          "args": [
+            {
+              "name": "value",
+              "type": "int",
+              "optional": true,
+              "default": 2
+            },
+            {
+              "name": "step",
+              "type": "int",
+              "optional": true,
+              "default": 0
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Engage fast forward transport motion."
+        },
+        "getLoopMode": {
+          "since": 1,
+          "args": [],
+          "ret": "int",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve current loop playback mode."
+        },
+        "getPlaybackSpeed": {
+          "since": 1,
+          "args": [],
+          "ret": "float",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve current playback speed multiplier."
+        },
+        "getSongLength": {
+          "since": 1,
+          "args": [
+            {
+              "name": "mode",
+              "type": "int",
+              "optional": true,
+              "default": 0
+            }
+          ],
+          "ret": "float",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve total song length in beats or seconds."
+        },
+        "getSongPos": {
+          "since": 1,
+          "args": [
+            {
+              "name": "mode",
+              "type": "int",
+              "optional": true,
+              "default": 0
+            }
+          ],
+          "ret": "float",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve normalized song position."
+        },
+        "globalTransport": {
+          "since": 1,
+          "args": [
+            {
+              "name": "command",
+              "type": "int"
+            },
+            {
+              "name": "value",
+              "type": "int",
+              "optional": true,
+              "default": 0
+            }
+          ],
+          "ret": "int",
+          "mutating": true,
+          "protected": false,
+          "summary": "Dispatch a global transport action code."
+        },
+        "isPlaying": {
+          "since": 1,
+          "args": [],
+          "ret": "bool",
+          "mutating": false,
+          "protected": false,
+          "summary": "Query whether transport playback is active."
+        },
+        "isRecording": {
+          "since": 1,
+          "args": [],
+          "ret": "bool",
+          "mutating": false,
+          "protected": false,
+          "summary": "Query whether transport recording mode is active."
+        },
+        "markerJump": {
+          "since": 1,
+          "args": [
+            {
+              "name": "step",
+              "type": "int"
+            },
+            {
+              "name": "select",
+              "type": "int",
+              "optional": true,
+              "default": 0
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Jump playback to the previous or next timeline marker."
+        },
+        "record": {
+          "since": 1,
+          "args": [],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Toggle or arm recording state."
+        },
+        "rewind": {
+          "since": 1,
+          "args": [
+            {
+              "name": "value",
+              "type": "int",
+              "optional": true,
+              "default": 2
+            },
+            {
+              "name": "step",
+              "type": "int",
+              "optional": true,
+              "default": 0
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Engage rewind transport motion."
+        },
+        "setLoopMode": {
+          "since": 1,
+          "args": [],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Toggle loop playback mode."
+        },
+        "setPlaybackSpeed": {
+          "since": 1,
+          "args": [
+            {
+              "name": "speed",
+              "type": "float"
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Set transport playback speed factor."
+        },
+        "setSongPos": {
+          "since": 1,
+          "args": [
+            {
+              "name": "pos",
+              "type": "float",
+              "range": [
+                0.0,
+                1.0
+              ]
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "verify": {
+            "getter": "getSongPos",
+            "args": [],
+            "compare": "approx",
+            "settle": "idle1",
+            "tol": 0.01
+          },
+          "summary": "Set the normalized playback cursor position."
+        },
+        "start": {
+          "since": 1,
+          "args": [],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Start transport playback."
+        },
+        "stop": {
+          "since": 1,
+          "args": [],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Stop transport playback."
+        }
+      }
+    },
+    "ui": {
+      "summary": "FL Studio user interface control module.",
+      "functions": {
+        "crDisplay": {
+          "since": 1,
+          "args": [
+            {
+              "name": "index",
+              "type": "int"
+            },
+            {
+              "name": "value",
+              "type": "int"
+            },
+            {
+              "name": "mode",
+              "type": "int",
+              "optional": true,
+              "default": 0
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Update channel rack display control."
+        },
+        "getFocused": {
+          "since": 1,
+          "args": [
+            {
+              "name": "window",
+              "type": "int"
+            }
+          ],
+          "ret": "bool",
+          "mutating": false,
+          "protected": false,
+          "summary": "Query whether specified FL Studio window currently holds focus."
+        },
+        "getStepEditMode": {
+          "since": 1,
+          "args": [],
+          "ret": "int",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve channel rack step sequencer edit mode."
+        },
+        "getVersion": {
+          "since": 1,
+          "args": [],
+          "ret": "int",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve UI subsystem API version."
+        },
+        "getVisible": {
+          "since": 1,
+          "args": [
+            {
+              "name": "window",
+              "type": "int"
+            }
+          ],
+          "ret": "bool",
+          "mutating": false,
+          "protected": false,
+          "summary": "Query whether specified FL Studio window is currently visible."
+        },
+        "getVisibleForm": {
+          "since": 1,
+          "args": [
+            {
+              "name": "formId",
+              "type": "int"
+            }
+          ],
+          "ret": "bool",
+          "mutating": false,
+          "protected": false,
+          "summary": "Query whether floating tool form is currently visible."
+        },
+        "hideWindow": {
+          "since": 1,
+          "args": [
+            {
+              "name": "window",
+              "type": "int"
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Hide the designated FL Studio workspace window."
+        },
+        "jog": {
+          "since": 1,
+          "args": [
+            {
+              "name": "value",
+              "type": "int"
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Send jog wheel navigation delta."
+        },
+        "scrollWindow": {
+          "since": 1,
+          "args": [
+            {
+              "name": "window",
+              "type": "int"
+            },
+            {
+              "name": "delta",
+              "type": "int"
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Scroll contents of specified window by delta."
+        },
+        "setFocused": {
+          "since": 1,
+          "args": [
+            {
+              "name": "window",
+              "type": "int"
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Direct focus to the specified workspace window."
+        },
+        "setFocusedForm": {
+          "since": 1,
+          "args": [
+            {
+              "name": "formId",
+              "type": "int"
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Direct focus to floating form."
+        },
+        "setStepEditMode": {
+          "since": 1,
+          "args": [
+            {
+              "name": "mode",
+              "type": "int"
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Configure channel rack step editing mode."
+        },
+        "showWindow": {
+          "since": 1,
+          "args": [
+            {
+              "name": "window",
+              "type": "int"
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Display and bring forward the designated workspace window."
+        },
+        "snapMode": {
+          "since": 1,
+          "args": [],
+          "ret": "int",
+          "mutating": false,
+          "protected": false,
+          "summary": "Retrieve current timeline snap grid setting."
+        },
+        "snapWindow": {
+          "since": 1,
+          "args": [
+            {
+              "name": "window",
+              "type": "int"
+            },
+            {
+              "name": "mode",
+              "type": "int"
+            }
+          ],
+          "ret": "none",
+          "mutating": true,
+          "protected": false,
+          "summary": "Snap window position to preset desktop docking grid."
+        }
+      }
+    }
+  },
+  "callbacks": {
+    "OnDeInit": {
+      "since": 1,
+      "summary": "Invoked when script is unloaded or MIDI device disconnected."
+    },
+    "OnDirtyChannel": {
+      "since": 1,
+      "args": [
+        {
+          "name": "index",
+          "type": "int"
+        }
+      ],
+      "summary": "Invoked when channel properties or parameters mutate."
+    },
+    "OnDirtyMixerTrack": {
+      "since": 1,
+      "args": [
+        {
+          "name": "index",
+          "type": "int"
+        }
+      ],
+      "summary": "Invoked when mixer track properties or volume mutate."
+    },
+    "OnIdle": {
+      "since": 1,
+      "summary": "Invoked periodically by FL Studio main thread idle loop."
+    },
+    "OnInit": {
+      "since": 1,
+      "summary": "Invoked when script is initialized and linked to MIDI port."
+    },
+    "OnMidiIn": {
+      "since": 1,
+      "args": [
+        {
+          "name": "event",
+          "type": "int"
+        }
+      ],
+      "summary": "Invoked on incoming standard MIDI channel message."
+    },
+    "OnMidiMsg": {
+      "since": 1,
+      "args": [
+        {
+          "name": "event",
+          "type": "int"
+        }
+      ],
+      "summary": "Invoked on low-level MIDI status message."
+    },
+    "OnMidiOutMsg": {
+      "since": 1,
+      "args": [
+        {
+          "name": "event",
+          "type": "int"
+        }
+      ],
+      "summary": "Invoked when script emits outgoing MIDI message."
+    },
+    "OnProjectLoad": {
+      "since": 16,
+      "args": [
+        {
+          "name": "status",
+          "type": "int"
+        }
+      ],
+      "summary": "Invoked when project file loading begins or finishes."
+    },
+    "OnRefresh": {
+      "since": 1,
+      "args": [
+        {
+          "name": "flags",
+          "type": "int"
+        }
+      ],
+      "summary": "Invoked when host UI or mixer state is refreshed."
+    },
+    "OnSendTempMsg": {
+      "since": 1,
+      "args": [
+        {
+          "name": "message",
+          "type": "str"
+        },
+        {
+          "name": "duration",
+          "type": "int",
+          "optional": true,
+          "default": 1000
+        }
+      ],
+      "summary": "Invoked to post temporary notification to FL Studio hint bar."
+    },
+    "OnSysEx": {
+      "since": 1,
+      "args": [
+        {
+          "name": "event",
+          "type": "int"
+        }
+      ],
+      "summary": "Invoked on incoming MIDI System Exclusive message."
+    },
+    "OnUpdateBeatIndicator": {
+      "since": 1,
+      "args": [
+        {
+          "name": "value",
+          "type": "int"
+        }
+      ],
+      "summary": "Invoked on musical metronome beat pulse."
+    },
+    "OnWaitingForInput": {
+      "since": 1,
+      "summary": "Invoked when FL Studio enters modal waiting dialog."
+    }
+  },
+  "flags": {
+    "FPT_CountDown": 115,
+    "FPT_FastForward": 113,
+    "FPT_Jog": 100,
+    "FPT_Jog2": 101,
+    "FPT_Loop": 109,
+    "FPT_LoopRecord": 117,
+    "FPT_Metronome": 114,
+    "FPT_Overdub": 116,
+    "FPT_Pattern": 107,
+    "FPT_Play": 104,
+    "FPT_PunchIn": 119,
+    "FPT_PunchOut": 120,
+    "FPT_Record": 106,
+    "FPT_Rewind": 112,
+    "FPT_Save": 92,
+    "FPT_SaveNew": 93,
+    "FPT_Song": 108,
+    "FPT_StepEdit": 118,
+    "FPT_Stop": 105,
+    "FPT_Tempo": 102,
+    "FPT_WaitKey": 111
+  }
+}
