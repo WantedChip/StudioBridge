@@ -37,11 +37,13 @@ class DeviceEmulator:
         script_file: pathlib.Path | str | None = None,
         script_code: str | None = None,
         device_name: str = "StudioBridge",
+        enforce_sandbox: bool = True,
     ) -> None:
         self.script_dir = pathlib.Path(script_dir) if script_dir else None
         self.script_file = pathlib.Path(script_file) if script_file else None
         self.script_code = script_code
         self.device_name = device_name
+        self.enforce_sandbox = enforce_sandbox
 
         self.state: MockFLState = MockFLState()
         self.blocker: SandboxImportBlocker = SandboxImportBlocker()
@@ -64,12 +66,13 @@ class DeviceEmulator:
 
         self._orig_sys_path = list(sys.path)
 
-        # Stash forbidden modules currently in sys.modules
-        self._stashed_modules = {}
-        for mod_name in list(sys.modules.keys()):
-            root = mod_name.split(".")[0]
-            if root in FORBIDDEN_MODULES:
-                self._stashed_modules[mod_name] = sys.modules.pop(mod_name)
+        if self.enforce_sandbox:
+            # Stash forbidden modules currently in sys.modules
+            self._stashed_modules = {}
+            for mod_name in list(sys.modules.keys()):
+                root = mod_name.split(".")[0]
+                if root in FORBIDDEN_MODULES:
+                    self._stashed_modules[mod_name] = sys.modules.pop(mod_name)
 
         # 1. Install mock FL modules
         mock_mods = create_mock_fl_modules(self.state)
@@ -78,7 +81,7 @@ class DeviceEmulator:
             sys.modules[name] = mod
 
         # 2. Install sandbox import blocker
-        if self.blocker not in sys.meta_path:
+        if self.enforce_sandbox and self.blocker not in sys.meta_path:
             sys.meta_path.insert(0, self.blocker)
 
         # 3. Configure sys.path
@@ -140,14 +143,15 @@ class DeviceEmulator:
         for name in self._installed_mod_names:
             sys.modules.pop(name, None)
 
-        # Restore stashed forbidden modules
-        for mod_name, mod in self._stashed_modules.items():
-            sys.modules[mod_name] = mod
-        self._stashed_modules.clear()
+        if self.enforce_sandbox:
+            # Restore stashed forbidden modules
+            for mod_name, mod in self._stashed_modules.items():
+                sys.modules[mod_name] = mod
+            self._stashed_modules.clear()
 
-        # 3. Remove import blocker
-        if self.blocker in sys.meta_path:
-            sys.meta_path.remove(self.blocker)
+            # 3. Remove import blocker
+            if self.blocker in sys.meta_path:
+                sys.meta_path.remove(self.blocker)
 
         # 4. Restore sys.path
         sys.path = self._orig_sys_path

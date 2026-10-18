@@ -67,12 +67,15 @@ def classify_priority(op: str, explicit: str | Priority | None = None) -> Priori
             pass
 
     op_lower = op.lower()
+    leaf = op_lower.split(".")[-1]
     if op_lower in {"panic", "ping", "control", "broker.ping", "broker.shutdown"}:
         return Priority.CONTROL
 
-    if op_lower.startswith(
-        ("get", "read", "is", "list", "probe", "info", "find", "check")
-    ) or op_lower in {"session.info", "broker.status", "capabilities.get"}:
+    if (
+        op_lower.startswith(("get", "read", "is", "list", "probe", "info", "find", "check"))
+        or leaf.startswith(("get", "read", "is", "list", "probe", "info", "find", "check"))
+        or op_lower in {"hello", "probe", "session.info", "broker.status", "capabilities.get"}
+    ):
         return Priority.READ
 
     if op_lower.startswith(("batch", "bulk", "dump", "scan", "sync")) or op_lower == "device.batch":

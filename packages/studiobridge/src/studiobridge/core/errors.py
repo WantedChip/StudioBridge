@@ -6,6 +6,7 @@ retryable flags, and contextual details per spec 12_crosscutting.md §7.
 
 from __future__ import annotations
 
+import builtins
 from dataclasses import dataclass
 from typing import Any
 
@@ -402,10 +403,74 @@ class PortError(StudioBridgeError):
     default_code: str = "E_ENV_PORT"
 
 
-class BrokerError(StudioBridgeError):
+class ConnectionError(StudioBridgeError, builtins.ConnectionError):
+    """Base exception for StudioBridge connection and communication failures."""
+
+    default_code: str = "E_NOBROKER"
+
+    def __init__(
+        self,
+        message: str | None = None,
+        *,
+        code: str | None = None,
+        details: dict[str, Any] | None = None,
+        retryable: bool | None = None,
+        remedy: str | None = None,
+        docs_anchor: str | None = None,
+    ) -> None:
+        super().__init__(
+            message=message,
+            code=code,
+            details=details,
+            retryable=retryable,
+            remedy=remedy,
+            docs_anchor=docs_anchor,
+        )
+        builtins.ConnectionError.__init__(self, self.message)
+
+
+class NoBrokerError(ConnectionError):
+    """Raised when the StudioBridge broker daemon is not running or unreachable."""
+
+    default_code: str = "E_NOBROKER"
+
+
+class NoDeviceError(ConnectionError):
+    """Raised when FL Studio device script is not connected or FL Studio is closed."""
+
+    default_code: str = "E_NODEVICE"
+
+
+class VersionMismatchError(ConnectionError):
+    """Raised when protocol or broker minor version mismatch occurs."""
+
+    default_code: str = "E_VERSION"
+
+
+class DisconnectedError(ConnectionError):
+    """Raised when MIDI port or broker connection closes unexpectedly."""
+
+    default_code: str = "E_DISCONNECTED"
+
+
+class LeaseError(ConnectionError):
+    """Raised when a writer lease cannot be acquired or was revoked."""
+
+    default_code: str = "E_LEASE"
+
+
+class BrokerError(ConnectionError):
     """Raised on broker daemon connection, lease acquisition, or IPC failures."""
 
     default_code: str = "E_NOBROKER"
+
+
+# Aliases per spec 09_l1_sdk.md §10
+NoBroker = NoBrokerError
+NoDevice = NoDeviceError
+VersionMismatch = VersionMismatchError
+Disconnected = DisconnectedError
+Lease = LeaseError
 
 
 class DeviceError(StudioBridgeError):
@@ -414,10 +479,142 @@ class DeviceError(StudioBridgeError):
     default_code: str = "E_FL"
 
 
+class FLCallFailedError(DeviceError):
+    """Raised when an internal exception occurred inside FL Studio."""
+
+    default_code: str = "E_FL"
+
+
+class SandboxBlockedError(DeviceError):
+    """Raised when an operation is blocked by the FL Studio Python sandbox."""
+
+    default_code: str = "E_SANDBOX"
+
+
+class BusyError(DeviceError):
+    """Raised when the device controller is busy executing a previous operation."""
+
+    default_code: str = "E_BUSY"
+
+
+class TimeoutError(DeviceError):
+    """Raised when command timed out waiting for response from FL Studio."""
+
+    default_code: str = "E_TIMEOUT"
+
+
+class UncertainError(DeviceError):
+    """Raised when execution state of a command cannot be verified."""
+
+    default_code: str = "E_UNCERTAIN"
+
+
 class PreconditionError(StudioBridgeError):
     """Raised when an argument, target reference, or state precondition is violated."""
 
     default_code: str = "E_PRECONDITION"
+
+
+class ArgumentError(StudioBridgeError):
+    """Raised on argument type, value, or reference mismatch."""
+
+    default_code: str = "E_ARGS"
+
+
+class BadRefError(ArgumentError):
+    """Raised when a target reference identifier or index was not found."""
+
+    default_code: str = "E_BADREF"
+
+
+class AmbiguousRefError(ArgumentError):
+    """Raised when a name or query matches multiple target candidates."""
+
+    default_code: str = "E_AMBIGUOUS"
+
+
+class OutOfRangeError(ArgumentError):
+    """Raised when a parameter value is outside allowed numerical or enum range."""
+
+    default_code: str = "E_RANGE"
+
+
+# Aliases per spec 09_l1_sdk.md §10
+BadRef = BadRefError
+AmbiguousRef = AmbiguousRefError
+OutOfRange = OutOfRangeError
+
+
+class CapabilityError(StudioBridgeError):
+    """Base exception for capability and feature availability errors."""
+
+    default_code: str = "E_UNAVAILABLE"
+
+    def __init__(
+        self,
+        message: str | None = None,
+        *,
+        code: str = "E_UNAVAILABLE",
+        details: dict[str, Any] | None = None,
+        retryable: bool = False,
+        remedy: str | None = None,
+        docs_anchor: str | None = None,
+        capability: str | None = None,
+        alternatives: list[str] | None = None,
+    ) -> None:
+        det = dict(details) if details else {}
+        self.capability: str | None = capability or det.get("capability")
+        self.alternatives: list[str] = (
+            list(alternatives) if alternatives else list(det.get("alternatives", []))
+        )
+        if self.capability and "capability" not in det:
+            det["capability"] = self.capability
+        if self.alternatives and "alternatives" not in det:
+            det["alternatives"] = self.alternatives
+
+        super().__init__(
+            message=message,
+            code=code,
+            details=det,
+            retryable=retryable,
+            remedy=remedy,
+            docs_anchor=docs_anchor,
+        )
+
+    @property
+    def capability_id(self) -> str | None:
+        """Alias for capability."""
+        return self.capability
+
+    def to_dict(self) -> dict[str, Any]:
+        data = super().to_dict()
+        data["capability"] = self.capability
+        data["alternatives"] = self.alternatives
+        return data
+
+
+class UnavailableError(CapabilityError):
+    """Raised when a requested capability is unavailable in the current environment."""
+
+    default_code: str = "E_UNAVAILABLE"
+
+
+class DegradedError(CapabilityError):
+    """Raised when a capability is running in degraded mode with reduced functionality."""
+
+    default_code: str = "E_DEGRADED"
+
+
+class ExperimentalDisabledError(CapabilityError):
+    """Raised when an experimental feature is invoked while disabled."""
+
+    default_code: str = "E_EXPERIMENTAL"
+
+
+# Aliases per spec 09_l1_sdk.md §10
+Unavailable = UnavailableError
+Degraded = DegradedError
+ExperimentalDisabled = ExperimentalDisabledError
 
 
 class VerificationError(StudioBridgeError):
@@ -452,43 +649,88 @@ class VerificationError(StudioBridgeError):
         )
 
 
-class UnavailableError(StudioBridgeError):
-    """Raised when a requested capability is unavailable in the current environment."""
+class UnverifiedWriteError(VerificationError):
+    """Raised when a write cannot be verified and strict write verification is enabled."""
 
-    default_code: str = "E_UNAVAILABLE"
+    default_code: str = "E_UNVERIFIED"
 
-    def __init__(
-        self,
-        message: str | None = None,
-        *,
-        code: str = "E_UNAVAILABLE",
-        details: dict[str, Any] | None = None,
-        retryable: bool = False,
-        remedy: str | None = None,
-        docs_anchor: str | None = None,
-        alternatives: list[str] | None = None,
-    ) -> None:
-        det = dict(details) if details else {}
-        self.alternatives: list[str] = list(alternatives) if alternatives else []
-        if self.alternatives and "alternatives" not in det:
-            det["alternatives"] = self.alternatives
 
-        super().__init__(
-            message=message,
-            code=code,
-            details=det,
-            retryable=retryable,
-            remedy=remedy,
-            docs_anchor=docs_anchor,
-        )
-
-    def to_dict(self) -> dict[str, Any]:
-        data = super().to_dict()
-        data["alternatives"] = self.alternatives
-        return data
+UnverifiedWrite = UnverifiedWriteError
 
 
 class SafetyError(StudioBridgeError):
     """Raised when an operation violates active safety policy or read-only mode."""
 
     default_code: str = "E_READONLY"
+
+
+class ReadOnlyError(SafetyError):
+    """Raised when a mutating operation is attempted in read-only mode."""
+
+    default_code: str = "E_READONLY"
+
+
+class ProtectedTargetError(SafetyError):
+    """Raised when an operation targets a protected parameter without override."""
+
+    default_code: str = "E_PROTECTED"
+
+
+class PolicyDeniedError(SafetyError):
+    """Raised when an action violates safety policy rules."""
+
+    default_code: str = "E_POLICY"
+
+
+class OfflineError(StudioBridgeError):
+    """Base exception for offline FLP engine operations."""
+
+    default_code: str = "E_FLP_PARSE"
+
+
+class FlpParseError(OfflineError):
+    """Raised when binary FLP parser fails."""
+
+    default_code: str = "E_FLP_PARSE"
+
+
+class FlpVersionUnsupportedError(OfflineError):
+    """Raised when an unsupported FLP file version is encountered."""
+
+    default_code: str = "E_FLP_VERSION"
+
+
+class FlpInvariantViolationError(OfflineError):
+    """Raised when an offline FLP structural invariant is violated."""
+
+    default_code: str = "E_FLP_INVARIANT"
+
+
+class RenderError(StudioBridgeError):
+    """Base exception for render orchestration failures."""
+
+    default_code: str = "E_RND_FLRUNNING"
+
+
+class FlRunningError(RenderError):
+    """Raised when an interactive FL Studio instance blocks offline rendering."""
+
+    default_code: str = "E_RND_FLRUNNING"
+
+
+class BlockingDialogError(RenderError):
+    """Raised when an unexpected modal dialog blocks rendering."""
+
+    default_code: str = "E_RND_DIALOG"
+
+
+class RenderTimeoutError(RenderError):
+    """Raised when a render job exceeds its timeout limit."""
+
+    default_code: str = "E_RND_TIMEOUT"
+
+
+class InvalidOutputError(RenderError):
+    """Raised when render output is empty, silent, or invalid."""
+
+    default_code: str = "E_RND_INVALID"

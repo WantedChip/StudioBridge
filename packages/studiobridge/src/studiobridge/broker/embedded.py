@@ -27,6 +27,7 @@ from studiobridge.broker.scheduler import (
 )
 from studiobridge.core.errors import BrokerError, StudioBridgeError
 from studiobridge.core.logging import get_logger
+from studiobridge.device.assets._sb_api import ALLOW
 from studiobridge.ports.base import MidiPort
 from studiobridge.wire.auth import sign_request
 from studiobridge.wire.chunk import Reassembler, chunk_payload
@@ -80,6 +81,8 @@ class EmbeddedBroker:
         )
 
         self.session: Session = Session.allocate(sid=1)
+        if port is not None:
+            self.session.fp = ""
         self._reassembler: Reassembler = Reassembler()
         self._mid_counter: int = 1
         self._started_at: float = clock()
@@ -224,8 +227,11 @@ class EmbeddedBroker:
         """Schedule and execute a single device operation."""
         call_args = args or {}
         p = classify_priority(op, explicit=priority)
-        is_write = p in {Priority.WRITE, Priority.BULK} and not op.lower().startswith(
-            ("get", "read", "list", "is", "probe", "info", "find", "check")
+        leaf = op.split(".")[-1].lower()
+        is_write = (
+            p in {Priority.WRITE, Priority.BULK}
+            and op not in {"hello", "probe", "ping", "session.info"}
+            and not leaf.startswith(("get", "read", "list", "is", "probe", "info", "find", "check"))
         )
 
         # 1. Enforce single-writer lease on mutating operations
@@ -354,7 +360,7 @@ class EmbeddedBroker:
             req.set_result(res)
             return res
 
-        if req.op in {"hello", "session.info"}:
+        if req.op == "session.info" or (req.op == "hello" and self.port is None):
             res = await self.session_info()
             req.set_result(res)
             return res
@@ -370,11 +376,41 @@ class EmbeddedBroker:
         self._in_flight[mid] = req
 
         try:
+            wire_op = req.op
+            wire_args = req.args
+            if req.op not in {"ping", "hello", "probe", "call", "batch", "log", "panic"}:
+                wire_op = "call"
+                if isinstance(req.args, dict) and "fn" in req.args and "a" in req.args:
+                    wire_args = req.args
+                else:
+                    a_list: list[Any] = []
+                    if "." in req.op:
+                        m_name, f_name = req.op.split(".", 1)
+                        if m_name in ALLOW and f_name in ALLOW[m_name]:
+                            param_specs = ALLOW[m_name][f_name].get("args", [])
+                            for p_spec in param_specs:
+                                p_name = p_spec["name"]
+                                if p_name in req.args:
+                                    a_list.append(req.args[p_name])
+                                elif not p_spec.get("optional", False) and len(a_list) < len(
+                                    req.args
+                                ):
+                                    a_list = list(req.args.values())
+                                    break
+                    if not a_list and isinstance(req.args, dict):
+                        a_list = list(req.args.values())
+                    wire_args = {"fn": req.op, "a": a_list}
+
             # Build RequestEnvelope
+            fp_to_send = (
+                self.session.fp
+                if (self.session.fp and wire_op not in {"hello", "probe", "ping"})
+                else None
+            )
             req_env = RequestEnvelope(
-                op=req.op,
-                args=req.args,
-                opts=RequestOpts(fp=self.session.fp),
+                op=wire_op,
+                args=wire_args,
+                opts=RequestOpts(fp=fp_to_send),
             )
             if self.secret is not None:
                 req_env = sign_request(self.secret, req_env)
@@ -436,6 +472,11 @@ class EmbeddedBroker:
                             )
                         )
                     else:
+                        if req.op == "hello" and isinstance(res_env.r, dict):
+                            if "sid" in res_env.r:
+                                self.session.sid = int(res_env.r["sid"])
+                            if "fp" in res_env.r:
+                                self.session.fp = res_env.r["fp"]
                         req.set_result(res_env.r)
             except Exception as exc:
                 logger.error("res_decode_failed", f"Failed decoding response: {exc}")

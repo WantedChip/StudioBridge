@@ -33,10 +33,27 @@ class Capability:
 
     id: str
     state: CapabilityState = CapabilityState.UNKNOWN
+    name: str | None = None
     reason: str | None = None
     requires: list[str] = field(default_factory=list)
     alternatives: list[str] = field(default_factory=list)
     evidence: list[str] = field(default_factory=list)
+    is_experimental: bool = False
+
+    @property
+    def is_available(self) -> bool:
+        """Whether capability is fully operational."""
+        return self.state == CapabilityState.AVAILABLE
+
+    @property
+    def is_degraded(self) -> bool:
+        """Whether capability is operating in a degraded mode."""
+        return self.state == CapabilityState.DEGRADED
+
+    @property
+    def is_unavailable(self) -> bool:
+        """Whether capability is offline or prerequisite unsatisfied."""
+        return self.state == CapabilityState.UNAVAILABLE
 
     def to_dict(self) -> dict[str, Any]:
         """Serialize capability to a dictionary."""
@@ -45,10 +62,12 @@ class Capability:
             "state": self.state.value
             if isinstance(self.state, CapabilityState)
             else str(self.state),
+            "name": self.name,
             "reason": self.reason,
             "requires": list(self.requires),
             "alternatives": list(self.alternatives),
             "evidence": list(self.evidence),
+            "is_experimental": self.is_experimental,
         }
 
     @classmethod
@@ -63,10 +82,12 @@ class Capability:
         return cls(
             id=data["id"],
             state=state,
+            name=data.get("name"),
             reason=data.get("reason"),
             requires=list(data.get("requires", [])),
             alternatives=list(data.get("alternatives", [])),
             evidence=list(data.get("evidence", [])),
+            is_experimental=bool(data.get("is_experimental", False)),
         )
 
 
@@ -89,6 +110,24 @@ class CapabilityRegistry:
         """Retrieve capability by ID without prerequisite evaluation."""
         return self._capabilities.get(cap_id)
 
+    def __getitem__(self, cap_id: str) -> Capability:
+        """Evaluate and return effective capability by ID, supporting fl.caps[id]."""
+        if cap_id not in self._capabilities:
+            raise KeyError(f"Capability '{cap_id}' is not registered.")
+        return self.evaluate(cap_id)
+
+    def __contains__(self, cap_id: object) -> bool:
+        """Check if capability ID is registered."""
+        return cap_id in self._capabilities
+
+    def __iter__(self):
+        """Iterate over registered capability IDs."""
+        return iter(self._capabilities)
+
+    def __len__(self) -> int:
+        """Return total count of registered capabilities."""
+        return len(self._capabilities)
+
     def set_state(
         self,
         cap_id: str,
@@ -97,12 +136,25 @@ class CapabilityRegistry:
         evidence: list[str] | None = None,
     ) -> None:
         """Update the state and metadata of a registered capability."""
+        self.update(cap_id, state=state, reason=reason, evidence=evidence)
+
+    def update(
+        self,
+        cap_id: str,
+        state: CapabilityState | str,
+        reason: str | None = None,
+        alternatives: list[str] | None = None,
+        evidence: list[str] | None = None,
+    ) -> None:
+        """Update or insert a capability with given state and metadata."""
         cap_state = CapabilityState(state) if isinstance(state, str) else state
         if cap_id in self._capabilities:
             cap = self._capabilities[cap_id]
             cap.state = cap_state
             if reason is not None:
                 cap.reason = reason
+            if alternatives is not None:
+                cap.alternatives = list(alternatives)
             if evidence is not None:
                 cap.evidence = list(evidence)
         else:
@@ -110,6 +162,7 @@ class CapabilityRegistry:
                 id=cap_id,
                 state=cap_state,
                 reason=reason,
+                alternatives=list(alternatives) if alternatives else [],
                 evidence=list(evidence) if evidence else [],
             )
 
@@ -142,10 +195,12 @@ class CapabilityRegistry:
             return Capability(
                 id=base_cap.id,
                 state=CapabilityState.UNAVAILABLE,
+                name=base_cap.name,
                 reason=base_cap.reason or "Capability is marked unavailable.",
                 requires=list(base_cap.requires),
                 alternatives=list(base_cap.alternatives),
                 evidence=list(base_cap.evidence),
+                is_experimental=base_cap.is_experimental,
             )
 
         effective_state = base_cap.state
@@ -177,10 +232,12 @@ class CapabilityRegistry:
         return Capability(
             id=base_cap.id,
             state=effective_state,
+            name=base_cap.name,
             reason=effective_reason,
             requires=list(base_cap.requires),
             alternatives=all_alternatives,
             evidence=list(base_cap.evidence),
+            is_experimental=base_cap.is_experimental,
         )
 
     def check_capability(self, cap_id: str) -> Capability:
