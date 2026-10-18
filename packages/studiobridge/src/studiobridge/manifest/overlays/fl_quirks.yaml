@@ -1,0 +1,157 @@
+# fl_quirks.yaml - FL Studio MIDI Controller Scripting Quirks & Overlays
+# Enforces [MAN-02]: Every overlay entry must cite empirical evidence and link to a live test or spike.
+
+- fn: transport.start
+  note: "No effect while recording is armed on some builds; stop recording first."
+  evidence:
+    - "karl-andres/fl-studio-mcp#7"
+    - "spike:S2"
+  test: tests/live/test_transport_start_recording.py
+  severity: warn
+
+- fn: channels.getChannelVolume
+  note: "Argument order/semantics differ between docs and build; probe at runtime."
+  evidence:
+    - "spike:S1"
+    - "il-api-forum-thread-10294"
+  test: tests/live/test_channel_volume_args.py
+  severity: warn
+
+- fn: mixer.setTrackVolume
+  verify:
+    getter: mixer.getTrackVolume
+    args: [0]
+    compare: approx
+    tol: 0.01
+    settle: idle1
+  note: "Applied asynchronously on some builds; verify after settle."
+  evidence:
+    - "spike:S2"
+    - "il-api-v44-errata"
+  test: tests/live/test_mixer_volume_settle.py
+  severity: info
+
+- fn: channels.setStepParameterByIndex
+  note: "Velocity may quantize; compare with tolerance."
+  evidence:
+    - "spike:S1"
+  test: tests/live/test_step_parameter_quantization.py
+  severity: warn
+
+- fn: mixer.setTrackPan
+  verify:
+    getter: mixer.getTrackPan
+    args: [0]
+    compare: approx
+    tol: 0.01
+    settle: immediate
+  note: "Pan values range [-1.0, 1.0]; verify tolerance required for float rounding."
+  evidence:
+    - "spike:S2"
+  test: tests/live/test_mixer_pan.py
+  severity: info
+
+- fn: mixer.setTrackName
+  verify:
+    getter: mixer.getTrackName
+    args: [0]
+    compare: exact
+    settle: immediate
+  note: "Mixer track name verified write."
+  evidence:
+    - "spike:S1"
+  test: tests/live/test_mixer_name.py
+  severity: info
+
+- fn: mixer.muteTrack
+  verify:
+    getter: mixer.isTrackMuted
+    args: [0]
+    compare: exact
+    settle: immediate
+  note: "Mute track toggle or explicit state."
+  evidence:
+    - "spike:S1"
+  test: tests/live/test_mixer_mute.py
+  severity: info
+
+- fn: channels.setChannelVolume
+  verify:
+    getter: channels.getChannelVolume
+    args: [0]
+    compare: approx
+    tol: 0.01
+    settle: immediate
+  note: "Channel volume verified write pair."
+  evidence:
+    - "spike:S1"
+  test: tests/live/test_channel_volume.py
+  severity: info
+
+- fn: channels.setChannelPan
+  verify:
+    getter: channels.getChannelPan
+    args: [0]
+    compare: approx
+    tol: 0.01
+    settle: immediate
+  note: "Channel pan verified write pair."
+  evidence:
+    - "spike:S1"
+  test: tests/live/test_channel_pan.py
+  severity: info
+
+- fn: channels.setChannelName
+  verify:
+    getter: channels.getChannelName
+    args: [0]
+    compare: exact
+    settle: immediate
+  note: "Channel name verified write."
+  evidence:
+    - "spike:S1"
+  test: tests/live/test_channel_name.py
+  severity: info
+
+- fn: patterns.setPatternName
+  verify:
+    getter: patterns.getPatternName
+    args: [0]
+    compare: exact
+    settle: immediate
+  note: "Pattern name verified write."
+  evidence:
+    - "spike:S1"
+  test: tests/live/test_pattern_name.py
+  severity: info
+
+- fn: transport.setSongPos
+  verify:
+    getter: transport.getSongPos
+    args: []
+    compare: approx
+    tol: 0.01
+    settle: idle1
+  note: "Song position update is asynchronous across audio engine buffer cycles."
+  evidence:
+    - "spike:S2"
+  test: tests/live/test_song_pos.py
+  severity: info
+
+- fn: general.restore
+  protected: true
+  mutating: true
+  note: "Potentially destructive undo history manipulation; protected call."
+  evidence:
+    - "spike:S1"
+    - "il-forum-undo-crash"
+  test: tests/live/test_undo_protection.py
+  severity: warn
+
+- fn: general.undo
+  mutating: true
+  note: "Direct undo manipulation changes project state without confirmation."
+  evidence:
+    - "spike:S1"
+  test: tests/live/test_general_undo.py
+  severity: warn

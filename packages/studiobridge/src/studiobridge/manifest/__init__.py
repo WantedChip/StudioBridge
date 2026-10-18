@@ -1,11 +1,25 @@
-"""API manifest schema, documentation scraper, and AST normalizer.
+"""API manifest schema, documentation scraper, AST normalizer, quirks overlay, and code generator.
 
-Provides machine-readable typed descriptors and parsing utilities for FL Studio's
-official Python MIDI controller scripting API per 05_l0c_device_script_manifest.md §11–§14.
+Provides machine-readable typed descriptors, parsing utilities, introspect-merge,
+quirks overlays, and deterministic code generation for FL Studio's MIDI scripting API
+per 05_l0c_device_script_manifest.md §11–§16.
 """
 
 from __future__ import annotations
 
+from studiobridge.manifest.codegen import (
+    generate_all,
+    generate_emulator_stubs,
+    generate_fl_consts,
+    generate_fl_init,
+    generate_sb_api,
+    generate_sdk_module,
+    generate_sdk_stubs,
+)
+from studiobridge.manifest.merge import (
+    merge_introspect,
+    merge_manifest,
+)
 from studiobridge.manifest.normalizer import (
     STANDARD_VERIFIERS,
     TYPE_ALIASES,
@@ -17,6 +31,17 @@ from studiobridge.manifest.normalizer import (
     normalize_raw_module,
     parse_python_signature,
     resolve_type_alias,
+)
+from studiobridge.manifest.overlay import (
+    DEFAULT_QUIRKS_FILE,
+    OVERLAYS_DIR,
+    OverlayEntry,
+    OverlayValidationError,
+    QuirksOverlay,
+    apply_overlay,
+    load_default_overlay,
+    load_overlay_file,
+    parse_overlay_yaml,
 )
 from studiobridge.manifest.schema import (
     ALLOWED_PARAM_TYPES,
@@ -50,6 +75,7 @@ __all__ = [
     "ArgDoc",
     "CallbackDoc",
     "DEFAULT_CACHE_DIR",
+    "DEFAULT_QUIRKS_FILE",
     "FunctionDoc",
     "HTMLTableExtractor",
     "MANIFEST_JSON_SCHEMA",
@@ -57,22 +83,39 @@ __all__ = [
     "Manifest",
     "ManifestValidationError",
     "ModuleDoc",
+    "OVERLAYS_DIR",
+    "OverlayEntry",
+    "OverlayValidationError",
+    "QuirksOverlay",
     "RawFunction",
     "RawModule",
     "STANDARD_VERIFIERS",
     "ScraperError",
     "TYPE_ALIASES",
     "VerifySpec",
+    "apply_overlay",
     "fetch_or_cache",
+    "generate_all",
+    "generate_emulator_stubs",
+    "generate_fl_consts",
+    "generate_fl_init",
     "generate_original_summary",
+    "generate_sb_api",
+    "generate_sdk_module",
+    "generate_sdk_stubs",
     "infer_arg_range",
     "infer_arg_type",
     "infer_conservative_mutating",
     "infer_ret_type",
+    "load_default_overlay",
+    "load_overlay_file",
+    "merge_introspect",
+    "merge_manifest",
     "normalize_manifest",
     "normalize_raw_function",
     "normalize_raw_module",
     "parse_html_table_doc",
+    "parse_overlay_yaml",
     "parse_python_signature",
     "resolve_type_alias",
     "validate_manifest_dict",

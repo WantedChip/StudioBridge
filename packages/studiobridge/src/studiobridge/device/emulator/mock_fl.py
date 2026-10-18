@@ -209,7 +209,7 @@ def create_mock_fl_modules(state: MockFLState) -> dict[str, types.ModuleType]:
     def _getTrackVolume(index: int) -> float:
         return state.mixer_tracks[index]["volume"]
 
-    def _setTrackVolume(index: int, volume: float) -> None:
+    def _setTrackVolume(index: int, volume: float, pickupMode: int = 0) -> None:
         state.mixer_tracks[index]["volume"] = float(volume)
 
     def _getTrackPan(index: int) -> float:
