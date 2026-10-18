@@ -1,0 +1,66 @@
+# Agent planning materials & private context (NEVER commit or push)
+.agents/
+
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+wheelhouse/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.venv/
+venv/
+ENV/
+
+# Testing & Linting
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+.ruff_cache/
+.mypy_cache/
+.pyright/
+
+# Node / Astro (Site)
+node_modules/
+.npm/
+.astro/
+
+# IDE / OS
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+Thumbs.db
+[Dd]esktop.ini
+.DS_Store
+
+# Hardware spikes / local probe dumps
+spikes/**/output.txt
+spikes/**/*.log
+spikes/**/*.raw
+!spikes/**/REPORT.md
