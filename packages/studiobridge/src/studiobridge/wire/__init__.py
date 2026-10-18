@@ -1,5 +1,29 @@
-"""Wire protocol framing, CRC, chunking, and packet codecs."""
+"""Wire protocol framing, CRC, chunking, envelopes, authentication, and session state."""
 
+from studiobridge.wire.auth import (
+    ALG_SHA256,
+    ALG_SIPHASH24,
+    AUTH_SEPARATOR,
+    SUPPORTED_ALGORITHMS,
+    UNAUTHENTICATED_OPS,
+    canonical_json,
+    compute_auth,
+    format_auth_payload,
+    sign_request,
+    siphash24,
+    verify_auth,
+    verify_request,
+)
+from studiobridge.wire.chunk import (
+    DEFAULT_MAX_PAYLOAD,
+    DEFAULT_TIMEOUT_MS,
+    DEFAULT_WINDOW_SIZE,
+    MAX_CLIENT_INBOUND,
+    MAX_DEVICE_INBOUND,
+    Reassembler,
+    ReassemblyExpiry,
+    chunk_payload,
+)
 from studiobridge.wire.crc import (
     CRC_CHECK_INPUT,
     CRC_CHECK_VALUE,
@@ -13,6 +37,19 @@ from studiobridge.wire.crc import (
     unpack_crc,
     unpack_septets_14,
     unpack_septets_21,
+)
+from studiobridge.wire.envelope import (
+    MAX_IDEM_LENGTH,
+    VALID_CONTROL_COMMANDS,
+    ControlEnvelope,
+    Envelope,
+    EventEnvelope,
+    RequestEnvelope,
+    RequestOpts,
+    ResponseEnvelope,
+    ResponseError,
+    deserialize_envelope,
+    serialize_envelope,
 )
 from studiobridge.wire.frame import (
     DEFAULT_MAX_FRAME,
@@ -31,6 +68,15 @@ from studiobridge.wire.frame import (
     decode_frame,
     encode_frame,
     try_decode_frame,
+)
+from studiobridge.wire.session import (
+    MAX_IDEMPOTENCY_CACHE_SIZE,
+    MAX_MID_VALUE,
+    MAX_SID_VALUE,
+    MUTATING_OPERATIONS,
+    Session,
+    evaluate_precondition,
+    is_mutating_operation,
 )
 
 __all__ = [
@@ -64,4 +110,46 @@ __all__ = [
     "decode_frame",
     "encode_frame",
     "try_decode_frame",
+    # Chunking & Reassembly
+    "DEFAULT_MAX_PAYLOAD",
+    "DEFAULT_TIMEOUT_MS",
+    "DEFAULT_WINDOW_SIZE",
+    "MAX_CLIENT_INBOUND",
+    "MAX_DEVICE_INBOUND",
+    "Reassembler",
+    "ReassemblyExpiry",
+    "chunk_payload",
+    # Envelopes & Serialization
+    "MAX_IDEM_LENGTH",
+    "VALID_CONTROL_COMMANDS",
+    "ControlEnvelope",
+    "Envelope",
+    "EventEnvelope",
+    "RequestEnvelope",
+    "RequestOpts",
+    "ResponseEnvelope",
+    "ResponseError",
+    "deserialize_envelope",
+    "serialize_envelope",
+    # Authentication & HMAC
+    "ALG_SHA256",
+    "ALG_SIPHASH24",
+    "AUTH_SEPARATOR",
+    "SUPPORTED_ALGORITHMS",
+    "UNAUTHENTICATED_OPS",
+    "canonical_json",
+    "compute_auth",
+    "format_auth_payload",
+    "sign_request",
+    "siphash24",
+    "verify_auth",
+    "verify_request",
+    # Session & Idempotency
+    "MAX_IDEMPOTENCY_CACHE_SIZE",
+    "MAX_MID_VALUE",
+    "MAX_SID_VALUE",
+    "MUTATING_OPERATIONS",
+    "Session",
+    "evaluate_precondition",
+    "is_mutating_operation",
 ]
