@@ -232,6 +232,7 @@ class EmbeddedBroker:
             p in {Priority.WRITE, Priority.BULK}
             and op not in {"hello", "probe", "ping", "session.info"}
             and not leaf.startswith(("get", "read", "list", "is", "probe", "info", "find", "check"))
+            and not leaf.endswith(("count", "number"))
         )
 
         # 1. Enforce single-writer lease on mutating operations

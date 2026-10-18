@@ -57,6 +57,9 @@ class MockFLState:
         self.transport_song_pos: float = 0.0
         self.transport_song_length: float = 120.0
         self.transport_loop_mode: int = 0
+        self.transport_tempo: float = 120.0
+        self.transport_metronome: bool = False
+        self.transport_time_signature: tuple[int, int] = (4, 4)
 
         # mixer state: 127 tracks
         self.mixer_tracks: list[dict[str, Any]] = []
@@ -70,6 +73,9 @@ class MockFLState:
                     "color": 0x4A5055,
                     "muted": False,
                     "solo": False,
+                    "armed": False,
+                    "peak": 0.0,
+                    "routes": dict.fromkeys(range(127), False),
                 }
             )
 
@@ -82,6 +88,9 @@ class MockFLState:
                 "color": 0x4A5055,
                 "muted": False,
                 "solo": False,
+                "pitch": 0.0,
+                "target_fx": 0,
+                "step_grid": [0] * 16,
             },
             {
                 "name": "3x Osc",
@@ -90,6 +99,9 @@ class MockFLState:
                 "color": 0x4A5055,
                 "muted": False,
                 "solo": False,
+                "pitch": 0.0,
+                "target_fx": 0,
+                "step_grid": [0] * 16,
             },
             {
                 "name": "FL Keys",
@@ -98,9 +110,13 @@ class MockFLState:
                 "color": 0x4A5055,
                 "muted": False,
                 "solo": False,
+                "pitch": 0.0,
+                "target_fx": 0,
+                "step_grid": [0] * 16,
             },
         ]
         self.channels_selected: int = 0
+        self.triggered_notes: list[dict[str, Any]] = []
 
         # patterns state
         self.patterns_list: list[dict[str, Any]] = [
@@ -178,13 +194,42 @@ def create_mock_fl_modules(state: MockFLState) -> dict[str, types.ModuleType]:
     def _getSongLength(mode: int = 0) -> float:
         return state.transport_song_length
 
-    def _setLoopMode() -> None:
-        state.transport_loop_mode = 1 if state.transport_loop_mode == 0 else 0
+    def _setLoopMode(mode: Any = -1) -> None:
+        if mode is not None and int(mode) >= 0:
+            state.transport_loop_mode = int(mode)
+        else:
+            state.transport_loop_mode = 1 if state.transport_loop_mode == 0 else 0
 
     def _getLoopMode() -> int:
         return state.transport_loop_mode
 
+    def _getTempo() -> float:
+        return state.transport_tempo
+
+    def _setTempo(bpm: float) -> None:
+        state.transport_tempo = float(bpm)
+
+    def _getMetronome() -> bool:
+        return state.transport_metronome
+
+    def _setMetronome(enabled: Any = None) -> None:
+        if enabled is None:
+            state.transport_metronome = not state.transport_metronome
+        else:
+            state.transport_metronome = bool(enabled)
+
+    def _getTimeSignature() -> list[int]:
+        return list(state.transport_time_signature)
+
     def _globalTransport(command: int, value: int = 0) -> int:
+        if command == 110:  # FPT_Metronome
+            state.transport_metronome = not state.transport_metronome
+        elif command == 10:  # FPT_Play
+            state.transport_playing = True
+        elif command == 11:  # FPT_Stop
+            state.transport_playing = False
+        elif command == 12:  # FPT_Record
+            state.transport_recording = not state.transport_recording
         return 1
 
     mod_trans.start = _start  # type: ignore
@@ -197,6 +242,11 @@ def create_mock_fl_modules(state: MockFLState) -> dict[str, types.ModuleType]:
     mod_trans.getSongLength = _getSongLength  # type: ignore
     mod_trans.setLoopMode = _setLoopMode  # type: ignore
     mod_trans.getLoopMode = _getLoopMode  # type: ignore
+    mod_trans.getTempo = _getTempo  # type: ignore
+    mod_trans.setTempo = _setTempo  # type: ignore
+    mod_trans.getMetronome = _getMetronome  # type: ignore
+    mod_trans.setMetronome = _setMetronome  # type: ignore
+    mod_trans.getTimeSignature = _getTimeSignature  # type: ignore
     mod_trans.globalTransport = _globalTransport  # type: ignore
     mods["transport"] = mod_trans
 
@@ -236,6 +286,15 @@ def create_mock_fl_modules(state: MockFLState) -> dict[str, types.ModuleType]:
         else:
             state.mixer_tracks[index]["solo"] = bool(value)
 
+    def _isTrackArmed(index: int) -> bool:
+        return state.mixer_tracks[index].get("armed", False)
+
+    def _armTrack(index: int, value: int = -1) -> None:
+        if value == -1:
+            state.mixer_tracks[index]["armed"] = not state.mixer_tracks[index].get("armed", False)
+        else:
+            state.mixer_tracks[index]["armed"] = bool(value)
+
     def _getTrackName(index: int) -> str:
         return state.mixer_tracks[index]["name"]
 
@@ -248,6 +307,20 @@ def create_mock_fl_modules(state: MockFLState) -> dict[str, types.ModuleType]:
     def _setTrackColor(index: int, color: int) -> None:
         state.mixer_tracks[index]["color"] = int(color)
 
+    def _getTrackPeaks(index: int, mode: int = 0) -> float:
+        return float(state.mixer_tracks[index].get("peak", 0.0))
+
+    def _getRouteTo(source: int, dest: int) -> bool:
+        routes = state.mixer_tracks[source].get("routes", {})
+        return bool(routes.get(dest, False))
+
+    def _setRouteTo(source: int, dest: int, value: int = 1) -> None:
+        routes = state.mixer_tracks[source].setdefault("routes", {})
+        routes[dest] = bool(value)
+
+    def _linkTrackToChannel(channel: int, track: int) -> None:
+        state.channels_list[channel]["target_fx"] = int(track)
+
     mod_mix.trackCount = _trackCount  # type: ignore
     mod_mix.getTrackVolume = _getTrackVolume  # type: ignore
     mod_mix.setTrackVolume = _setTrackVolume  # type: ignore
@@ -257,10 +330,16 @@ def create_mock_fl_modules(state: MockFLState) -> dict[str, types.ModuleType]:
     mod_mix.muteTrack = _muteTrack  # type: ignore
     mod_mix.isTrackSolo = _isTrackSolo  # type: ignore
     mod_mix.soloTrack = _soloTrack  # type: ignore
+    mod_mix.isTrackArmed = _isTrackArmed  # type: ignore
+    mod_mix.armTrack = _armTrack  # type: ignore
     mod_mix.getTrackName = _getTrackName  # type: ignore
     mod_mix.setTrackName = _setTrackName  # type: ignore
     mod_mix.getTrackColor = _getTrackColor  # type: ignore
     mod_mix.setTrackColor = _setTrackColor  # type: ignore
+    mod_mix.getTrackPeaks = _getTrackPeaks  # type: ignore
+    mod_mix.getRouteTo = _getRouteTo  # type: ignore
+    mod_mix.setRouteTo = _setRouteTo  # type: ignore
+    mod_mix.linkTrackToChannel = _linkTrackToChannel  # type: ignore
     mods["mixer"] = mod_mix
 
     # 4. channels module
@@ -311,6 +390,34 @@ def create_mock_fl_modules(state: MockFLState) -> dict[str, types.ModuleType]:
     def _setChannelColor(index: int, color: int) -> None:
         state.channels_list[index]["color"] = int(color)
 
+    def _getChannelPitch(index: int) -> float:
+        return float(state.channels_list[index].get("pitch", 0.0))
+
+    def _setChannelPitch(index: int, pitch: float) -> None:
+        state.channels_list[index]["pitch"] = float(pitch)
+
+    def _getTargetFxTrack(index: int) -> int:
+        return int(state.channels_list[index].get("target_fx", 0))
+
+    def _setTargetFxTrack(index: int, track: int) -> None:
+        state.channels_list[index]["target_fx"] = int(track)
+
+    def _triggerNote(index: int, note: int = 60, velocity: int = 100, duration: int = 1) -> None:
+        state.triggered_notes.append(
+            {
+                "channel": index,
+                "note": int(note),
+                "velocity": int(velocity),
+                "duration": int(duration),
+            }
+        )
+
+    def _getStepGrid(index: int) -> list[int]:
+        return list(state.channels_list[index].get("step_grid", [0] * 16))
+
+    def _setStepGrid(index: int, steps: list[Any]) -> None:
+        state.channels_list[index]["step_grid"] = [int(bool(s)) for s in steps]
+
     def _selectedChannel() -> int:
         return state.channels_selected
 
@@ -330,6 +437,13 @@ def create_mock_fl_modules(state: MockFLState) -> dict[str, types.ModuleType]:
     mod_chan.soloChannel = _soloChannel  # type: ignore
     mod_chan.getChannelColor = _getChannelColor  # type: ignore
     mod_chan.setChannelColor = _setChannelColor  # type: ignore
+    mod_chan.getChannelPitch = _getChannelPitch  # type: ignore
+    mod_chan.setChannelPitch = _setChannelPitch  # type: ignore
+    mod_chan.getTargetFxTrack = _getTargetFxTrack  # type: ignore
+    mod_chan.setTargetFxTrack = _setTargetFxTrack  # type: ignore
+    mod_chan.triggerNote = _triggerNote  # type: ignore
+    mod_chan.getStepGrid = _getStepGrid  # type: ignore
+    mod_chan.setStepGrid = _setStepGrid  # type: ignore
     mod_chan.selectedChannel = _selectedChannel  # type: ignore
     mod_chan.selectChannel = _selectChannel  # type: ignore
     mods["channels"] = mod_chan
@@ -358,8 +472,18 @@ def create_mock_fl_modules(state: MockFLState) -> dict[str, types.ModuleType]:
     def _getPatternLength(index: int) -> int:
         return state.patterns_list[index - 1]["length"]
 
+    def _setPatternLength(index: int, length: int) -> None:
+        state.patterns_list[index - 1]["length"] = int(length)
+
     def _jumpToPattern(index: int) -> None:
         state.patterns_current = int(index)
+
+    def _selectPattern(index: int, value: int = 1) -> None:
+        state.patterns_current = int(index)
+
+    def _clearPattern(index: int) -> None:
+        state.patterns_list[index - 1]["name"] = f"Pattern {index}"
+        state.patterns_list[index - 1]["length"] = 64
 
     mod_pat.patternCount = _patternCount  # type: ignore
     mod_pat.patternNumber = _patternNumber  # type: ignore
@@ -368,7 +492,10 @@ def create_mock_fl_modules(state: MockFLState) -> dict[str, types.ModuleType]:
     mod_pat.getPatternColor = _getPatternColor  # type: ignore
     mod_pat.setPatternColor = _setPatternColor  # type: ignore
     mod_pat.getPatternLength = _getPatternLength  # type: ignore
+    mod_pat.setPatternLength = _setPatternLength  # type: ignore
     mod_pat.jumpToPattern = _jumpToPattern  # type: ignore
+    mod_pat.selectPattern = _selectPattern  # type: ignore
+    mod_pat.clearPattern = _clearPattern  # type: ignore
     mods["patterns"] = mod_pat
 
     # 6. general module

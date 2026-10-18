@@ -16,12 +16,24 @@ from studiobridge.sdk.capabilities import (
     gate_capability,
     get_capability_for_op,
 )
+from studiobridge.sdk.channels import (
+    AsyncChannels,
+    SyncChannels,
+)
 from studiobridge.sdk.client import (
     AsyncRawApi,
     AsyncStudio,
     Studio,
     SyncRawApi,
     connect,
+)
+from studiobridge.sdk.mixer import (
+    AsyncMixer,
+    SyncMixer,
+)
+from studiobridge.sdk.patterns import (
+    AsyncPatterns,
+    SyncPatterns,
 )
 from studiobridge.sdk.session import (
     Session,
@@ -35,24 +47,46 @@ from studiobridge.sdk.trace import (
     TraceRecord,
     redact_secrets,
 )
+from studiobridge.sdk.transport import (
+    AsyncTransport,
+    SyncTransport,
+)
+from studiobridge.sdk.types import (
+    Channel,
+    MixerTrack,
+    Pattern,
+    Verified,
+)
 
 __all__ = [
     "AsyncBatchContext",
+    "AsyncChannels",
+    "AsyncMixer",
+    "AsyncPatterns",
     "AsyncRawApi",
     "AsyncStudio",
     "AsyncTraceContext",
+    "AsyncTransport",
     "BaseBatchContext",
     "BatchContext",
     "Change",
+    "Channel",
+    "MixerTrack",
+    "Pattern",
     "Session",
     "StatsAccumulator",
     "Status",
     "Studio",
     "SyncBatchContext",
+    "SyncChannels",
+    "SyncMixer",
+    "SyncPatterns",
     "SyncRawApi",
     "SyncTraceContext",
+    "SyncTransport",
     "TraceContext",
     "TraceRecord",
+    "Verified",
     "WriteReport",
     "build_write_report",
     "check_operation_capability",

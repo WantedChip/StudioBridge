@@ -25,8 +25,12 @@ from studiobridge.device.assets._sb_api import ALLOW
 from studiobridge.ports.base import MidiPort
 from studiobridge.sdk.batch import AsyncBatchContext, SyncBatchContext
 from studiobridge.sdk.capabilities import check_operation_capability
+from studiobridge.sdk.channels import AsyncChannels, SyncChannels
+from studiobridge.sdk.mixer import AsyncMixer, SyncMixer
+from studiobridge.sdk.patterns import AsyncPatterns, SyncPatterns
 from studiobridge.sdk.session import Session, Status
 from studiobridge.sdk.trace import AsyncTraceContext, SyncTraceContext
+from studiobridge.sdk.transport import AsyncTransport, SyncTransport
 
 BUILTIN_ALLOWED_OPS = {
     "hello",
@@ -168,6 +172,10 @@ class AsyncStudio:
         self._session: Session = session
         self.raw: AsyncRawApi = AsyncRawApi(session)
         self.caps: CapabilityRegistry = session.caps
+        self.transport: AsyncTransport = AsyncTransport(session)
+        self.mixer: AsyncMixer = AsyncMixer(session)
+        self.channels: AsyncChannels = AsyncChannels(session)
+        self.patterns: AsyncPatterns = AsyncPatterns(session)
 
     @property
     def session(self) -> Session:
@@ -277,6 +285,16 @@ class Studio:
         self._async = async_studio
         self.raw: SyncRawApi = SyncRawApi(portal, async_studio.raw, session=async_studio.session)
         self.caps: CapabilityRegistry = async_studio.caps
+        self.transport: SyncTransport = SyncTransport(
+            portal, async_studio.transport, session=async_studio.session
+        )
+        self.mixer: SyncMixer = SyncMixer(portal, async_studio.mixer, session=async_studio.session)
+        self.channels: SyncChannels = SyncChannels(
+            portal, async_studio.channels, session=async_studio.session
+        )
+        self.patterns: SyncPatterns = SyncPatterns(
+            portal, async_studio.patterns, session=async_studio.session
+        )
 
     @property
     def session(self) -> Session:

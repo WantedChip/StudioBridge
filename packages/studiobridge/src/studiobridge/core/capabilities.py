@@ -340,6 +340,8 @@ class CapabilityRegistry:
 # Standard capability IDs from specification
 CAP_LIVE_TRANSPORT_CONTROL = "live.transport.control"
 CAP_LIVE_MIXER_WRITE = "live.mixer.write"
+CAP_LIVE_CHANNELS = "live.channels"
+CAP_LIVE_PATTERNS = "live.patterns"
 CAP_LIVE_PLUGIN_PARAM_WRITE = "live.plugin.param.write"
 CAP_LIVE_PIANOROLL_APPLY = "live.pianoroll.apply"
 CAP_LIVE_PROJECT_SAVE = "live.project.save"
@@ -369,6 +371,16 @@ def create_default_registry() -> CapabilityRegistry:
             ),
             Capability(
                 id=CAP_LIVE_MIXER_WRITE,
+                state=CapabilityState.UNKNOWN,
+                requires=[CAP_PORT_WMS_LOOPBACK],
+            ),
+            Capability(
+                id=CAP_LIVE_CHANNELS,
+                state=CapabilityState.UNKNOWN,
+                requires=[CAP_PORT_WMS_LOOPBACK],
+            ),
+            Capability(
+                id=CAP_LIVE_PATTERNS,
                 state=CapabilityState.UNKNOWN,
                 requires=[CAP_PORT_WMS_LOOPBACK],
             ),

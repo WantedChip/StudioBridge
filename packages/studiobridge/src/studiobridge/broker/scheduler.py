@@ -74,6 +74,7 @@ def classify_priority(op: str, explicit: str | Priority | None = None) -> Priori
     if (
         op_lower.startswith(("get", "read", "is", "list", "probe", "info", "find", "check"))
         or leaf.startswith(("get", "read", "is", "list", "probe", "info", "find", "check"))
+        or leaf.endswith(("count", "number"))
         or op_lower in {"hello", "probe", "session.info", "broker.status", "capabilities.get"}
     ):
         return Priority.READ
@@ -97,16 +98,40 @@ class ScheduledRequest:
     future_event: anyio.Event = field(default_factory=anyio.Event)
     result: Any = None
     error: Exception | None = None
+    _loop: Any = field(default=None)
+
+    def __post_init__(self) -> None:
+        if self._loop is None:
+            try:
+                import asyncio
+
+                self._loop = asyncio.get_running_loop()
+            except RuntimeError:
+                self._loop = None
+
+    def _notify(self) -> None:
+        if self._loop is not None and not self._loop.is_closed():
+            try:
+                import asyncio
+
+                if asyncio.get_running_loop() is self._loop:
+                    self.future_event.set()
+                    return
+            except RuntimeError:
+                pass
+            self._loop.call_soon_threadsafe(self.future_event.set)
+        else:
+            self.future_event.set()
 
     def set_result(self, result: Any) -> None:
         """Mark request complete with a result value and unblock awaiter."""
         self.result = result
-        self.future_event.set()
+        self._notify()
 
     def set_error(self, error: Exception) -> None:
         """Mark request failed with an exception and unblock awaiter."""
         self.error = error
-        self.future_event.set()
+        self._notify()
 
 
 class TokenBucket:

@@ -176,6 +176,35 @@ ALLOW = {
             "ret": "none",
             "mutating": True,
         },
+        "triggerNote": {
+            "args": [
+                {"name": "index", "type": "int", "min": 0, "max": 999},
+                {"name": "note", "type": "int", "optional": True, "default": 60},
+                {"name": "velocity", "type": "int", "optional": True, "default": 100},
+                {"name": "duration", "type": "int", "optional": True, "default": 1},
+            ],
+            "ret": "none",
+            "mutating": True,
+        },
+        "getStepGrid": {
+            "args": [
+                {"name": "index", "type": "int", "min": 0, "max": 999},
+            ],
+            "ret": "list",
+            "mutating": False,
+        },
+        "setStepGrid": {
+            "args": [
+                {"name": "index", "type": "int", "min": 0, "max": 999},
+                {"name": "steps", "type": "list"},
+            ],
+            "ret": "none",
+            "mutating": True,
+            "getter": "channels.getStepGrid",
+            "getter_args": [0],
+            "compare": "exact",
+            "settle": "immediate",
+        },
     },
     "device": {
         "baseTrackSelect": {
@@ -487,6 +516,35 @@ ALLOW = {
             "ret": "int",
             "mutating": False,
         },
+        "getTrackPeaks": {
+            "args": [
+                {"name": "index", "type": "int", "min": 0, "max": 126},
+                {"name": "mode", "type": "int", "optional": True, "default": 0},
+            ],
+            "ret": "float",
+            "mutating": False,
+        },
+        "getRouteTo": {
+            "args": [
+                {"name": "source", "type": "int", "min": 0, "max": 126},
+                {"name": "dest", "type": "int", "min": 0, "max": 126},
+            ],
+            "ret": "bool",
+            "mutating": False,
+        },
+        "setRouteTo": {
+            "args": [
+                {"name": "source", "type": "int", "min": 0, "max": 126},
+                {"name": "dest", "type": "int", "min": 0, "max": 126},
+                {"name": "value", "type": "int", "optional": True, "default": 1},
+            ],
+            "ret": "none",
+            "mutating": True,
+            "getter": "mixer.getRouteTo",
+            "getter_args": [0, 1],
+            "compare": "exact",
+            "settle": "immediate",
+        },
     },
     "patterns": {
         "ensureValidPattern": {
@@ -576,6 +634,13 @@ ALLOW = {
             "getter_args": [0],
             "compare": "exact",
             "settle": "immediate",
+        },
+        "clearPattern": {
+            "args": [
+                {"name": "index", "type": "int", "min": 1, "max": 999},
+            ],
+            "ret": "none",
+            "mutating": True,
         },
     },
     "plugins": {
@@ -762,9 +827,15 @@ ALLOW = {
             "mutating": True,
         },
         "setLoopMode": {
-            "args": [],
+            "args": [
+                {"name": "mode", "type": "int", "optional": True, "default": -1},
+            ],
             "ret": "none",
             "mutating": True,
+            "getter": "transport.getLoopMode",
+            "getter_args": [],
+            "compare": "exact",
+            "settle": "immediate",
         },
         "setPlaybackSpeed": {
             "args": [
@@ -772,6 +843,44 @@ ALLOW = {
             ],
             "ret": "none",
             "mutating": True,
+        },
+        "getTempo": {
+            "args": [],
+            "ret": "float",
+            "mutating": False,
+        },
+        "setTempo": {
+            "args": [
+                {"name": "bpm", "type": "float"},
+            ],
+            "ret": "none",
+            "mutating": True,
+            "getter": "transport.getTempo",
+            "getter_args": [],
+            "compare": "approx",
+            "tol": 0.1,
+            "settle": "immediate",
+        },
+        "getMetronome": {
+            "args": [],
+            "ret": "bool",
+            "mutating": False,
+        },
+        "setMetronome": {
+            "args": [
+                {"name": "enabled", "type": "bool", "optional": True, "default": True},
+            ],
+            "ret": "none",
+            "mutating": True,
+            "getter": "transport.getMetronome",
+            "getter_args": [],
+            "compare": "exact",
+            "settle": "immediate",
+        },
+        "getTimeSignature": {
+            "args": [],
+            "ret": "list",
+            "mutating": False,
         },
         "setSongPos": {
             "args": [
@@ -967,6 +1076,8 @@ def coerce_args(module_name, func_name, raw_args):
                 val = bool(val)
             elif arg_type == "str":
                 val = str(val)
+            elif arg_type in ("list", "tuple"):
+                val = list(val)
         except (TypeError, ValueError) as exc:
             raise ValueError(
                 f"Invalid value for argument '{arg_spec['name']}' of "
