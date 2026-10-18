@@ -17,6 +17,7 @@ from studiobridge.cli.commands.broker import handle_broker
 from studiobridge.cli.commands.diag import handle_diag
 from studiobridge.cli.commands.doctor import handle_doctor
 from studiobridge.cli.commands.hello import handle_hello
+from studiobridge.cli.commands.manifest import handle_manifest
 from studiobridge.cli.commands.ports import handle_ports
 from studiobridge.cli.commands.probe import handle_probe
 from studiobridge.cli.commands.setup import handle_setup
@@ -180,6 +181,113 @@ def build_parser() -> argparse.ArgumentParser:
         "--skip-live", action="store_true", default=True, help="Skip live checks in bundle"
     )
     diag_p.set_defaults(handler=handle_diag)
+
+    # 9. sbridge manifest
+    manifest_p = subparsers.add_parser(
+        "manifest", help="API manifest inspection, drift detection & documentation cards"
+    )
+    manifest_sub = manifest_p.add_subparsers(
+        dest="manifest_action", metavar="<check-drift|coverage|cards|live-diff>"
+    )
+
+    # 9.1 check-drift
+    drift_p = manifest_sub.add_parser(
+        "check-drift", help="Detect API differences between baseline and candidate manifests"
+    )
+    drift_p.add_argument(
+        "--baseline",
+        type=str,
+        default=None,
+        help="Path to baseline manifest JSON (default: api_v44.json)",
+    )
+    drift_p.add_argument(
+        "--current",
+        "--candidate",
+        dest="current",
+        type=str,
+        default=None,
+        help="Path to candidate manifest JSON",
+    )
+    drift_p.add_argument(
+        "--fail-on-drift",
+        action="store_true",
+        default=False,
+        help="Exit with code 1 if any drift is detected",
+    )
+    drift_p.add_argument(
+        "--fail-on-breaking",
+        action="store_true",
+        default=False,
+        help="Exit with code 1 if breaking changes detected",
+    )
+    drift_p.add_argument(
+        "--dry-run",
+        action="store_true",
+        default=False,
+        help="Simulate check without side-effects",
+    )
+    drift_p.set_defaults(handler=handle_manifest)
+
+    # 9.2 coverage
+    cov_p = manifest_sub.add_parser(
+        "coverage",
+        help="Verify 100% parameter and return type coverage across all functions",
+    )
+    cov_p.add_argument(
+        "--manifest",
+        type=str,
+        default=None,
+        help="Path to manifest JSON (default: api_v44.json)",
+    )
+    cov_p.set_defaults(handler=handle_manifest)
+
+    # 9.3 cards
+    cards_p = manifest_sub.add_parser(
+        "cards",
+        help="Generate Markdown API reference cards for docs and MCP resources",
+    )
+    cards_p.add_argument(
+        "--manifest",
+        type=str,
+        default=None,
+        help="Path to manifest JSON (default: api_v44.json)",
+    )
+    cards_p.add_argument(
+        "--out",
+        type=str,
+        default=None,
+        help="Directory to write Markdown cards into",
+    )
+    cards_p.set_defaults(handler=handle_manifest)
+
+    # 9.4 live-diff
+    ldiff_p = manifest_sub.add_parser(
+        "live-diff",
+        help="Compare manifest against live runtime introspection payload",
+    )
+    ldiff_p.add_argument(
+        "--manifest",
+        type=str,
+        default=None,
+        help="Path to manifest JSON (default: api_v44.json)",
+    )
+    ldiff_p.add_argument(
+        "--introspect",
+        type=str,
+        required=True,
+        help="Path to runtime introspection JSON dump",
+    )
+    ldiff_p.set_defaults(handler=handle_manifest)
+
+    for p in (manifest_p, drift_p, cov_p, cards_p, ldiff_p):
+        p.add_argument(
+            "--json",
+            action="store_true",
+            default=False,
+            help="Emit output formatted as machine-readable JSON",
+        )
+
+    manifest_p.set_defaults(handler=handle_manifest)
 
     return parser
 

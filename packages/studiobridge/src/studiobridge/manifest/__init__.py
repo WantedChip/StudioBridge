@@ -1,12 +1,17 @@
-"""API manifest schema, documentation scraper, AST normalizer, quirks overlay, and code generator.
+"""API manifest schema, scraper, normalizer, overlay, drift detection, and card generator.
 
 Provides machine-readable typed descriptors, parsing utilities, introspect-merge,
-quirks overlays, and deterministic code generation for FL Studio's MIDI scripting API
-per 05_l0c_device_script_manifest.md §11–§16.
+quirks overlays, drift detection, API coverage analysis, and documentation card generation
+for FL Studio's MIDI scripting API per 05_l0c_device_script_manifest.md §11–§17.
 """
 
 from __future__ import annotations
 
+from studiobridge.manifest.cards import (
+    ApiCardsDict,
+    generate_all_cards,
+    generate_card,
+)
 from studiobridge.manifest.codegen import (
     generate_all,
     generate_emulator_stubs,
@@ -15,6 +20,18 @@ from studiobridge.manifest.codegen import (
     generate_sb_api,
     generate_sdk_module,
     generate_sdk_stubs,
+)
+from studiobridge.manifest.drift import (
+    DEFAULT_BASELINE_MANIFEST_PATH,
+    CoverageReport,
+    DriftChange,
+    DriftReport,
+    LiveDiffReport,
+    check_api_coverage,
+    compare_manifest_files,
+    compare_manifests,
+    compare_with_introspection,
+    load_baseline_manifest,
 )
 from studiobridge.manifest.merge import (
     merge_introspect,
@@ -72,12 +89,18 @@ from studiobridge.manifest.scraper import (
 __all__ = [
     "ALLOWED_PARAM_TYPES",
     "ALLOWED_RET_TYPES",
+    "ApiCardsDict",
     "ArgDoc",
     "CallbackDoc",
+    "CoverageReport",
+    "DEFAULT_BASELINE_MANIFEST_PATH",
     "DEFAULT_CACHE_DIR",
     "DEFAULT_QUIRKS_FILE",
+    "DriftChange",
+    "DriftReport",
     "FunctionDoc",
     "HTMLTableExtractor",
+    "LiveDiffReport",
     "MANIFEST_JSON_SCHEMA",
     "MANIFEST_SCHEMA_VERSION",
     "Manifest",
@@ -94,8 +117,14 @@ __all__ = [
     "TYPE_ALIASES",
     "VerifySpec",
     "apply_overlay",
+    "check_api_coverage",
+    "compare_manifest_files",
+    "compare_manifests",
+    "compare_with_introspection",
     "fetch_or_cache",
     "generate_all",
+    "generate_all_cards",
+    "generate_card",
     "generate_emulator_stubs",
     "generate_fl_consts",
     "generate_fl_init",
@@ -107,6 +136,7 @@ __all__ = [
     "infer_arg_type",
     "infer_conservative_mutating",
     "infer_ret_type",
+    "load_baseline_manifest",
     "load_default_overlay",
     "load_overlay_file",
     "merge_introspect",

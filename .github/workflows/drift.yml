@@ -1,0 +1,58 @@
+name: API Drift & Coverage
+
+on:
+  schedule:
+    - cron: "0 0 * * 0" # Weekly on Sunday at 00:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  drift-check:
+    name: API Drift Detection & Typing Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install workspace dependencies
+        run: uv sync --all-groups
+
+      - name: Verify API typing coverage (api-coverage)
+        run: uv run sbridge manifest coverage
+
+      - name: Check API drift in dry-run mode (manifest-drift)
+        id: check_drift
+        run: |
+          uv run sbridge manifest check-drift --dry-run
+
+      - name: Generate API reference cards
+        run: |
+          uv run sbridge manifest cards --out docs/api
+
+      - name: Open Automated PR if API Drift Detected
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore(manifest): sync api drift updates and regenerate cards"
+          title: "Automated API Drift Detection & Reference Sync"
+          body: |
+            ## Automated API Drift Report
+            Scheduled weekly API drift detection detected documentation changes against baseline manifest fixtures.
+
+            - **Action:** Regenerated documentation reference cards and updated manifest bindings.
+            - **Validation:** Verified 100% typing coverage via `sbridge manifest coverage`.
+          branch: "automation/api-drift-sync"
+          delete-branch: true
