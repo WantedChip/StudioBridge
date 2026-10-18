@@ -54,6 +54,7 @@ indent-style = "space"
 include = [
     "packages/studiobridge/src",
     "tests",
+    "tools",
 ]
 exclude = [
     "**/__pycache__",
@@ -62,12 +63,14 @@ exclude = [
 ]
 extraPaths = [
     "packages/studiobridge/src",
+    ".",
 ]
 pythonVersion = "3.10"
 typeCheckingMode = "standard"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]

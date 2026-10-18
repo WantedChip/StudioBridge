@@ -36,6 +36,9 @@ jobs:
       - name: Validate import layering (import-linter)
         run: uv run lint-imports
 
+      - name: Validate brand tokens
+        run: python tools/rename.py --check
+
   test:
     name: Test (${{ matrix.os }} - Py ${{ matrix.python-version }})
     needs: lint

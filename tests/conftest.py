@@ -1,8 +1,13 @@
 """StudioBridge master pytest configuration and root fixtures."""
 
 import sys
+from pathlib import Path
 
 import pytest
+
+_ROOT = Path(__file__).resolve().parent.parent
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
