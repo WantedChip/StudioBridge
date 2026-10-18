@@ -1,0 +1,176 @@
+[project]
+name = "studiobridge-workspace"
+version = "0.1.0"
+description = "StudioBridge monorepo workspace"
+requires-python = ">=3.10"
+dependencies = [
+    "studiobridge",
+]
+
+[tool.uv]
+package = false
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "hypothesis>=6.100.0",
+    "import-linter>=2.0",
+    "pyright>=1.1.370",
+    "ruff>=0.6.0",
+    "hatchling>=1.25.0",
+]
+
+[tool.uv.workspace]
+members = ["packages/studiobridge"]
+
+[tool.uv.sources]
+studiobridge = { workspace = true }
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+]
+ignore = []
+
+[tool.ruff.lint.isort]
+known-first-party = ["studiobridge"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pyright]
+include = [
+    "packages/studiobridge/src",
+    "tests",
+]
+exclude = [
+    "**/__pycache__",
+    ".venv",
+    ".agents",
+]
+extraPaths = [
+    "packages/studiobridge/src",
+]
+pythonVersion = "3.10"
+typeCheckingMode = "standard"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "winmm: tests requiring the Windows Multimedia (winmm.dll) MIDI API",
+    "live: tests requiring a running FL Studio instance and live hardware/loopback",
+    "emulator: tests running inside the FL Studio controller script emulator",
+]
+addopts = "-ra --strict-markers"
+
+[tool.importlinter]
+root_packages = ["studiobridge"]
+
+[[tool.importlinter.contracts]]
+name = "Core layer has no dependencies on higher layers"
+type = "forbidden"
+source_modules = ["studiobridge.core"]
+forbidden_modules = [
+    "studiobridge.wire",
+    "studiobridge.ports",
+    "studiobridge.broker",
+    "studiobridge.device",
+    "studiobridge.manifest",
+    "studiobridge.pianoroll",
+    "studiobridge.actuate",
+    "studiobridge.render",
+    "studiobridge.flp",
+    "studiobridge.setup",
+    "studiobridge.sdk",
+    "studiobridge.mcp",
+    "studiobridge.cli",
+    "studiobridge.http",
+    "studiobridge.agents",
+]
+
+[[tool.importlinter.contracts]]
+name = "Wire depends only on core"
+type = "forbidden"
+source_modules = ["studiobridge.wire"]
+forbidden_modules = [
+    "studiobridge.ports",
+    "studiobridge.broker",
+    "studiobridge.device",
+    "studiobridge.manifest",
+    "studiobridge.pianoroll",
+    "studiobridge.actuate",
+    "studiobridge.render",
+    "studiobridge.flp",
+    "studiobridge.setup",
+    "studiobridge.sdk",
+    "studiobridge.mcp",
+    "studiobridge.cli",
+    "studiobridge.http",
+    "studiobridge.agents",
+]
+
+[[tool.importlinter.contracts]]
+name = "Ports depends only on core"
+type = "forbidden"
+source_modules = ["studiobridge.ports"]
+forbidden_modules = [
+    "studiobridge.wire",
+    "studiobridge.broker",
+    "studiobridge.device",
+    "studiobridge.manifest",
+    "studiobridge.pianoroll",
+    "studiobridge.actuate",
+    "studiobridge.render",
+    "studiobridge.flp",
+    "studiobridge.setup",
+    "studiobridge.sdk",
+    "studiobridge.mcp",
+    "studiobridge.cli",
+    "studiobridge.http",
+    "studiobridge.agents",
+]
+
+[[tool.importlinter.contracts]]
+name = "Device code remains fully isolated"
+type = "forbidden"
+source_modules = ["studiobridge.device"]
+forbidden_modules = [
+    "studiobridge.core",
+    "studiobridge.wire",
+    "studiobridge.ports",
+    "studiobridge.broker",
+    "studiobridge.manifest",
+    "studiobridge.pianoroll",
+    "studiobridge.actuate",
+    "studiobridge.render",
+    "studiobridge.flp",
+    "studiobridge.setup",
+    "studiobridge.sdk",
+    "studiobridge.mcp",
+    "studiobridge.cli",
+    "studiobridge.http",
+    "studiobridge.agents",
+]
+
+[[tool.importlinter.contracts]]
+name = "Wire and Ports are independent"
+type = "independence"
+modules = [
+    "studiobridge.wire",
+    "studiobridge.ports",
+]
