@@ -1,0 +1,105 @@
+"""FL Studio Piano Roll script probe for S1 hardware spike.
+
+Investigates Python interpreter environment, standard imports,
+flpianoroll module availability, and filesystem I/O within the
+Piano Roll script context.
+"""
+
+import sys
+
+
+def _try(label, fn):
+    try:
+        r = fn()
+        print(f"[SBP-PR] {label}: OK {'' if r is None else r}")
+    except Exception as e:
+        print(f"[SBP-PR] {label}: FAIL {type(e).__name__}: {str(e)[:90]}")
+
+
+def _imp(m):
+    __import__(m)
+
+
+def run_probe():
+    try:
+        print("[SBP-PR] version:", sys.version.replace("\n", " ")[:100])
+        names = sorted(sys.builtin_module_names)
+        print(f"[SBP-PR] builtin({len(names)}): {','.join(names)}")
+
+        # Test Piano Roll specific module
+        def _check_pr():
+            import flpianoroll
+
+            return f"flpianoroll.Score={hasattr(flpianoroll, 'Score')}"
+
+        _try("import flpianoroll", _check_pr)
+
+        for m in (
+            "socket",
+            "_socket",
+            "select",
+            "threading",
+            "_thread",
+            "os",
+            "nt",
+            "posix",
+            "subprocess",
+            "ctypes",
+            "json",
+            "_json",
+            "hmac",
+            "hashlib",
+            "_hashlib",
+            "_sha256",
+            "_sha1",
+            "_md5",
+            "_blake2",
+            "struct",
+            "binascii",
+            "zlib",
+            "base64",
+            "re",
+            "time",
+            "datetime",
+            "itertools",
+            "collections",
+            "functools",
+            "random",
+            "math",
+            "array",
+            "io",
+            "_io",
+            "pathlib",
+            "traceback",
+            "contextlib",
+            "enum",
+            "dataclasses",
+            "typing",
+        ):
+            _try("import " + m, lambda m=m: _imp(m))
+
+        _try("sys.path[:6]", lambda: sys.path[:6])
+        _try("__file__", lambda: globals().get("__file__"))
+        _try("len(sys.modules)", lambda: len(sys.modules))
+
+        for label, path in (
+            ("rel", "sbp_pr_rel.txt"),
+            ("public", "C:\\Users\\Public\\sbp_pr_pub.txt"),
+        ):
+
+            def w(path=path):
+                with open(path, "w") as f:
+                    f.write("x_pr")
+                with open(path) as f:
+                    d = f.read()
+                return f"wrote+read={d!r}"
+
+            _try("file " + label, w)
+
+        print("[SBP-PR] done")
+    except Exception as e:
+        print("[SBP-PR] FATAL", type(e).__name__, str(e)[:90])
+
+
+# Execute probe when script is run from Piano Roll Tools or CLI
+run_probe()

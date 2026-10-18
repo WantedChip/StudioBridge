@@ -1,0 +1,54 @@
+﻿{
+    "Timestamp":  "2026-10-18T16:41:30Z",
+    "Host":  "LAPTOP-POB35TC2",
+    "MachineType":  "Machine A (ARM64 Snapdragon)",
+    "OS":  {
+               "Caption":  "Microsoft Windows 11 Pro",
+               "Version":  "10.0.26200",
+               "Build":  "26200.9445",
+               "Architecture":  "ARM 64-bit Processor"
+           },
+    "CPU":  {
+                "Name":  "Snapdragon(R) X Plus - X1P42100 - Qualcomm(R) Oryon(TM) CPU",
+                "Architecture":  "ARM64",
+                "EnvironmentArch":  "ARM64"
+            },
+    "Python":  {
+                   "Path":  "C:\\Users\\Lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+                   "Version":  "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+                   "Architecture":  "ARM64",
+                   "RunningUnderPrism":  false,
+                   "PyLauncherInstalled":  true,
+                   "PyList":  [
+                                  " -V:3.12 *        C:\\Users\\Lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+                                  " -V:Astral/CPython3.11.16 C:\\Users\\Lenovo\\AppData\\Roaming\\uv\\python\\cpython-3.11.16-windows-x86_64-none\\python.exe"
+                              ]
+               },
+    "Toolchain":  {
+                      "Uv":  "uv 0.12.5 (210d1f678 2026-08-14 x86_64-pc-windows-msvc)",
+                      "Node":  "v22.22.2",
+                      "NodeArch":  "arm64"
+                  },
+    "MIDI":  {
+                 "MidisrvStatus":  "Running",
+                 "MidisrvStartType":  "Manual",
+                 "WmsRegistryPresent":  true
+             },
+    "FLStudio":  {
+                     "InstalledVersions":  [
+                                               {
+                                                   "Path":  "C:\\Program Files\\Image-Line\\FL Studio 2026",
+                                                   "Version":  "26.1.3.5570",
+                                                   "FileVersion":  "26.1.3.5570"
+                                               }
+                                           ],
+                     "UserDataFolder":  "C:\\Users\\Lenovo\\Documents\\Image-Line\\FL Studio",
+                     "UserDataExists":  true,
+                     "RegistryVersions":  [
+                                              "FL Studio 26"
+                                          ],
+                     "RunningProcesses":  [
+
+                                          ]
+                 }
+}
