@@ -1,0 +1,34 @@
+[
+  {
+    "name": "vector_1",
+    "description": "REQ, session 0, MID 1, single chunk, payload {\"op\":\"ping\"} (35 bytes)",
+    "hex": "F0 7D 53 42 01 01 00 00 00 00 00 01 00 00 00 01 00 0D 7B 22 6F 70 22 3A 22 70 69 6E 67 22 7D 00 40 17 F7",
+    "kind": 1,
+    "kind_name": "REQ",
+    "flags": 0,
+    "sid": 0,
+    "mid": 1,
+    "cidx": 0,
+    "ccnt": 1,
+    "payload_len": 13,
+    "payload": "{\"op\":\"ping\"}",
+    "crc": 8215,
+    "crc_hex": "0x2017"
+  },
+  {
+    "name": "vector_2",
+    "description": "RES, session 0x1234, MID 5, chunk 0 of 2 (63 bytes), payload {\"ok\":true,\"r\":{\"device\":{\"build\":\"0.1.0\"",
+    "hex": "F0 7D 53 42 01 02 00 24 34 00 00 05 00 00 00 02 00 29 7B 22 6F 6B 22 3A 74 72 75 65 2C 22 72 22 3A 7B 22 64 65 76 69 63 65 22 3A 7B 22 62 75 69 6C 64 22 3A 22 30 2E 31 2E 30 22 02 50 37 F7",
+    "kind": 2,
+    "kind_name": "RES",
+    "flags": 0,
+    "sid": 4660,
+    "mid": 5,
+    "cidx": 0,
+    "ccnt": 2,
+    "payload_len": 41,
+    "payload": "{\"ok\":true,\"r\":{\"device\":{\"build\":\"0.1.0\"",
+    "crc": 43063,
+    "crc_hex": "0xA837"
+  }
+]
