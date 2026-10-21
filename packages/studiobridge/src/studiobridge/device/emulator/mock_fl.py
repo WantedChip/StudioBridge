@@ -133,6 +133,54 @@ class MockFLState:
         self.ui_version: int = 44
         self.ui_focused: int = 0
         self.ui_windows: dict[int, bool] = {0: True, 1: True, 2: False}
+        self.ui_hint: str = ""
+
+        # plugins state: keyed by (track_or_channel_index, slot_index)
+        self.plugins_slots: dict[tuple[int, int], dict[str, Any]] = {
+            (0, 0): {
+                "name": "Fruity Limiter",
+                "color": 0x4A5055,
+                "presets": ["Default", "Slow Attack", "Punchy"],
+                "params": {
+                    0: {"name": "Ceiling", "value": 0.9, "text": "0.0 dB"},
+                    1: {"name": "Gain", "value": 0.5, "text": "0.0 dB"},
+                    2: {"name": "Attack", "value": 0.2, "text": "2.0 ms"},
+                    3: {"name": "Release", "value": 0.4, "text": "200 ms"},
+                },
+            },
+            (1, 0): {
+                "name": "Fruity Parametric EQ 2",
+                "color": 0x4A5055,
+                "presets": ["Default", "Warm Vintage"],
+                "params": {
+                    0: {"name": "Band 1 Gain", "value": 0.5, "text": "0.0 dB"},
+                    1: {"name": "Band 1 Freq", "value": 0.3, "text": "100 Hz"},
+                    2: {"name": "Band 2 Gain", "value": 0.5, "text": "0.0 dB"},
+                },
+            },
+            (0, -1): {
+                "name": "Sampler",
+                "color": 0x4A5055,
+                "presets": ["Default"],
+                "params": {
+                    0: {"name": "Pitch", "value": 0.5, "text": "0 cents"},
+                },
+            },
+        }
+
+        # project state
+        self.project_title: str = "My Project"
+        self.project_author: str = "Producer"
+        self.project_comment: str = "Demo Project"
+        self.project_dirty: bool = False
+        self.project_version_counter: int = 1
+
+        # playlist state: 1-based indexing, 32 tracks
+        self.playlist_tracks: list[dict[str, Any]] = [
+            {"name": f"Track {i}", "color": 0x4A5055, "muted": False, "solo": False}
+            for i in range(1, 33)
+        ]
+        self.placed_clips: list[dict[str, Any]] = []
 
     def reset(self) -> None:
         """Reset state to defaults."""
@@ -519,12 +567,20 @@ def create_mock_fl_modules(state: MockFLState) -> dict[str, types.ModuleType]:
     def _undoUp() -> None:
         pass
 
+    def _getChangedFlag() -> int:
+        return 1 if state.project_dirty else 0
+
+    def _clearChangedFlag() -> None:
+        state.project_dirty = False
+
     mod_gen.getVersion = _getVersion  # type: ignore
     mod_gen.getRecPPQ = _getRecPPQ  # type: ignore
     mod_gen.saveUndo = _saveUndo  # type: ignore
     mod_gen.undo = _undo  # type: ignore
     mod_gen.redo = _redo  # type: ignore
     mod_gen.undoUp = _undoUp  # type: ignore
+    mod_gen.getChangedFlag = _getChangedFlag  # type: ignore
+    mod_gen.clearChangedFlag = _clearChangedFlag  # type: ignore
     mods["general"] = mod_gen
 
     # 7. ui module
@@ -548,12 +604,174 @@ def create_mock_fl_modules(state: MockFLState) -> dict[str, types.ModuleType]:
     def _getVisible(window: int) -> bool:
         return state.ui_windows.get(window, False)
 
+    def _setHintMsg(msg: str) -> None:
+        state.ui_hint = str(msg)
+
     mod_ui.getVersion = _ui_getVersion  # type: ignore
     mod_ui.getFocused = _getFocused  # type: ignore
     mod_ui.setFocused = _setFocused  # type: ignore
     mod_ui.showWindow = _showWindow  # type: ignore
     mod_ui.hideWindow = _hideWindow  # type: ignore
     mod_ui.getVisible = _getVisible  # type: ignore
+    mod_ui.setHintMsg = _setHintMsg  # type: ignore
     mods["ui"] = mod_ui
+
+    # 8. plugins module
+    mod_plug = types.ModuleType("plugins")
+
+    def _isValid(index: int, slot: int = -1) -> bool:
+        return (int(index), int(slot)) in state.plugins_slots
+
+    def _getPluginName(index: int, slot: int = -1) -> str:
+        return state.plugins_slots.get((int(index), int(slot)), {}).get("name", "")
+
+    def _plug_getName(index: int, slot: int = -1) -> str:
+        return state.plugins_slots.get((int(index), int(slot)), {}).get("name", "")
+
+    def _getColor(index: int, slot: int = -1) -> int:
+        return state.plugins_slots.get((int(index), int(slot)), {}).get("color", 0)
+
+    def _getColorName(index: int, slot: int = -1) -> str:
+        return "Default"
+
+    def _getParamCount(index: int, slot: int = -1) -> int:
+        return len(state.plugins_slots.get((int(index), int(slot)), {}).get("params", {}))
+
+    def _getParamName(paramIndex: int, index: int, slot: int = -1) -> str:
+        params = state.plugins_slots.get((int(index), int(slot)), {}).get("params", {})
+        return params.get(int(paramIndex), {}).get("name", f"Param {paramIndex}")
+
+    def _getParamValue(paramIndex: int, index: int, slot: int = -1) -> float:
+        params = state.plugins_slots.get((int(index), int(slot)), {}).get("params", {})
+        return float(params.get(int(paramIndex), {}).get("value", 0.0))
+
+    def _getParamValueText(paramIndex: int, index: int, slot: int = -1) -> str:
+        params = state.plugins_slots.get((int(index), int(slot)), {}).get("params", {})
+        param = params.get(int(paramIndex), {})
+        return str(param.get("text", f"{float(param.get('value', 0.0)):.2f}"))
+
+    def _setParamValue(value: float, paramIndex: int, index: int, slot: int = -1) -> None:
+        key = (int(index), int(slot))
+        plugin = state.plugins_slots.setdefault(
+            key,
+            {"name": "Plugin", "color": 0, "presets": [], "params": {}},
+        )
+        param = plugin["params"].setdefault(
+            int(paramIndex),
+            {"name": f"Param {paramIndex}", "value": 0.0, "text": ""},
+        )
+        param["value"] = float(value)
+        param["text"] = f"{float(value):.2f}"
+
+    def _getPresetCount(index: int, slot: int = -1) -> int:
+        return len(state.plugins_slots.get((int(index), int(slot)), {}).get("presets", []))
+
+    def _getPresetName(presetIndex: int, index: int, slot: int = -1) -> str:
+        presets = state.plugins_slots.get((int(index), int(slot)), {}).get("presets", [])
+        p_idx = int(presetIndex)
+        return presets[p_idx] if 0 <= p_idx < len(presets) else ""
+
+    def _showEditor(index: int, slot: int = -1) -> None:
+        pass
+
+    mod_plug.isValid = _isValid  # type: ignore
+    mod_plug.getPluginName = _getPluginName  # type: ignore
+    mod_plug.getName = _plug_getName  # type: ignore
+    mod_plug.getColor = _getColor  # type: ignore
+    mod_plug.getColorName = _getColorName  # type: ignore
+    mod_plug.getParamCount = _getParamCount  # type: ignore
+    mod_plug.getParamName = _getParamName  # type: ignore
+    mod_plug.getParamValue = _getParamValue  # type: ignore
+    mod_plug.getParamValueText = _getParamValueText  # type: ignore
+    mod_plug.setParamValue = _setParamValue  # type: ignore
+    mod_plug.getPresetCount = _getPresetCount  # type: ignore
+    mod_plug.getPresetName = _getPresetName  # type: ignore
+    mod_plug.showEditor = _showEditor  # type: ignore
+    mods["plugins"] = mod_plug
+
+    # 9. project module
+    mod_proj = types.ModuleType("project")
+
+    def _getTitle() -> str:
+        return state.project_title
+
+    def _getAuthor() -> str:
+        return state.project_author
+
+    def _getComment() -> str:
+        return state.project_comment
+
+    def _isDirty() -> bool:
+        return state.project_dirty
+
+    def _save() -> None:
+        state.project_dirty = False
+
+    def _saveNewVersion() -> None:
+        state.project_version_counter += 1
+        state.project_dirty = False
+
+    mod_proj.getTitle = _getTitle  # type: ignore
+    mod_proj.getAuthor = _getAuthor  # type: ignore
+    mod_proj.getComment = _getComment  # type: ignore
+    mod_proj.isDirty = _isDirty  # type: ignore
+    mod_proj.save = _save  # type: ignore
+    mod_proj.saveNewVersion = _saveNewVersion  # type: ignore
+    mods["project"] = mod_proj
+
+    # 10. playlist module
+    mod_play = types.ModuleType("playlist")
+
+    def _playlist_trackCount() -> int:
+        return len(state.playlist_tracks)
+
+    def _playlist_getTrackName(index: int) -> str:
+        return state.playlist_tracks[int(index) - 1]["name"]
+
+    def _playlist_setTrackName(index: int, name: str) -> None:
+        state.playlist_tracks[int(index) - 1]["name"] = str(name)
+
+    def _playlist_getTrackColor(index: int) -> int:
+        return state.playlist_tracks[int(index) - 1]["color"]
+
+    def _playlist_setTrackColor(index: int, color: int) -> None:
+        state.playlist_tracks[int(index) - 1]["color"] = int(color)
+
+    def _playlist_isTrackMuted(index: int) -> bool:
+        return state.playlist_tracks[int(index) - 1]["muted"]
+
+    def _playlist_muteTrack(index: int, value: int = -1) -> None:
+        idx = int(index) - 1
+        if value == -1:
+            state.playlist_tracks[idx]["muted"] = not state.playlist_tracks[idx]["muted"]
+        else:
+            state.playlist_tracks[idx]["muted"] = bool(value)
+
+    def _playlist_isTrackSolo(index: int) -> bool:
+        return state.playlist_tracks[int(index) - 1]["solo"]
+
+    def _playlist_soloTrack(index: int, value: int = -1) -> None:
+        idx = int(index) - 1
+        if value == -1:
+            state.playlist_tracks[idx]["solo"] = not state.playlist_tracks[idx]["solo"]
+        else:
+            state.playlist_tracks[idx]["solo"] = bool(value)
+
+    def _playlist_placePattern(pattern: int, track: int, time: float = 0.0) -> None:
+        state.placed_clips.append(
+            {"pattern": int(pattern), "track": int(track), "time": float(time)}
+        )
+
+    mod_play.trackCount = _playlist_trackCount  # type: ignore
+    mod_play.getTrackName = _playlist_getTrackName  # type: ignore
+    mod_play.setTrackName = _playlist_setTrackName  # type: ignore
+    mod_play.getTrackColor = _playlist_getTrackColor  # type: ignore
+    mod_play.setTrackColor = _playlist_setTrackColor  # type: ignore
+    mod_play.isTrackMuted = _playlist_isTrackMuted  # type: ignore
+    mod_play.muteTrack = _playlist_muteTrack  # type: ignore
+    mod_play.isTrackSolo = _playlist_isTrackSolo  # type: ignore
+    mod_play.soloTrack = _playlist_soloTrack  # type: ignore
+    mod_play.placePattern = _playlist_placePattern  # type: ignore
+    mods["playlist"] = mod_play
 
     return mods

@@ -694,6 +694,15 @@ ALLOW = {
             "ret": "float",
             "mutating": False,
         },
+        "getParamValueText": {
+            "args": [
+                {"name": "paramIndex", "type": "int"},
+                {"name": "index", "type": "int", "min": 0, "max": 999},
+                {"name": "slot", "type": "int", "optional": True, "default": -1},
+            ],
+            "ret": "str",
+            "mutating": False,
+        },
         "getPluginName": {
             "args": [
                 {"name": "index", "type": "int", "min": 0, "max": 999},
@@ -1006,6 +1015,134 @@ ALLOW = {
                 {"name": "window", "type": "int"},
                 {"name": "mode", "type": "int"},
             ],
+            "ret": "none",
+            "mutating": True,
+        },
+        "setHintMsg": {
+            "args": [
+                {"name": "msg", "type": "str"},
+            ],
+            "ret": "none",
+            "mutating": True,
+        },
+    },
+    "playlist": {
+        "getTrackColor": {
+            "args": [
+                {"name": "index", "type": "int", "min": 1, "max": 999},
+            ],
+            "ret": "int",
+            "mutating": False,
+        },
+        "getTrackName": {
+            "args": [
+                {"name": "index", "type": "int", "min": 1, "max": 999},
+            ],
+            "ret": "str",
+            "mutating": False,
+        },
+        "isTrackMuted": {
+            "args": [
+                {"name": "index", "type": "int", "min": 1, "max": 999},
+            ],
+            "ret": "bool",
+            "mutating": False,
+        },
+        "isTrackSolo": {
+            "args": [
+                {"name": "index", "type": "int", "min": 1, "max": 999},
+            ],
+            "ret": "bool",
+            "mutating": False,
+        },
+        "muteTrack": {
+            "args": [
+                {"name": "index", "type": "int", "min": 1, "max": 999},
+                {"name": "value", "type": "int", "optional": True, "default": -1},
+            ],
+            "ret": "none",
+            "mutating": True,
+            "getter": "playlist.isTrackMuted",
+            "getter_args": [0],
+            "compare": "exact",
+            "settle": "immediate",
+        },
+        "placePattern": {
+            "args": [
+                {"name": "pattern", "type": "int", "min": 1, "max": 999},
+                {"name": "track", "type": "int", "min": 1, "max": 999},
+                {"name": "time", "type": "float", "optional": True, "default": 0.0},
+            ],
+            "ret": "none",
+            "mutating": True,
+        },
+        "setTrackColor": {
+            "args": [
+                {"name": "index", "type": "int", "min": 1, "max": 999},
+                {"name": "color", "type": "int"},
+            ],
+            "ret": "none",
+            "mutating": True,
+            "getter": "playlist.getTrackColor",
+            "getter_args": [0],
+            "compare": "exact",
+            "settle": "immediate",
+        },
+        "setTrackName": {
+            "args": [
+                {"name": "index", "type": "int", "min": 1, "max": 999},
+                {"name": "name", "type": "str"},
+            ],
+            "ret": "none",
+            "mutating": True,
+            "getter": "playlist.getTrackName",
+            "getter_args": [0],
+            "compare": "exact",
+            "settle": "immediate",
+        },
+        "soloTrack": {
+            "args": [
+                {"name": "index", "type": "int", "min": 1, "max": 999},
+                {"name": "value", "type": "int", "optional": True, "default": -1},
+            ],
+            "ret": "none",
+            "mutating": True,
+        },
+        "trackCount": {
+            "args": [],
+            "ret": "int",
+            "mutating": False,
+        },
+    },
+    "project": {
+        "getAuthor": {
+            "args": [],
+            "ret": "str",
+            "mutating": False,
+        },
+        "getComment": {
+            "args": [],
+            "ret": "str",
+            "mutating": False,
+        },
+        "getTitle": {
+            "args": [],
+            "ret": "str",
+            "mutating": False,
+        },
+        "isDirty": {
+            "args": [],
+            "ret": "bool",
+            "mutating": False,
+        },
+        "save": {
+            "args": [],
+            "ret": "none",
+            "mutating": True,
+            "protected": True,
+        },
+        "saveNewVersion": {
+            "args": [],
             "ret": "none",
             "mutating": True,
         },

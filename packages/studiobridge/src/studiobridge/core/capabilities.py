@@ -352,6 +352,9 @@ CAP_RENDER_CLI = "render.cli"
 CAP_ACTUATE_KEYSTROKE = "actuate.keystroke"
 CAP_SANDBOX_FILE_IO = "sandbox.file_io"
 CAP_PORT_WMS_LOOPBACK = "port.wms.loopback"
+CAP_LIVE_PROJECT = "live.project"
+CAP_LIVE_UI = "live.ui"
+CAP_EXPERIMENTAL_PLAYLIST_PLACE = "experimental.playlist_place"
 
 
 def create_default_registry() -> CapabilityRegistry:
@@ -404,6 +407,23 @@ def create_default_registry() -> CapabilityRegistry:
                 id=CAP_LIVE_PLAYLIST_CLIP_PLACE,
                 state=CapabilityState.UNKNOWN,
                 requires=[CAP_PORT_WMS_LOOPBACK],
+            ),
+            Capability(
+                id=CAP_LIVE_PROJECT,
+                state=CapabilityState.UNKNOWN,
+                requires=[CAP_PORT_WMS_LOOPBACK],
+            ),
+            Capability(
+                id=CAP_LIVE_UI,
+                state=CapabilityState.UNKNOWN,
+                requires=[CAP_PORT_WMS_LOOPBACK],
+            ),
+            Capability(
+                id=CAP_EXPERIMENTAL_PLAYLIST_PLACE,
+                state=CapabilityState.DEGRADED,
+                is_experimental=True,
+                reason="Feature flag experimental.playlist_place is disabled.",
+                alternatives=["Enable experimental capability 'experimental.playlist_place'"],
             ),
             Capability(
                 id=CAP_OFFLINE_FLP_READ,

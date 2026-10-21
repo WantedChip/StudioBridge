@@ -28,9 +28,13 @@ from studiobridge.sdk.capabilities import check_operation_capability
 from studiobridge.sdk.channels import AsyncChannels, SyncChannels
 from studiobridge.sdk.mixer import AsyncMixer, SyncMixer
 from studiobridge.sdk.patterns import AsyncPatterns, SyncPatterns
+from studiobridge.sdk.playlist import AsyncPlaylist, SyncPlaylist
+from studiobridge.sdk.plugins import AsyncPlugins, SyncPlugins
+from studiobridge.sdk.project import AsyncProject, SyncProject
 from studiobridge.sdk.session import Session, Status
 from studiobridge.sdk.trace import AsyncTraceContext, SyncTraceContext
 from studiobridge.sdk.transport import AsyncTransport, SyncTransport
+from studiobridge.sdk.ui import AsyncUi, SyncUi
 
 BUILTIN_ALLOWED_OPS = {
     "hello",
@@ -176,6 +180,10 @@ class AsyncStudio:
         self.mixer: AsyncMixer = AsyncMixer(session)
         self.channels: AsyncChannels = AsyncChannels(session)
         self.patterns: AsyncPatterns = AsyncPatterns(session)
+        self.plugins: AsyncPlugins = AsyncPlugins(session)
+        self.project: AsyncProject = AsyncProject(session)
+        self.playlist: AsyncPlaylist = AsyncPlaylist(session)
+        self.ui: AsyncUi = AsyncUi(session)
 
     @property
     def session(self) -> Session:
@@ -295,6 +303,16 @@ class Studio:
         self.patterns: SyncPatterns = SyncPatterns(
             portal, async_studio.patterns, session=async_studio.session
         )
+        self.plugins: SyncPlugins = SyncPlugins(
+            portal, async_studio.plugins, session=async_studio.session
+        )
+        self.project: SyncProject = SyncProject(
+            portal, async_studio.project, session=async_studio.session
+        )
+        self.playlist: SyncPlaylist = SyncPlaylist(
+            portal, async_studio.playlist, session=async_studio.session
+        )
+        self.ui: SyncUi = SyncUi(portal, async_studio.ui, session=async_studio.session)
 
     @property
     def session(self) -> Session:

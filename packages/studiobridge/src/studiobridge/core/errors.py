@@ -605,7 +605,7 @@ class DegradedError(CapabilityError):
     default_code: str = "E_DEGRADED"
 
 
-class ExperimentalDisabledError(CapabilityError):
+class ExperimentalDisabledError(UnavailableError):
     """Raised when an experimental feature is invoked while disabled."""
 
     default_code: str = "E_EXPERIMENTAL"

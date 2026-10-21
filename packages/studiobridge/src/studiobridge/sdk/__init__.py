@@ -35,6 +35,18 @@ from studiobridge.sdk.patterns import (
     AsyncPatterns,
     SyncPatterns,
 )
+from studiobridge.sdk.playlist import (
+    AsyncPlaylist,
+    SyncPlaylist,
+)
+from studiobridge.sdk.plugins import (
+    AsyncPlugins,
+    SyncPlugins,
+)
+from studiobridge.sdk.project import (
+    AsyncProject,
+    SyncProject,
+)
 from studiobridge.sdk.session import (
     Session,
     Status,
@@ -55,7 +67,16 @@ from studiobridge.sdk.types import (
     Channel,
     MixerTrack,
     Pattern,
+    PlaylistTrack,
+    PluginInfo,
+    PluginParam,
+    ProjectInfo,
+    Slot,
     Verified,
+)
+from studiobridge.sdk.ui import (
+    AsyncUi,
+    SyncUi,
 )
 
 __all__ = [
@@ -63,17 +84,26 @@ __all__ = [
     "AsyncChannels",
     "AsyncMixer",
     "AsyncPatterns",
+    "AsyncPlaylist",
+    "AsyncPlugins",
+    "AsyncProject",
     "AsyncRawApi",
     "AsyncStudio",
     "AsyncTraceContext",
     "AsyncTransport",
+    "AsyncUi",
     "BaseBatchContext",
     "BatchContext",
     "Change",
     "Channel",
     "MixerTrack",
     "Pattern",
+    "PlaylistTrack",
+    "PluginInfo",
+    "PluginParam",
+    "ProjectInfo",
     "Session",
+    "Slot",
     "StatsAccumulator",
     "Status",
     "Studio",
@@ -81,9 +111,13 @@ __all__ = [
     "SyncChannels",
     "SyncMixer",
     "SyncPatterns",
+    "SyncPlaylist",
+    "SyncPlugins",
+    "SyncProject",
     "SyncRawApi",
     "SyncTraceContext",
     "SyncTransport",
+    "SyncUi",
     "TraceContext",
     "TraceRecord",
     "Verified",

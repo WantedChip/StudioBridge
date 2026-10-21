@@ -126,9 +126,97 @@ class Pattern:
         return self.number
 
 
+@dataclass
+class PlaylistTrack:
+    """Playlist track identity reference object per 09_l1_sdk.md §3.2.
+
+    1-based indexing per FL Studio conventions (Track 1, Track 2, ...).
+    """
+
+    number: int
+    name: str = ""
+    color: int = 0
+    muted: bool = False
+    solo: bool = False
+
+    def __post_init__(self) -> None:
+        if self.number < 1:
+            raise ValueError(f"PlaylistTrack number must be >= 1 (1-based), got {self.number}")
+
+    @property
+    def index(self) -> int:
+        """Alias for track number."""
+        return self.number
+
+    def __int__(self) -> int:
+        return self.number
+
+    def __index__(self) -> int:
+        return self.number
+
+
+@dataclass(frozen=True)
+class Slot:
+    """Effect slot identity reference object per 09_l1_sdk.md §3.2.
+
+    0-based indexing: track = mixer track index (0..126), slot = effect slot index (0..9).
+    """
+
+    track: int
+    slot: int
+
+    def __post_init__(self) -> None:
+        if self.track < 0:
+            raise ValueError(f"Slot track index must be non-negative (0-based), got {self.track}")
+        if self.slot < 0:
+            raise ValueError(f"Slot slot index must be non-negative (0-based), got {self.slot}")
+
+
+@dataclass
+class PluginInfo:
+    """Information about a plugin loaded in a mixer slot or channel."""
+
+    track: int
+    slot: int
+    name: str = ""
+    param_count: int = 0
+    is_valid: bool = True
+    color: int = 0
+    preset_count: int = 0
+
+
+@dataclass
+class PluginParam:
+    """Plugin parameter metadata and value."""
+
+    track: int
+    slot: int
+    param_id: int
+    name: str = ""
+    value: float = 0.0
+    min_value: float = 0.0
+    max_value: float = 1.0
+    text: str = ""
+
+
+@dataclass
+class ProjectInfo:
+    """Project metadata and modification state snapshot."""
+
+    title: str = ""
+    author: str = ""
+    comment: str = ""
+    is_dirty: bool = False
+
+
 __all__ = [
     "Channel",
     "MixerTrack",
     "Pattern",
+    "PlaylistTrack",
+    "PluginInfo",
+    "PluginParam",
+    "ProjectInfo",
+    "Slot",
     "Verified",
 ]
