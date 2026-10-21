@@ -151,6 +151,21 @@ class Session:
         self._broker: EmbeddedBroker | None = None
         self._client: BrokerClient | None = None
         self._trace_listeners: list[Callable[[TraceRecord], None]] = []
+        self._txn_stack: list[Any] = []
+
+    @property
+    def active_transaction(self) -> Any | None:
+        """Currently active transaction on this session, if any."""
+        return self._txn_stack[-1] if self._txn_stack else None
+
+    def push_transaction(self, txn: Any) -> None:
+        """Push a transaction onto the active session transaction stack."""
+        self._txn_stack.append(txn)
+
+    def pop_transaction(self, txn: Any) -> None:
+        """Pop a transaction from the active session transaction stack."""
+        if txn in self._txn_stack:
+            self._txn_stack.remove(txn)
 
     @property
     def mode(self) -> str:
@@ -173,6 +188,20 @@ class Session:
         else:
             assert self._client is not None
             lease_dict = await self._client.lease_acquire(ttl=ttl, purpose=purpose)
+        self.lease_holder = self.client_id
+        return lease_dict
+
+    async def renew_lease(
+        self,
+        ttl: float = 15.0,
+    ) -> dict[str, Any]:
+        """Extend active writer lease."""
+        if self.backend == "embedded":
+            assert self._broker is not None
+            lease_dict = await self._broker.lease_renew(self.client_id, ttl=ttl)
+        else:
+            assert self._client is not None
+            lease_dict = await self._client.lease_renew(ttl=ttl)
         self.lease_holder = self.client_id
         return lease_dict
 

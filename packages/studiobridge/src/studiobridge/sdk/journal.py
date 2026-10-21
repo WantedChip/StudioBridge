@@ -14,6 +14,7 @@ import os
 import re
 import secrets
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -127,7 +128,18 @@ class MutationJournal:
         self._session_id: str = _sanitize_session_id(session_id)
         self.user: str = user or os.environ.get("USERNAME") or "sdk_user"
         self._entries: list[JournalEntry] = []
+        self._listeners: list[Callable[[JournalEntry], None]] = []
         self._ensure_dir()
+
+    def add_listener(self, listener: Callable[[JournalEntry], None]) -> None:
+        """Register callback listener invoked on journal records."""
+        if listener not in self._listeners:
+            self._listeners.append(listener)
+
+    def remove_listener(self, listener: Callable[[JournalEntry], None]) -> None:
+        """Unregister journal callback listener."""
+        if listener in self._listeners:
+            self._listeners.remove(listener)
 
     @property
     def session_id(self) -> str:
@@ -225,6 +237,10 @@ class MutationJournal:
         except Exception:
             # Tolerant against ephemeral filesystem lock glitches while preserving in-memory
             pass
+
+        for listener in list(self._listeners):
+            with contextlib.suppress(Exception):
+                listener(entry)
 
         return entry
 

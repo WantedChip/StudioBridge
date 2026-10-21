@@ -35,6 +35,7 @@ from studiobridge.sdk.safety import AsyncSafetyManager, SyncSafetyManager
 from studiobridge.sdk.session import Session, Status
 from studiobridge.sdk.trace import AsyncTraceContext, SyncTraceContext
 from studiobridge.sdk.transport import AsyncTransport, SyncTransport
+from studiobridge.sdk.txn import AsyncTransaction, SyncTransaction
 from studiobridge.sdk.ui import AsyncUi, SyncUi
 
 BUILTIN_ALLOWED_OPS = {
@@ -261,6 +262,21 @@ class AsyncStudio:
         """Create asynchronous batch execution context."""
         return AsyncBatchContext(self._session)
 
+    def transaction(
+        self,
+        name: str = "default",
+        timeout: float = 300.0,
+        *,
+        allow_protected: bool = False,
+    ) -> AsyncTransaction:
+        """Create an asynchronous transaction context manager per 09_l1_sdk.md §6."""
+        return AsyncTransaction(
+            self._session,
+            name=name,
+            timeout=timeout,
+            allow_protected=allow_protected,
+        )
+
     def trace(self, output_path: Path | str | None = None) -> AsyncTraceContext:
         """Create asynchronous trace recording context."""
         return AsyncTraceContext(self._session, output_path=output_path)
@@ -398,6 +414,22 @@ class Studio:
     def batch(self) -> SyncBatchContext:
         """Create synchronous batch execution context."""
         return SyncBatchContext(self._portal, self._async.session)
+
+    def transaction(
+        self,
+        name: str = "default",
+        timeout: float = 300.0,
+        *,
+        allow_protected: bool = False,
+    ) -> SyncTransaction:
+        """Create a synchronous transaction context manager per 09_l1_sdk.md §6."""
+        return SyncTransaction(
+            self._portal,
+            self._async.session,
+            name=name,
+            timeout=timeout,
+            allow_protected=allow_protected,
+        )
 
     def trace(self, output_path: Path | str | None = None) -> SyncTraceContext:
         """Create synchronous trace recording context."""
