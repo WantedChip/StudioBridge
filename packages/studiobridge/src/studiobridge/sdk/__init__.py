@@ -27,6 +27,10 @@ from studiobridge.sdk.client import (
     SyncRawApi,
     connect,
 )
+from studiobridge.sdk.journal import (
+    JournalEntry,
+    MutationJournal,
+)
 from studiobridge.sdk.mixer import (
     AsyncMixer,
     SyncMixer,
@@ -43,6 +47,10 @@ from studiobridge.sdk.plugins import (
     AsyncPlugins,
     SyncPlugins,
 )
+from studiobridge.sdk.policy import (
+    POLICY_FILE_NAMES,
+    Policy,
+)
 from studiobridge.sdk.project import (
     AsyncProject,
     SyncProject,
@@ -54,6 +62,14 @@ from studiobridge.sdk.refs import (
     PlaylistTrack,
     Slot,
     resolve_reference,
+)
+from studiobridge.sdk.safety import (
+    ALLOWED_SAFETY_MODES,
+    AsyncSafetyManager,
+    SafetyManager,
+    SafetyMode,
+    SyncSafetyManager,
+    is_operation_mutating,
 )
 from studiobridge.sdk.session import (
     Session,
@@ -75,6 +91,7 @@ from studiobridge.sdk.types import (
     PluginInfo,
     PluginParam,
     ProjectInfo,
+    UntrustedString,
     Verified,
 )
 from studiobridge.sdk.ui import (
@@ -110,6 +127,7 @@ from studiobridge.sdk.verification import (
 )
 
 __all__ = [
+    "ALLOWED_SAFETY_MODES",
     "AsyncBatchContext",
     "AsyncChannels",
     "AsyncMixer",
@@ -118,6 +136,7 @@ __all__ = [
     "AsyncPlugins",
     "AsyncProject",
     "AsyncRawApi",
+    "AsyncSafetyManager",
     "AsyncStudio",
     "AsyncTraceContext",
     "AsyncTransport",
@@ -135,16 +154,22 @@ __all__ = [
     "DEFAULT_TOLERANCE",
     "Db",
     "FL_PALETTE",
+    "JournalEntry",
     "MixerTrack",
+    "MutationJournal",
+    "POLICY_FILE_NAMES",
     "Pan",
     "Pattern",
     "Percent",
     "PlaylistTrack",
     "PluginInfo",
     "PluginParam",
+    "Policy",
     "ProjectInfo",
     "ProofLevel",
     "RGB",
+    "SafetyManager",
+    "SafetyMode",
     "Session",
     "Slot",
     "StatsAccumulator",
@@ -158,6 +183,7 @@ __all__ = [
     "SyncPlugins",
     "SyncProject",
     "SyncRawApi",
+    "SyncSafetyManager",
     "SyncTraceContext",
     "SyncTransport",
     "SyncUi",
@@ -165,6 +191,7 @@ __all__ = [
     "Ticks",
     "TraceContext",
     "TraceRecord",
+    "UntrustedString",
     "Verified",
     "Volume",
     "WriteReport",
@@ -176,6 +203,7 @@ __all__ = [
     "gate_capability",
     "get_capability_for_op",
     "get_declared_tolerance",
+    "is_operation_mutating",
     "redact_secrets",
     "resolve_proof_level",
     "resolve_reference",

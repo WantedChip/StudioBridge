@@ -13,7 +13,7 @@ from anyio.from_thread import BlockingPortal
 
 from studiobridge.core.errors import DisconnectedError, PreconditionError
 from studiobridge.sdk.refs import Channel, resolve_reference
-from studiobridge.sdk.types import Verified
+from studiobridge.sdk.types import UntrustedString, Verified
 from studiobridge.sdk.units import Color, Db, Pan, Percent, Volume
 from studiobridge.sdk.verification import build_expect_guard, tolerance_matches, verify_mutation
 
@@ -39,11 +39,11 @@ class AsyncChannels:
         res = await self._session.call("channels.channelCount", {})
         return int(res) if res is not None else 0
 
-    async def get_name(self, index: int | Channel) -> str:
-        """Retrieve channel name."""
+    async def get_name(self, index: int | Channel) -> UntrustedString:
+        """Retrieve channel name tagged with untrusted metadata."""
         idx = _resolve_channel_index(index)
         res = await self._session.call("channels.getChannelName", {"index": idx})
-        return str(res) if res is not None else ""
+        return UntrustedString(res) if res is not None else UntrustedString("")
 
     async def set_name(
         self,
@@ -89,6 +89,7 @@ class AsyncChannels:
             strict=strict,
             fp=self._session.fp,
             evidence={"channel": idx},
+            journal=self._session.safety.journal,
             remedy="Ensure channel index exists and name is valid.",
         )
 
@@ -161,6 +162,7 @@ class AsyncChannels:
             strict=strict,
             fp=self._session.fp,
             evidence={"channel": idx},
+            journal=self._session.safety.journal,
             remedy="Check whether channel volume is clamped within 0.0 to 1.0.",
         )
 
@@ -225,6 +227,7 @@ class AsyncChannels:
             strict=strict,
             fp=self._session.fp,
             evidence={"channel": idx},
+            journal=self._session.safety.journal,
             remedy="Check whether channel pan is within valid range [-1.0, 1.0].",
         )
 
@@ -278,6 +281,7 @@ class AsyncChannels:
             strict=strict,
             fp=self._session.fp,
             evidence={"channel": idx},
+            journal=self._session.safety.journal,
             remedy="Check whether channel mute state is locked.",
         )
 
@@ -331,6 +335,7 @@ class AsyncChannels:
             strict=strict,
             fp=self._session.fp,
             evidence={"channel": idx},
+            journal=self._session.safety.journal,
             remedy="Check whether other channels prevent solo state changes.",
         )
 
@@ -384,6 +389,7 @@ class AsyncChannels:
             strict=strict,
             fp=self._session.fp,
             evidence={"channel": idx},
+            journal=self._session.safety.journal,
             remedy="Ensure color value is formatted as valid 24-bit RGB integer.",
         )
 
@@ -448,6 +454,7 @@ class AsyncChannels:
             strict=strict,
             fp=self._session.fp,
             evidence={"channel": idx},
+            journal=self._session.safety.journal,
             remedy="Check whether channel pitch is supported by generator plugin.",
         )
 
@@ -501,6 +508,7 @@ class AsyncChannels:
             strict=strict,
             fp=self._session.fp,
             evidence={"channel": idx},
+            journal=self._session.safety.journal,
             remedy="Ensure target mixer track index exists.",
         )
 
@@ -519,6 +527,15 @@ class AsyncChannels:
         await self._session.call(
             "channels.triggerNote",
             {"index": idx, "note": note, "velocity": vel, "duration": dur},
+        )
+        self._session.safety.journal.record(
+            op="channels.triggerNote",
+            target=f"channel.{idx}",
+            before=None,
+            after=True,
+            proof="none",
+            verified=True,
+            details={"channel": idx, "note": note, "vel": vel, "dur": dur},
         )
         return Verified(
             value=True,
@@ -585,6 +602,7 @@ class AsyncChannels:
             strict=strict,
             fp=self._session.fp,
             evidence={"channel": idx},
+            journal=self._session.safety.journal,
             remedy="Check whether step grid length matches pattern length.",
         )
 
@@ -685,8 +703,8 @@ class SyncChannels:
         self._check_connection()
         return self._portal.call(functools.partial(self._async.find, name))
 
-    def get_name(self, index: int | Channel) -> str:
-        """Retrieve channel name."""
+    def get_name(self, index: int | Channel) -> UntrustedString | str:
+        """Retrieve channel name tagged with untrusted metadata."""
         self._check_connection()
         return self._portal.call(functools.partial(self._async.get_name, index))
 

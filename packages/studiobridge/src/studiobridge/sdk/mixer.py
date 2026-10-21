@@ -18,7 +18,7 @@ from studiobridge.core.errors import (
     PreconditionError,
 )
 from studiobridge.sdk.refs import Channel, MixerTrack
-from studiobridge.sdk.types import Verified
+from studiobridge.sdk.types import UntrustedString, Verified
 from studiobridge.sdk.units import Color, Db, Pan, Percent, Volume
 from studiobridge.sdk.verification import build_expect_guard, tolerance_matches, verify_mutation
 
@@ -64,6 +64,8 @@ class AsyncMixer:
         *,
         expect: float | Volume | Db | Percent | dict[str, Any] | None = None,
         strict: bool = False,
+        allow_protected: bool = False,
+        confirm: bool = False,
     ) -> Verified[float]:
         """Set normalized track volume with read-back verification."""
         idx = _resolve_track_index(index)
@@ -105,6 +107,8 @@ class AsyncMixer:
             "mixer.setTrackVolume",
             {"index": idx, "volume": vol_val},
             opts=call_opts,
+            allow_protected=allow_protected,
+            confirm=confirm,
         )
         after = await self.get_volume(idx)
         return verify_mutation(
@@ -116,6 +120,7 @@ class AsyncMixer:
             strict=strict,
             fp=self._session.fp,
             evidence={"track": idx},
+            journal=self._session.safety.journal,
             remedy="Check whether mixer track volume is clamped or automated.",
         )
 
@@ -132,6 +137,8 @@ class AsyncMixer:
         *,
         expect: float | Pan | dict[str, Any] | None = None,
         strict: bool = False,
+        allow_protected: bool = False,
+        confirm: bool = False,
     ) -> Verified[float]:
         """Set track pan position (-1.0 to 1.0) with read-back verification."""
         idx = _resolve_track_index(index)
@@ -169,6 +176,8 @@ class AsyncMixer:
             "mixer.setTrackPan",
             {"index": idx, "pan": pan_val},
             opts=call_opts,
+            allow_protected=allow_protected,
+            confirm=confirm,
         )
         after = await self.get_pan(idx)
         return verify_mutation(
@@ -180,6 +189,7 @@ class AsyncMixer:
             strict=strict,
             fp=self._session.fp,
             evidence={"track": idx},
+            journal=self._session.safety.journal,
             remedy="Ensure pan value is within range [-1.0, 1.0].",
         )
 
@@ -196,6 +206,8 @@ class AsyncMixer:
         *,
         expect: bool | dict[str, Any] | None = None,
         strict: bool = False,
+        allow_protected: bool = False,
+        confirm: bool = False,
     ) -> Verified[bool]:
         """Mute or unmute mixer track with read-back verification."""
         idx = _resolve_track_index(index)
@@ -221,6 +233,8 @@ class AsyncMixer:
             "mixer.muteTrack",
             {"index": idx, "value": 1 if target else 0},
             opts=call_opts,
+            allow_protected=allow_protected,
+            confirm=confirm,
         )
         after = await self.is_muted(idx)
         return verify_mutation(
@@ -231,6 +245,7 @@ class AsyncMixer:
             strict=strict,
             fp=self._session.fp,
             evidence={"track": idx},
+            journal=self._session.safety.journal,
             remedy="Check whether track mute state is locked or overridden by solo.",
         )
 
@@ -247,6 +262,8 @@ class AsyncMixer:
         *,
         expect: bool | dict[str, Any] | None = None,
         strict: bool = False,
+        allow_protected: bool = False,
+        confirm: bool = False,
     ) -> Verified[bool]:
         """Solo or unsolo mixer track with read-back verification."""
         idx = _resolve_track_index(index)
@@ -272,6 +289,8 @@ class AsyncMixer:
             "mixer.soloTrack",
             {"index": idx, "value": 1 if target else 0},
             opts=call_opts,
+            allow_protected=allow_protected,
+            confirm=confirm,
         )
         after = await self.is_solo(idx)
         return verify_mutation(
@@ -282,6 +301,7 @@ class AsyncMixer:
             strict=strict,
             fp=self._session.fp,
             evidence={"track": idx},
+            journal=self._session.safety.journal,
             remedy="Check whether other tracks prevent solo state change.",
         )
 
@@ -333,14 +353,15 @@ class AsyncMixer:
             strict=strict,
             fp=self._session.fp,
             evidence={"track": idx},
+            journal=self._session.safety.journal,
             remedy="Ensure recording destination path is valid in FL Studio.",
         )
 
-    async def get_name(self, index: int | MixerTrack) -> str:
-        """Retrieve mixer track name."""
+    async def get_name(self, index: int | MixerTrack) -> UntrustedString:
+        """Retrieve mixer track name tagged with untrusted metadata."""
         idx = _resolve_track_index(index)
         res = await self._session.call("mixer.getTrackName", {"index": idx})
-        return str(res) if res is not None else ""
+        return UntrustedString(res) if res is not None else UntrustedString("")
 
     async def set_name(
         self,
@@ -386,6 +407,7 @@ class AsyncMixer:
             strict=strict,
             fp=self._session.fp,
             evidence={"track": idx},
+            journal=self._session.safety.journal,
             remedy="Check whether track name contains unsupported characters.",
         )
 
@@ -439,6 +461,7 @@ class AsyncMixer:
             strict=strict,
             fp=self._session.fp,
             evidence={"track": idx},
+            journal=self._session.safety.journal,
             remedy="Ensure color value is formatted as valid 24-bit RGB integer.",
         )
 
@@ -494,6 +517,7 @@ class AsyncMixer:
             strict=strict,
             fp=self._session.fp,
             evidence={"source": src, "dest": dst},
+            journal=self._session.safety.journal,
             remedy="Check whether circular routing is prohibited.",
         )
 
@@ -541,6 +565,7 @@ class AsyncMixer:
             strict=strict,
             fp=self._session.fp,
             evidence={"channel": chan, "track": trk},
+            journal=self._session.safety.journal,
             remedy="Ensure channel and track indices are valid.",
         )
 
@@ -682,11 +707,21 @@ class SyncMixer:
         *,
         expect: float | Volume | Db | Percent | dict[str, Any] | None = None,
         strict: bool = False,
+        allow_protected: bool = False,
+        confirm: bool = False,
     ) -> Verified[float]:
         """Set normalized track volume with read-back verification."""
         self._check_connection()
         return self._portal.call(
-            functools.partial(self._async.set_volume, index, val, expect=expect, strict=strict)
+            functools.partial(
+                self._async.set_volume,
+                index,
+                val,
+                expect=expect,
+                strict=strict,
+                allow_protected=allow_protected,
+                confirm=confirm,
+            )
         )
 
     def get_pan(self, index: int | MixerTrack) -> float:
@@ -701,11 +736,21 @@ class SyncMixer:
         *,
         expect: float | Pan | dict[str, Any] | None = None,
         strict: bool = False,
+        allow_protected: bool = False,
+        confirm: bool = False,
     ) -> Verified[float]:
         """Set track pan position (-1.0 to 1.0) with read-back verification."""
         self._check_connection()
         return self._portal.call(
-            functools.partial(self._async.set_pan, index, val, expect=expect, strict=strict)
+            functools.partial(
+                self._async.set_pan,
+                index,
+                val,
+                expect=expect,
+                strict=strict,
+                allow_protected=allow_protected,
+                confirm=confirm,
+            )
         )
 
     def is_muted(self, index: int | MixerTrack) -> bool:
@@ -720,11 +765,21 @@ class SyncMixer:
         *,
         expect: bool | dict[str, Any] | None = None,
         strict: bool = False,
+        allow_protected: bool = False,
+        confirm: bool = False,
     ) -> Verified[bool]:
         """Mute or unmute mixer track with read-back verification."""
         self._check_connection()
         return self._portal.call(
-            functools.partial(self._async.mute, index, muted=muted, expect=expect, strict=strict)
+            functools.partial(
+                self._async.mute,
+                index,
+                muted=muted,
+                expect=expect,
+                strict=strict,
+                allow_protected=allow_protected,
+                confirm=confirm,
+            )
         )
 
     def is_solo(self, index: int | MixerTrack) -> bool:
@@ -739,11 +794,21 @@ class SyncMixer:
         *,
         expect: bool | dict[str, Any] | None = None,
         strict: bool = False,
+        allow_protected: bool = False,
+        confirm: bool = False,
     ) -> Verified[bool]:
         """Solo or unsolo mixer track with read-back verification."""
         self._check_connection()
         return self._portal.call(
-            functools.partial(self._async.solo, index, soloed=soloed, expect=expect, strict=strict)
+            functools.partial(
+                self._async.solo,
+                index,
+                soloed=soloed,
+                expect=expect,
+                strict=strict,
+                allow_protected=allow_protected,
+                confirm=confirm,
+            )
         )
 
     def is_armed(self, index: int | MixerTrack) -> bool:
@@ -765,8 +830,8 @@ class SyncMixer:
             functools.partial(self._async.arm, index, armed=armed, expect=expect, strict=strict)
         )
 
-    def get_name(self, index: int | MixerTrack) -> str:
-        """Retrieve mixer track name."""
+    def get_name(self, index: int | MixerTrack) -> UntrustedString | str:
+        """Retrieve mixer track name tagged with untrusted metadata."""
         self._check_connection()
         return self._portal.call(functools.partial(self._async.get_name, index))
 

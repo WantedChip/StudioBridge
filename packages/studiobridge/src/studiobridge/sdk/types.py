@@ -51,17 +51,53 @@ class Verified(Generic[T]):
         return bool(self.verified)
 
 
+class UntrustedString(str):
+    """String subclass tagging user-controlled project strings from FL Studio.
+
+    Carries untrusted=True metadata per 12_crosscutting.md §1 to defend against
+    downstream prompt injection in LLM agents and tools.
+    """
+
+    untrusted: bool = True
+
+    def __new__(cls, value: Any = "", untrusted: bool = True) -> UntrustedString:
+        instance = super().__new__(cls, str(value))
+        object.__setattr__(instance, "untrusted", untrusted)
+        return instance
+
+    def to_dict(self) -> dict[str, Any]:
+        """Serialize text along with untrusted metadata flag."""
+        return {"text": str(self), "value": str(self), "untrusted": bool(self.untrusted)}
+
+    def __repr__(self) -> str:
+        return f"UntrustedString({str(self)!r})"
+
+
 @dataclass
 class PluginInfo:
     """Information about a plugin loaded in a mixer slot or channel."""
 
     track: int
     slot: int
-    name: str = ""
+    name: str | UntrustedString = ""
     param_count: int = 0
     is_valid: bool = True
     color: int = 0
     preset_count: int = 0
+    untrusted: bool = True
+
+    def to_dict(self) -> dict[str, Any]:
+        """Serialize plugin info with prompt-injection defense metadata."""
+        return {
+            "track": self.track,
+            "slot": self.slot,
+            "name": str(self.name),
+            "param_count": self.param_count,
+            "is_valid": self.is_valid,
+            "color": self.color,
+            "preset_count": self.preset_count,
+            "untrusted": True,
+        }
 
 
 @dataclass
@@ -71,21 +107,47 @@ class PluginParam:
     track: int
     slot: int
     param_id: int
-    name: str = ""
+    name: str | UntrustedString = ""
     value: float = 0.0
     min_value: float = 0.0
     max_value: float = 1.0
-    text: str = ""
+    text: str | UntrustedString = ""
+    untrusted: bool = True
+
+    def to_dict(self) -> dict[str, Any]:
+        """Serialize plugin parameter with prompt-injection defense metadata."""
+        return {
+            "track": self.track,
+            "slot": self.slot,
+            "param_id": self.param_id,
+            "name": str(self.name),
+            "value": self.value,
+            "min_value": self.min_value,
+            "max_value": self.max_value,
+            "text": str(self.text),
+            "untrusted": True,
+        }
 
 
 @dataclass
 class ProjectInfo:
     """Project metadata and modification state snapshot."""
 
-    title: str = ""
-    author: str = ""
-    comment: str = ""
+    title: str | UntrustedString = ""
+    author: str | UntrustedString = ""
+    comment: str | UntrustedString = ""
     is_dirty: bool = False
+    untrusted: bool = True
+
+    def to_dict(self) -> dict[str, Any]:
+        """Serialize project info with prompt-injection defense metadata."""
+        return {
+            "title": str(self.title),
+            "author": str(self.author),
+            "comment": str(self.comment),
+            "is_dirty": self.is_dirty,
+            "untrusted": True,
+        }
 
 
 __all__ = [
@@ -98,6 +160,7 @@ __all__ = [
     "PluginParam",
     "ProjectInfo",
     "Slot",
+    "UntrustedString",
     "Verified",
     "WriteReport",
     "resolve_reference",

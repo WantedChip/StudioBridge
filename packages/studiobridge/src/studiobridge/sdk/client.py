@@ -31,6 +31,7 @@ from studiobridge.sdk.patterns import AsyncPatterns, SyncPatterns
 from studiobridge.sdk.playlist import AsyncPlaylist, SyncPlaylist
 from studiobridge.sdk.plugins import AsyncPlugins, SyncPlugins
 from studiobridge.sdk.project import AsyncProject, SyncProject
+from studiobridge.sdk.safety import AsyncSafetyManager, SyncSafetyManager
 from studiobridge.sdk.session import Session, Status
 from studiobridge.sdk.trace import AsyncTraceContext, SyncTraceContext
 from studiobridge.sdk.transport import AsyncTransport, SyncTransport
@@ -184,6 +185,7 @@ class AsyncStudio:
         self.project: AsyncProject = AsyncProject(session)
         self.playlist: AsyncPlaylist = AsyncPlaylist(session)
         self.ui: AsyncUi = AsyncUi(session)
+        self.safety: AsyncSafetyManager = AsyncSafetyManager(session, session.safety)
 
     @property
     def session(self) -> Session:
@@ -313,6 +315,7 @@ class Studio:
             portal, async_studio.playlist, session=async_studio.session
         )
         self.ui: SyncUi = SyncUi(portal, async_studio.ui, session=async_studio.session)
+        self.safety: SyncSafetyManager = SyncSafetyManager(portal, async_studio.safety)
 
     @property
     def session(self) -> Session:

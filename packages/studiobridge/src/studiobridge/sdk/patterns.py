@@ -13,7 +13,7 @@ from anyio.from_thread import BlockingPortal
 
 from studiobridge.core.errors import DisconnectedError, PreconditionError
 from studiobridge.sdk.refs import Pattern, resolve_reference
-from studiobridge.sdk.types import Verified
+from studiobridge.sdk.types import UntrustedString, Verified
 from studiobridge.sdk.units import Color
 from studiobridge.sdk.verification import build_expect_guard, verify_mutation
 
@@ -44,11 +44,11 @@ class AsyncPatterns:
         res = await self._session.call("patterns.patternNumber", {})
         return int(res) if res is not None else 1
 
-    async def get_name(self, index: int | Pattern) -> str:
-        """Retrieve pattern label."""
+    async def get_name(self, index: int | Pattern) -> UntrustedString:
+        """Retrieve pattern label tagged with untrusted metadata."""
         num = _resolve_pattern_number(index)
         res = await self._session.call("patterns.getPatternName", {"index": num})
-        return str(res) if res is not None else ""
+        return UntrustedString(res) if res is not None else UntrustedString("")
 
     async def set_name(
         self,
@@ -94,6 +94,7 @@ class AsyncPatterns:
             strict=strict,
             fp=self._session.fp,
             evidence={"pattern": num},
+            journal=self._session.safety.journal,
             remedy="Ensure pattern index exists and name is non-empty.",
         )
 
@@ -147,6 +148,7 @@ class AsyncPatterns:
             strict=strict,
             fp=self._session.fp,
             evidence={"pattern": num},
+            journal=self._session.safety.journal,
             remedy="Ensure color is valid 24-bit RGB integer.",
         )
 
@@ -198,6 +200,7 @@ class AsyncPatterns:
             strict=strict,
             fp=self._session.fp,
             evidence={"requested": num},
+            journal=self._session.safety.journal,
             remedy="Check whether pattern index exceeds patternCount.",
         )
 
@@ -345,8 +348,8 @@ class SyncPatterns:
             functools.partial(self._async.jump, index, expect=expect, strict=strict)
         )
 
-    def get_name(self, index: int | Pattern) -> str:
-        """Retrieve pattern label."""
+    def get_name(self, index: int | Pattern) -> UntrustedString | str:
+        """Retrieve pattern label tagged with untrusted metadata."""
         self._check_connection()
         return self._portal.call(functools.partial(self._async.get_name, index))
 

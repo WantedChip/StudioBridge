@@ -13,7 +13,14 @@ from typing import TYPE_CHECKING, Any, overload
 from anyio.from_thread import BlockingPortal
 
 from studiobridge.core.errors import DisconnectedError, PreconditionError
-from studiobridge.sdk.types import MixerTrack, PluginInfo, PluginParam, Slot, Verified
+from studiobridge.sdk.types import (
+    MixerTrack,
+    PluginInfo,
+    PluginParam,
+    Slot,
+    UntrustedString,
+    Verified,
+)
 from studiobridge.sdk.verification import build_expect_guard, tolerance_matches, verify_mutation
 
 if TYPE_CHECKING:
@@ -75,11 +82,12 @@ class AsyncPlugins:
         return PluginInfo(
             track=t,
             slot=s,
-            name=name,
+            name=UntrustedString(name),
             param_count=param_count,
             is_valid=is_valid,
             color=color,
             preset_count=preset_count,
+            untrusted=True,
         )
 
     async def list_plugins(
@@ -153,11 +161,12 @@ class AsyncPlugins:
             track=t,
             slot=s,
             param_id=p,
-            name=param_name,
+            name=UntrustedString(param_name),
             value=param_val,
             min_value=0.0,
             max_value=1.0,
-            text=text_val,
+            text=UntrustedString(text_val),
+            untrusted=True,
         )
 
     @overload
@@ -259,6 +268,7 @@ class AsyncPlugins:
             strict=strict,
             fp=self._session.fp,
             evidence={"track": t, "slot": s, "param_id": p, "text": after.text},
+            journal=self._session.safety.journal,
             remedy="Check parameter ranges (typically 0.0..1.0) and plugin edit state.",
         )
 

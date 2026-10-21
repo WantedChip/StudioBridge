@@ -763,6 +763,55 @@ class PolicyDeniedError(SafetyError):
     default_code: str = "E_POLICY"
 
 
+class ConfirmationRequiredError(SafetyError):
+    """Raised when user or explicit confirmation is required for a mutating action."""
+
+    default_code: str = "E_CONFIRM"
+
+    def __init__(
+        self,
+        message: str | None = None,
+        *,
+        code: str = "E_CONFIRM",
+        details: dict[str, Any] | None = None,
+        retryable: bool = False,
+        remedy: str | None = None,
+        docs_anchor: str | None = None,
+        token: str | None = None,
+        operation: str | None = None,
+    ) -> None:
+        det = dict(details) if details else {}
+        self.token: str | None = token or det.get("token")
+        self.operation: str | None = operation or det.get("operation")
+        if self.token is not None and "token" not in det:
+            det["token"] = self.token
+        if self.operation is not None and "operation" not in det:
+            det["operation"] = self.operation
+        super().__init__(
+            message=message,
+            code=code,
+            details=det,
+            retryable=retryable,
+            remedy=remedy,
+            docs_anchor=docs_anchor,
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        data = super().to_dict()
+        if self.token is not None:
+            data["token"] = self.token
+        if self.operation is not None:
+            data["operation"] = self.operation
+        return data
+
+
+# Aliases per spec 09_l1_sdk.md §10
+ReadOnlyMode = ReadOnlyError
+ProtectedTarget = ProtectedTargetError
+PolicyDenied = PolicyDeniedError
+ConfirmationRequired = ConfirmationRequiredError
+
+
 class OfflineError(StudioBridgeError):
     """Base exception for offline FLP engine operations."""
 

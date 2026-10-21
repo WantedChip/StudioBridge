@@ -19,7 +19,7 @@ from studiobridge.core.errors import (
 )
 from studiobridge.sdk.capabilities import gate_capability
 from studiobridge.sdk.refs import Pattern, PlaylistTrack
-from studiobridge.sdk.types import Verified
+from studiobridge.sdk.types import UntrustedString, Verified
 from studiobridge.sdk.units import Color
 from studiobridge.sdk.verification import build_expect_guard, verify_mutation
 
@@ -45,11 +45,11 @@ class AsyncPlaylist:
         res = await self._session.call("playlist.trackCount", {})
         return int(res) if res is not None else 0
 
-    async def get_name(self, index: int | PlaylistTrack) -> str:
-        """Retrieve playlist track name."""
+    async def get_name(self, index: int | PlaylistTrack) -> UntrustedString:
+        """Retrieve playlist track name tagged with untrusted metadata."""
         num = _resolve_track_number(index)
         res = await self._session.call("playlist.getTrackName", {"index": num})
-        return str(res) if res is not None else ""
+        return UntrustedString(res) if res is not None else UntrustedString("")
 
     async def set_name(
         self,
@@ -94,7 +94,8 @@ class AsyncPlaylist:
             before=before,
             strict=strict,
             fp=self._session.fp,
-            evidence={"track": num},
+            evidence={"playlist_track": num},
+            journal=self._session.safety.journal,
             remedy="Ensure track index exists and name is non-empty.",
         )
 
@@ -148,6 +149,7 @@ class AsyncPlaylist:
             strict=strict,
             fp=self._session.fp,
             evidence={"track": num},
+            journal=self._session.safety.journal,
             remedy="Ensure track index exists and color integer is valid.",
         )
 
@@ -201,6 +203,7 @@ class AsyncPlaylist:
             strict=strict,
             fp=self._session.fp,
             evidence={"track": num},
+            journal=self._session.safety.journal,
             remedy="Check whether track index exists or is muted by parent group.",
         )
 
@@ -254,6 +257,7 @@ class AsyncPlaylist:
             strict=strict,
             fp=self._session.fp,
             evidence={"track": num},
+            journal=self._session.safety.journal,
             remedy="Check whether other tracks prevent solo changes.",
         )
 
@@ -407,8 +411,8 @@ class SyncPlaylist:
         self._check_connection()
         return self._portal.call(functools.partial(self._async.find, name, limit=limit))
 
-    def get_name(self, index: int | PlaylistTrack) -> str:
-        """Retrieve playlist track name."""
+    def get_name(self, index: int | PlaylistTrack) -> UntrustedString | str:
+        """Retrieve playlist track name tagged with untrusted metadata."""
         self._check_connection()
         return self._portal.call(functools.partial(self._async.get_name, index))
 

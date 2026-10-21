@@ -59,6 +59,7 @@ class AsyncTransport:
             before=before,
             strict=strict,
             fp=self._session.fp,
+            journal=self._session.safety.journal,
             remedy="Ensure FL Studio audio device is enabled and not frozen.",
         )
 
@@ -95,6 +96,7 @@ class AsyncTransport:
             before=before,
             strict=strict,
             fp=self._session.fp,
+            journal=self._session.safety.journal,
             remedy="Check whether recording or external sync is overriding transport stop.",
         )
 
@@ -132,6 +134,7 @@ class AsyncTransport:
             before=before,
             strict=strict,
             fp=self._session.fp,
+            journal=self._session.safety.journal,
             remedy="Verify recording filter settings in FL Studio.",
         )
 
@@ -156,6 +159,8 @@ class AsyncTransport:
         *,
         expect: float | Tempo | dict[str, Any] | None = None,
         strict: bool = False,
+        allow_protected: bool = False,
+        confirm: bool = False,
     ) -> Verified[float]:
         """Set project tempo in BPM with read-back verification."""
         bpm_val = float(bpm)
@@ -187,7 +192,13 @@ class AsyncTransport:
                         details={"expected": exp_val, "actual": before, "tol": 0.1},
                     )
 
-        await self._session.call("transport.setTempo", {"bpm": bpm_val}, opts=call_opts)
+        await self._session.call(
+            "transport.setTempo",
+            {"bpm": bpm_val},
+            opts=call_opts,
+            allow_protected=allow_protected,
+            confirm=confirm,
+        )
         after = await self.get_tempo()
         return verify_mutation(
             "transport.setTempo",
@@ -197,6 +208,7 @@ class AsyncTransport:
             tol=0.1,
             strict=strict,
             fp=self._session.fp,
+            journal=self._session.safety.journal,
             remedy="Verify tempo range constraints (10.0 to 522.0 BPM).",
         )
 
@@ -243,6 +255,7 @@ class AsyncTransport:
             tol=0.05,
             strict=strict,
             fp=self._session.fp,
+            journal=self._session.safety.journal,
             remedy="Ensure playback position is within song boundaries.",
         )
 
@@ -289,6 +302,7 @@ class AsyncTransport:
             before=before,
             strict=strict,
             fp=self._session.fp,
+            journal=self._session.safety.journal,
             remedy="Verify loop mode value (0 = Pattern, 1 = Song).",
         )
 
@@ -338,6 +352,7 @@ class AsyncTransport:
             before=before,
             strict=strict,
             fp=self._session.fp,
+            journal=self._session.safety.journal,
             remedy="Check whether metronome is available in current project mode.",
         )
 
@@ -432,11 +447,20 @@ class SyncTransport:
         *,
         expect: float | Tempo | dict[str, Any] | None = None,
         strict: bool = False,
+        allow_protected: bool = False,
+        confirm: bool = False,
     ) -> Verified[float]:
         """Set project tempo in BPM with read-back verification."""
         self._check_connection()
         return self._portal.call(
-            functools.partial(self._async.set_tempo, bpm, expect=expect, strict=strict)
+            functools.partial(
+                self._async.set_tempo,
+                bpm,
+                expect=expect,
+                strict=strict,
+                allow_protected=allow_protected,
+                confirm=confirm,
+            )
         )
 
     def get_time(self, mode: int = 0) -> float:

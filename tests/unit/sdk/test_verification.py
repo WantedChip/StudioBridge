@@ -179,14 +179,14 @@ def test_expect_precondition_guard_live(studio: Studio) -> None:
     # Read initial master track volume
     current_vol = fl.mixer.get_volume(0)
 
-    # Calling with expect matching current volume should succeed
-    v = fl.mixer.set_volume(0, 0.75, expect=current_vol)
+    # Expect matching current volume succeeds (allow_protected=True on Master track 0)
+    v = fl.mixer.set_volume(0, 0.75, expect=current_vol, allow_protected=True)
     assert isinstance(v, Verified)
     assert v.verified is True
 
     # Calling with expect diverging from current volume should raise PreconditionError
     wrong_expect = 0.123
     with pytest.raises(PreconditionError) as exc_info:
-        fl.mixer.set_volume(0, 0.8, expect=wrong_expect)
+        fl.mixer.set_volume(0, 0.8, expect=wrong_expect, allow_protected=True)
 
     assert exc_info.value.code == "E_PRECONDITION"

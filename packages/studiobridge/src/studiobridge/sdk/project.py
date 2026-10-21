@@ -16,7 +16,7 @@ from studiobridge.core.errors import (
     ProtectedTargetError,
     ReadOnlyError,
 )
-from studiobridge.sdk.types import ProjectInfo, Verified
+from studiobridge.sdk.types import ProjectInfo, UntrustedString, Verified
 
 if TYPE_CHECKING:
     from studiobridge.sdk.session import Session
@@ -28,20 +28,20 @@ class AsyncProject:
     def __init__(self, session: Session) -> None:
         self._session = session
 
-    async def get_title(self) -> str:
-        """Retrieve project title / song name."""
+    async def get_title(self) -> UntrustedString:
+        """Retrieve project title / song name tagged with untrusted metadata."""
         res = await self._session.call("project.getTitle", {})
-        return str(res) if res is not None else ""
+        return UntrustedString(res) if res is not None else UntrustedString("")
 
-    async def get_author(self) -> str:
-        """Retrieve project author metadata."""
+    async def get_author(self) -> UntrustedString:
+        """Retrieve project author metadata tagged with untrusted metadata."""
         res = await self._session.call("project.getAuthor", {})
-        return str(res) if res is not None else ""
+        return UntrustedString(res) if res is not None else UntrustedString("")
 
-    async def get_comment(self) -> str:
-        """Retrieve project comments / notes metadata."""
+    async def get_comment(self) -> UntrustedString:
+        """Retrieve project comments / notes metadata tagged with untrusted metadata."""
         res = await self._session.call("project.getComment", {})
-        return str(res) if res is not None else ""
+        return UntrustedString(res) if res is not None else UntrustedString("")
 
     async def is_dirty(self) -> bool:
         """Query whether active project has unsaved modifications."""
@@ -59,6 +59,7 @@ class AsyncProject:
             author=author,
             comment=comment,
             is_dirty=dirty,
+            untrusted=True,
         )
 
     async def save(
@@ -66,11 +67,13 @@ class AsyncProject:
         *,
         confirm: bool = False,
         allow_overwrite: bool = False,
+        allow_protected: bool = False,
     ) -> Verified[bool]:
         """Save project to current file.
 
-        Requires explicit confirmation (confirm=True or allow_overwrite=True) and
-        write safety mode to prevent unprompted file overwrites per [SAF-01] and [SAF-03].
+        Requires explicit confirmation (confirm=True, allow_overwrite=True, or
+        allow_protected=True) and write safety mode to prevent unprompted file overwrites
+        per [SAF-01] and [SAF-03].
         """
         # 1. Enforce read-only safety guard [SAF-01]
         if self._session.mode == "read_only":
@@ -83,15 +86,16 @@ class AsyncProject:
             )
 
         # 2. Enforce explicit overwrite confirmation [SAF-03]
-        if not (confirm or allow_overwrite):
+        if not (confirm or allow_overwrite or allow_protected):
             raise ProtectedTargetError(
                 "Project save requires explicit confirmation ([SAF-01], [SAF-03]). "
-                "Pass confirm=True or allow_overwrite=True.",
+                "Pass confirm=True, allow_overwrite=True, or allow_protected=True.",
                 code="E_PROTECTED",
                 details={
                     "target": "project.save",
                     "confirm": confirm,
                     "allow_overwrite": allow_overwrite,
+                    "allow_protected": allow_protected,
                 },
                 remedy=(
                     "Call fl.project.save(confirm=True) to confirm overwrite, "
@@ -99,7 +103,21 @@ class AsyncProject:
                 ),
             )
 
-        await self._session.call("project.save", {})
+        await self._session.call(
+            "project.save",
+            {},
+            allow_protected=True,
+            confirm=True,
+        )
+        self._session.safety.journal.record(
+            op="project.save",
+            target="project",
+            before=None,
+            after=True,
+            proof="display_only",
+            verified=True,
+            details={"confirmed": True},
+        )
         return Verified(
             value=True,
             requested=True,
@@ -122,6 +140,15 @@ class AsyncProject:
             )
 
         await self._session.call("project.saveNewVersion", {})
+        self._session.safety.journal.record(
+            op="project.saveNewVersion",
+            target="project",
+            before=None,
+            after=True,
+            proof="display_only",
+            verified=True,
+            details={"new_version": True},
+        )
         return Verified(
             value=True,
             requested=True,
@@ -156,18 +183,18 @@ class SyncProject:
                 remedy="Establish session connection before invoking project methods.",
             )
 
-    def get_title(self) -> str:
-        """Retrieve project title / song name."""
+    def get_title(self) -> UntrustedString | str:
+        """Retrieve project title / song name tagged with untrusted metadata."""
         self._check_connection()
         return self._portal.call(self._async.get_title)
 
-    def get_author(self) -> str:
-        """Retrieve project author metadata."""
+    def get_author(self) -> UntrustedString | str:
+        """Retrieve project author metadata tagged with untrusted metadata."""
         self._check_connection()
         return self._portal.call(self._async.get_author)
 
-    def get_comment(self) -> str:
-        """Retrieve project comments / notes metadata."""
+    def get_comment(self) -> UntrustedString | str:
+        """Retrieve project comments / notes metadata tagged with untrusted metadata."""
         self._check_connection()
         return self._portal.call(self._async.get_comment)
 
@@ -186,6 +213,7 @@ class SyncProject:
         *,
         confirm: bool = False,
         allow_overwrite: bool = False,
+        allow_protected: bool = False,
     ) -> Verified[bool]:
         """Save project to current file with confirmation guard."""
         self._check_connection()
@@ -194,6 +222,7 @@ class SyncProject:
                 self._async.save,
                 confirm=confirm,
                 allow_overwrite=allow_overwrite,
+                allow_protected=allow_protected,
             )
         )
 

@@ -39,6 +39,8 @@ from studiobridge.device.assets._sb_api import ALLOW
 from studiobridge.ports.base import MidiPort
 from studiobridge.ports.fake import FakeMidiPort
 from studiobridge.sdk.capabilities import check_operation_capability
+from studiobridge.sdk.journal import MutationJournal
+from studiobridge.sdk.safety import SafetyManager
 from studiobridge.sdk.trace import StatsAccumulator, TraceRecord
 from studiobridge.wire.session import is_mutating_operation as is_wire_mutating
 
@@ -130,7 +132,6 @@ class Session:
         caps: CapabilityRegistry | None = None,
     ) -> None:
         self.backend: str = backend
-        self.mode: str = mode
         self.caps: CapabilityRegistry = caps if caps is not None else create_default_registry()
         self.stats_accumulator: StatsAccumulator = StatsAccumulator()
         self.client_id: str = f"sdk_{secrets.token_hex(4)}"
@@ -143,10 +144,22 @@ class Session:
         self.last_rtt: float = 0.0
         self.lease_holder: str | None = None
 
+        self.safety: SafetyManager = SafetyManager(session=self, mode=mode)
+        self.journal: MutationJournal = self.safety.journal
+
         self._is_connected: bool = False
         self._broker: EmbeddedBroker | None = None
         self._client: BrokerClient | None = None
         self._trace_listeners: list[Callable[[TraceRecord], None]] = []
+
+    @property
+    def mode(self) -> str:
+        """Active session safety mode."""
+        return self.safety.mode
+
+    @mode.setter
+    def mode(self, val: str) -> None:
+        self.safety.mode = val
 
     async def acquire_lease(
         self,
@@ -303,6 +316,8 @@ class Session:
                     details={"error": str(exc)},
                 ) from exc
 
+            self.journal.session_id = str(self.sid)
+
             # Ping and measure RTT
             t0 = time.monotonic()
             await self._broker.ping()
@@ -310,7 +325,7 @@ class Session:
             self.stats_accumulator.record_ping(self.last_rtt * 1000)
             self._is_connected = True
 
-            if self.mode in {"write", "unsafe"}:
+            if self.safety.is_write_allowed:
                 await self.acquire_lease()
 
         else:
@@ -422,6 +437,8 @@ class Session:
                     remedy=exc.remedy,
                 ) from exc
 
+            self.journal.session_id = str(self.sid)
+
             # Ping and measure RTT
             t0 = time.monotonic()
             await self._client.ping()
@@ -429,7 +446,7 @@ class Session:
             self.stats_accumulator.record_ping(self.last_rtt * 1000)
             self._is_connected = True
 
-            if self.mode in {"write", "unsafe"}:
+            if self.safety.is_write_allowed:
                 await self.acquire_lease()
 
     async def call(
@@ -440,6 +457,9 @@ class Session:
         opts: dict[str, Any] | None = None,
         priority: str | None = None,
         timeout: float = 5.0,
+        allow_protected: bool = False,
+        confirm: bool = False,
+        confirm_token: str | None = None,
     ) -> Any:
         """Execute a device operation through active broker transport."""
         if not self._is_connected:
@@ -454,16 +474,15 @@ class Session:
         # 1. Capability preflight gating per [CAP-02]
         check_operation_capability(self.caps, op)
 
-        # 2. Safety mode read-only guard per [SAF-01]
-        if self.mode == "read_only" and is_operation_mutating(op):
-            raise ReadOnlyError(
-                f"Cannot execute mutating operation '{op}' in read-only mode.",
-                code="E_READONLY",
-                details={"operation": op, "mode": self.mode},
-                remedy=(
-                    "Acquire writer lease and set mode to 'write' via fl.safety.set_mode('write')."
-                ),
-            )
+        # 2. Safety mode, protected target interlocks, confirmation, and policy guard [SAF-01..04]
+        self.safety.check_operation(
+            op,
+            call_args,
+            opts=opts,
+            allow_protected=allow_protected,
+            confirm=confirm,
+            confirm_token=confirm_token,
+        )
 
         # 3. Observability tracing and timing
         t0 = time.monotonic()

@@ -8,10 +8,13 @@ tolerances (defaulting to 0.005 per spec 09_l1_sdk.md §3), and proof levels
 from __future__ import annotations
 
 import math
-from typing import Any, Literal, TypeVar
+from typing import TYPE_CHECKING, Any, Literal, TypeVar
 
 from studiobridge.core.errors import UnverifiedWriteError
 from studiobridge.sdk.types import Verified
+
+if TYPE_CHECKING:
+    from studiobridge.sdk.journal import MutationJournal
 
 T = TypeVar("T")
 
@@ -116,6 +119,8 @@ def verify_mutation(
     fp: str | None = None,
     evidence: dict[str, Any] | None = None,
     remedy: str | None = None,
+    journal: MutationJournal | None = None,
+    target: Any = None,
 ) -> Verified[Any]:
     """Verify a state mutation against requested target and construct Verified[T].
 
@@ -134,6 +139,8 @@ def verify_mutation(
         fp: Session fingerprint pinned during the write.
         evidence: Optional extra context dictionary to merge.
         remedy: Suggested agent action in case of failure.
+        journal: Optional MutationJournal instance to automatically record the write.
+        target: Optional explicit target identifier for the journal.
 
     Returns:
         Verified[T] result object containing value, verified flag, proof level, and evidence.
@@ -166,6 +173,34 @@ def verify_mutation(
     }
     if evidence:
         evidence_dict.update(evidence)
+
+    # Automatically record verified write in mutation journal if provided
+    if journal is not None:
+        target_desc = target
+        if target_desc is None:
+            if evidence:
+                if "track" in evidence and "slot" in evidence:
+                    target_desc = f"mixer.track.{evidence['track']}.slot.{evidence['slot']}"
+                elif "track" in evidence:
+                    target_desc = f"mixer.track.{evidence['track']}"
+                elif "channel" in evidence:
+                    target_desc = f"channel.{evidence['channel']}"
+                elif "pattern" in evidence:
+                    target_desc = f"pattern.{evidence['pattern']}"
+                elif "playlist_track" in evidence:
+                    target_desc = f"playlist.track.{evidence['playlist_track']}"
+            if target_desc is None:
+                target_desc = fn
+
+        journal.record(
+            op=fn,
+            target=target_desc,
+            before=before,
+            after=actual,
+            proof=proof,
+            verified=verified,
+            details=evidence_dict,
+        )
 
     if strict and not verified:
         msg = (
