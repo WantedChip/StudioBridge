@@ -38,7 +38,9 @@ from studiobridge.core.errors import (
 from studiobridge.device.assets._sb_api import ALLOW
 from studiobridge.ports.base import MidiPort
 from studiobridge.ports.fake import FakeMidiPort
+from studiobridge.sdk.cache import CacheManager
 from studiobridge.sdk.capabilities import check_operation_capability
+from studiobridge.sdk.events import AsyncEventManager
 from studiobridge.sdk.journal import MutationJournal
 from studiobridge.sdk.safety import SafetyManager
 from studiobridge.sdk.trace import StatsAccumulator, TraceRecord
@@ -147,6 +149,9 @@ class Session:
         self.safety: SafetyManager = SafetyManager(session=self, mode=mode)
         self.journal: MutationJournal = self.safety.journal
 
+        self.cache: CacheManager = CacheManager()
+        self.events: AsyncEventManager = AsyncEventManager(session=self, cache=self.cache)
+
         self._is_connected: bool = False
         self._broker: EmbeddedBroker | None = None
         self._client: BrokerClient | None = None
@@ -215,6 +220,40 @@ class Session:
             res = await self._client.lease_release()
         self.lease_holder = None
         return res
+
+    def _on_broker_event(self, topic: str, data: Any) -> None:
+        """Handle raw event notification dispatched from broker transport."""
+        self.events.dispatch(topic, data)
+
+    async def subscribe_events(
+        self,
+        topics: list[str] | str,
+        callback: Callable[[str, Any], None] | None = None,
+    ) -> dict[str, Any]:
+        """Subscribe to broker device event topics."""
+        topic_list = [topics] if isinstance(topics, str) else list(topics)
+        cb = callback or self._on_broker_event
+        if self.backend == "embedded":
+            assert self._broker is not None
+            return await self._broker.device_subscribe(
+                topic_list, client_id=self.client_id, callback=cb
+            )
+        else:
+            assert self._client is not None
+            return await self._client.device_subscribe(topic_list, callback=cb)
+
+    async def unsubscribe_events(
+        self,
+        topics: list[str] | str,
+    ) -> dict[str, Any]:
+        """Unsubscribe from broker device event topics."""
+        topic_list = [topics] if isinstance(topics, str) else list(topics)
+        if self.backend == "embedded":
+            assert self._broker is not None
+            return await self._broker.device_unsubscribe(topic_list, client_id=self.client_id)
+        else:
+            assert self._client is not None
+            return await self._client.device_unsubscribe(topic_list)
 
     @property
     def is_connected(self) -> bool:
@@ -357,6 +396,13 @@ class Session:
             if self.safety.is_write_allowed:
                 await self.acquire_lease()
 
+            # Wire up event listening from embedded broker
+            if self._broker is not None:
+                with contextlib.suppress(Exception):
+                    await self._broker.device_subscribe(
+                        ["*"], client_id=self.client_id, callback=self._on_broker_event
+                    )
+
         else:
             self.backend = "tcp"
             if isinstance(broker, BrokerClient):
@@ -478,6 +524,10 @@ class Session:
             if self.safety.is_write_allowed:
                 await self.acquire_lease()
 
+            # Wire up event listening from daemon broker
+            with contextlib.suppress(Exception):
+                await self._client.device_subscribe(["*"], callback=self._on_broker_event)
+
     async def call(
         self,
         op: str,
@@ -512,6 +562,13 @@ class Session:
             confirm=confirm,
             confirm_token=confirm_token,
         )
+
+        # 3. Read-through cache lookup for slow-changing reads per 09 §9
+        is_mutating = is_operation_mutating(op)
+        if not is_mutating:
+            cached_val = self.cache.get_call(op, call_args)
+            if cached_val is not None:
+                return cached_val
 
         # 3. Observability tracing and timing
         t0 = time.monotonic()
@@ -556,6 +613,11 @@ class Session:
                     data=res,
                 )
             )
+            if not is_mutating:
+                self.cache.set_call(op, call_args, res)
+            else:
+                self.cache.invalidate_operation(op, call_args)
+
             return res
 
         except Exception as exc:
@@ -631,6 +693,11 @@ class Session:
 
             duration_ms = round((time.monotonic() - t0) * 1000, 3)
             self.stats_accumulator.record_batch(len(ops), duration_ms, success=True)
+            for item in ops:
+                op_name = item.get("op", "")
+                if is_operation_mutating(op_name):
+                    self.cache.invalidate_operation(op_name, item.get("args"))
+
             return results
         except Exception:
             duration_ms = round((time.monotonic() - t0) * 1000, 3)
@@ -677,6 +744,8 @@ class Session:
         if not self._is_connected:
             return
         self._is_connected = False
+        self.events.close()
+        self.cache.clear()
         if self.lease_holder == self.client_id:
             with contextlib.suppress(Exception):
                 await self.release_lease()

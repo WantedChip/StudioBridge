@@ -24,8 +24,10 @@ from studiobridge.core.errors import DisconnectedError, UnavailableError
 from studiobridge.device.assets._sb_api import ALLOW
 from studiobridge.ports.base import MidiPort
 from studiobridge.sdk.batch import AsyncBatchContext, SyncBatchContext
+from studiobridge.sdk.cache import CacheManager, SyncCacheManager
 from studiobridge.sdk.capabilities import check_operation_capability
 from studiobridge.sdk.channels import AsyncChannels, SyncChannels
+from studiobridge.sdk.events import AsyncEventManager, SyncEventManager
 from studiobridge.sdk.mixer import AsyncMixer, SyncMixer
 from studiobridge.sdk.patterns import AsyncPatterns, SyncPatterns
 from studiobridge.sdk.playlist import AsyncPlaylist, SyncPlaylist
@@ -187,6 +189,8 @@ class AsyncStudio:
         self.playlist: AsyncPlaylist = AsyncPlaylist(session)
         self.ui: AsyncUi = AsyncUi(session)
         self.safety: AsyncSafetyManager = AsyncSafetyManager(session, session.safety)
+        self.events: AsyncEventManager = session.events
+        self.cache: CacheManager = session.cache
 
     @property
     def session(self) -> Session:
@@ -332,6 +336,10 @@ class Studio:
         )
         self.ui: SyncUi = SyncUi(portal, async_studio.ui, session=async_studio.session)
         self.safety: SyncSafetyManager = SyncSafetyManager(portal, async_studio.safety)
+        self.events: SyncEventManager = SyncEventManager(
+            portal, async_studio.events, session=async_studio.session
+        )
+        self.cache: SyncCacheManager = SyncCacheManager(async_studio.cache)
 
     @property
     def session(self) -> Session:

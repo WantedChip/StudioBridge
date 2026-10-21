@@ -499,8 +499,22 @@ class EmbeddedBroker:
 
     def publish_event(self, topic: str, data: Any, seq: int = 0) -> None:
         """Fan out incoming event notification to all subscribed clients."""
-        subs = self._subscriptions.get(topic, [])
-        for sub in list(subs):
+        # Collect subscribers: exact match, wildcard "*", and prefix matching
+        matched_subs: list[EventSubscription] = list(self._subscriptions.get(topic, []))
+        if topic != "*":
+            matched_subs.extend(self._subscriptions.get("*", []))
+        for sub_topic, sub_list in self._subscriptions.items():
+            if sub_topic.endswith(".*"):
+                prefix = sub_topic[:-2]
+                if topic == prefix or topic.startswith(prefix + "."):
+                    matched_subs.extend(sub_list)
+
+        seen: set[int] = set()
+        for sub in matched_subs:
+            sub_id = id(sub)
+            if sub_id in seen:
+                continue
+            seen.add(sub_id)
             sub.queue.append((topic, data, seq))
             if sub.callback is not None:
                 try:
