@@ -1,19 +1,27 @@
-"""Playlist arrangement namespace for StudioBridge Python SDK.
+"""Playlist management namespace for StudioBridge Python SDK.
 
 Provides high-level typed playlist controllers (AsyncPlaylist and SyncPlaylist)
-mounted on AsyncStudio.playlist and Studio.playlist per spec 09_l1_sdk.md §4, §8.
+mounted on AsyncStudio.playlist and Studio.playlist per spec 09_l1_sdk.md §4.
 """
 
 from __future__ import annotations
 
 import functools
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from anyio.from_thread import BlockingPortal
 
-from studiobridge.core.errors import DisconnectedError, UnverifiedWriteError
+from studiobridge.core.errors import (
+    AmbiguousRefError,
+    BadRefError,
+    DisconnectedError,
+    PreconditionError,
+)
 from studiobridge.sdk.capabilities import gate_capability
-from studiobridge.sdk.types import Pattern, PlaylistTrack, Verified
+from studiobridge.sdk.refs import Pattern, PlaylistTrack
+from studiobridge.sdk.types import Verified
+from studiobridge.sdk.units import Color
+from studiobridge.sdk.verification import build_expect_guard, verify_mutation
 
 if TYPE_CHECKING:
     from studiobridge.sdk.session import Session
@@ -27,7 +35,7 @@ def _resolve_track_number(track: int | PlaylistTrack) -> int:
 
 
 class AsyncPlaylist:
-    """Asynchronous FL Studio playlist track inspection and management interface."""
+    """Asynchronous FL Studio playlist management interface."""
 
     def __init__(self, session: Session) -> None:
         self._session = session
@@ -48,34 +56,46 @@ class AsyncPlaylist:
         index: int | PlaylistTrack,
         name: str,
         *,
+        expect: str | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[str]:
         """Set playlist track name with read-back verification."""
         num = _resolve_track_number(index)
         str_val = str(name)
         before = await self.get_name(num)
-        await self._session.call("playlist.setTrackName", {"index": num, "name": str_val})
+
+        call_opts: dict[str, Any] | None = None
+        if expect is not None:
+            if isinstance(expect, dict):
+                call_opts = {"expect": expect}
+            else:
+                exp_val = str(expect)
+                guard = build_expect_guard(
+                    "playlist.setTrackName", "playlist.getTrackName", [num], exp_val
+                )
+                call_opts = {"expect": guard}
+                if before != exp_val:
+                    raise PreconditionError(
+                        f"Precondition guard failed for playlist.setTrackName: "
+                        f"expected {exp_val!r}, current value is {before!r}",
+                        code="E_PRECONDITION",
+                    )
+
+        await self._session.call(
+            "playlist.setTrackName",
+            {"index": num, "name": str_val},
+            opts=call_opts,
+        )
         after = await self.get_name(num)
-        verified = after == str_val
-
-        if strict and not verified:
-            raise UnverifiedWriteError(
-                f"Failed to verify playlist track {num} name: requested {str_val!r}, got {after!r}",
-                target_value=str_val,
-                actual_value=after,
-                details={"track": num, "before": before, "after": after},
-                remedy="Ensure track index exists and name is non-empty.",
-            )
-
-        return Verified(
-            value=after,
-            requested=str_val,
-            verified=verified,
-            plane="live",
-            settled=True,
-            proof="readback",
+        return verify_mutation(
+            "playlist.setTrackName",
+            str_val,
+            after,
+            before=before,
+            strict=strict,
             fp=self._session.fp,
-            evidence={"track": num, "before": before, "after": after},
+            evidence={"track": num},
+            remedy="Ensure track index exists and name is non-empty.",
         )
 
     async def get_color(self, index: int | PlaylistTrack) -> int:
@@ -87,126 +107,154 @@ class AsyncPlaylist:
     async def set_color(
         self,
         index: int | PlaylistTrack,
-        color: int,
+        color: int | Color | str | tuple[int, int, int],
         *,
+        expect: int | Color | str | tuple[int, int, int] | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[int]:
         """Set playlist track RGB color with read-back verification."""
         num = _resolve_track_number(index)
-        col_val = int(color)
+        col_val = int(Color(color)) if not isinstance(color, int) else int(color)
         before = await self.get_color(num)
-        await self._session.call("playlist.setTrackColor", {"index": num, "color": col_val})
+
+        call_opts: dict[str, Any] | None = None
+        if expect is not None:
+            if isinstance(expect, dict):
+                call_opts = {"expect": expect}
+            else:
+                exp_val = int(Color(expect)) if not isinstance(expect, int) else int(expect)
+                guard = build_expect_guard(
+                    "playlist.setTrackColor", "playlist.getTrackColor", [num], exp_val
+                )
+                call_opts = {"expect": guard}
+                if before != exp_val:
+                    raise PreconditionError(
+                        f"Precondition guard failed for playlist.setTrackColor: "
+                        f"expected {exp_val}, current value is {before}",
+                        code="E_PRECONDITION",
+                    )
+
+        await self._session.call(
+            "playlist.setTrackColor",
+            {"index": num, "color": col_val},
+            opts=call_opts,
+        )
         after = await self.get_color(num)
-        verified = after == col_val
-
-        if strict and not verified:
-            raise UnverifiedWriteError(
-                f"Failed to verify playlist track {num} color: requested {col_val}, got {after}",
-                target_value=col_val,
-                actual_value=after,
-                details={"track": num, "before": before, "after": after},
-                remedy="Ensure track index exists and color integer is valid.",
-            )
-
-        return Verified(
-            value=after,
-            requested=col_val,
-            verified=verified,
-            plane="live",
-            settled=True,
-            proof="readback",
+        return verify_mutation(
+            "playlist.setTrackColor",
+            col_val,
+            after,
+            before=before,
+            strict=strict,
             fp=self._session.fp,
-            evidence={"track": num, "before": before, "after": after},
+            evidence={"track": num},
+            remedy="Ensure track index exists and color integer is valid.",
         )
 
     async def is_muted(self, index: int | PlaylistTrack) -> bool:
         """Query whether playlist track is muted."""
         num = _resolve_track_number(index)
         res = await self._session.call("playlist.isTrackMuted", {"index": num})
-        return bool(res) if res is not None else False
+        return bool(res)
 
     async def mute(
         self,
         index: int | PlaylistTrack,
         value: bool = True,
         *,
+        expect: bool | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[bool]:
         """Set playlist track mute state with read-back verification."""
         num = _resolve_track_number(index)
-        target_val = bool(value)
+        target = bool(value)
         before = await self.is_muted(num)
+
+        call_opts: dict[str, Any] | None = None
+        if expect is not None:
+            if isinstance(expect, dict):
+                call_opts = {"expect": expect}
+            else:
+                exp_val = bool(expect)
+                guard = build_expect_guard(
+                    "playlist.muteTrack", "playlist.isTrackMuted", [num], exp_val
+                )
+                call_opts = {"expect": guard}
+                if before != exp_val:
+                    raise PreconditionError(
+                        f"Precondition guard failed for playlist.muteTrack: "
+                        f"expected {exp_val}, current value is {before}",
+                        code="E_PRECONDITION",
+                    )
+
         await self._session.call(
             "playlist.muteTrack",
-            {"index": num, "value": 1 if target_val else 0},
+            {"index": num, "value": 1 if target else 0},
+            opts=call_opts,
         )
         after = await self.is_muted(num)
-        verified = after == target_val
-
-        if strict and not verified:
-            raise UnverifiedWriteError(
-                f"Failed to verify playlist track {num} mute state: "
-                f"requested {target_val}, got {after}",
-                target_value=target_val,
-                actual_value=after,
-                details={"track": num, "before": before, "after": after},
-                remedy="Ensure track index exists and verify mute state.",
-            )
-
-        return Verified(
-            value=after,
-            requested=target_val,
-            verified=verified,
-            plane="live",
-            settled=True,
-            proof="readback",
+        return verify_mutation(
+            "playlist.muteTrack",
+            target,
+            after,
+            before=before,
+            strict=strict,
             fp=self._session.fp,
-            evidence={"track": num, "before": before, "after": after},
+            evidence={"track": num},
+            remedy="Check whether track index exists or is muted by parent group.",
         )
 
     async def is_solo(self, index: int | PlaylistTrack) -> bool:
         """Query whether playlist track is soloed."""
         num = _resolve_track_number(index)
         res = await self._session.call("playlist.isTrackSolo", {"index": num})
-        return bool(res) if res is not None else False
+        return bool(res)
 
     async def solo(
         self,
         index: int | PlaylistTrack,
         value: bool = True,
         *,
+        expect: bool | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[bool]:
         """Set playlist track solo state with read-back verification."""
         num = _resolve_track_number(index)
-        target_val = bool(value)
+        target = bool(value)
         before = await self.is_solo(num)
+
+        call_opts: dict[str, Any] | None = None
+        if expect is not None:
+            if isinstance(expect, dict):
+                call_opts = {"expect": expect}
+            else:
+                exp_val = bool(expect)
+                guard = build_expect_guard(
+                    "playlist.soloTrack", "playlist.isTrackSolo", [num], exp_val
+                )
+                call_opts = {"expect": guard}
+                if before != exp_val:
+                    raise PreconditionError(
+                        f"Precondition guard failed for playlist.soloTrack: "
+                        f"expected {exp_val}, current value is {before}",
+                        code="E_PRECONDITION",
+                    )
+
         await self._session.call(
             "playlist.soloTrack",
-            {"index": num, "value": 1 if target_val else 0},
+            {"index": num, "value": 1 if target else 0},
+            opts=call_opts,
         )
         after = await self.is_solo(num)
-        verified = after == target_val
-
-        if strict and not verified:
-            raise UnverifiedWriteError(
-                f"Failed to verify playlist track {num} solo state: "
-                f"requested {target_val}, got {after}",
-                target_value=target_val,
-                actual_value=after,
-                details={"track": num, "before": before, "after": after},
-                remedy="Ensure track index exists and verify solo state.",
-            )
-
-        return Verified(
-            value=after,
-            requested=target_val,
-            verified=verified,
-            plane="live",
-            settled=True,
-            proof="readback",
+        return verify_mutation(
+            "playlist.soloTrack",
+            target,
+            after,
+            before=before,
+            strict=strict,
             fp=self._session.fp,
-            evidence={"track": num, "before": before, "after": after},
+            evidence={"track": num},
+            remedy="Check whether other tracks prevent solo changes.",
         )
 
     async def get_track(self, index: int | PlaylistTrack) -> PlaylistTrack:
@@ -216,13 +264,7 @@ class AsyncPlaylist:
         color = await self.get_color(num)
         muted = await self.is_muted(num)
         solo = await self.is_solo(num)
-        return PlaylistTrack(
-            number=num,
-            name=name,
-            color=color,
-            muted=muted,
-            solo=solo,
-        )
+        return PlaylistTrack(number=num, name=name, color=color, muted=muted, solo=solo)
 
     async def list(self, limit: int = 32) -> list[PlaylistTrack]:
         """List active playlist tracks up to limit."""
@@ -233,12 +275,65 @@ class AsyncPlaylist:
             tracks.append(await self.get_track(i))
         return tracks
 
+    async def find(self, name: str, *, limit: int = 32) -> PlaylistTrack:
+        """Find playlist track by name per 09 §3.2.
+
+        Args:
+            name: Track name to look up.
+            limit: Maximum scan depth (default 32).
+
+        Returns:
+            Resolved PlaylistTrack handle.
+
+        Raises:
+            AmbiguousRefError: When multiple tracks match name.
+            BadRefError: When no track matches name.
+        """
+        tot = await self.count()
+        scan_count = min(tot, limit) if limit > 0 else tot
+        exact_matches: list[int] = []
+        ci_matches: list[int] = []
+        query_ci = name.strip().lower()
+        names: dict[int, str] = {}
+
+        for i in range(1, scan_count + 1):
+            nm = await self.get_name(i)
+            names[i] = nm
+            if nm == name:
+                exact_matches.append(i)
+            elif nm.strip().lower() == query_ci:
+                ci_matches.append(i)
+
+        if len(exact_matches) == 1:
+            return await self.get_track(exact_matches[0])
+        if len(exact_matches) > 1:
+            raise AmbiguousRefError(
+                f"Multiple playlist tracks matched {name!r}: {[names[i] for i in exact_matches]}",
+                candidates=[PlaylistTrack(number=i, name=names[i]) for i in exact_matches],
+                query=name,
+            )
+        if len(ci_matches) == 1:
+            return await self.get_track(ci_matches[0])
+        if len(ci_matches) > 1:
+            raise AmbiguousRefError(
+                f"Multiple playlist tracks matched {name!r} (case-insensitive): "
+                f"{[names[i] for i in ci_matches]}",
+                candidates=[PlaylistTrack(number=i, name=names[i]) for i in ci_matches],
+                query=name,
+            )
+        raise BadRefError(
+            f"No playlist track found matching {name!r}.",
+            target=name,
+            remedy="Verify playlist track name exists or list available playlist tracks.",
+        )
+
     async def place_pattern(
         self,
         pattern: int | Pattern,
         track: int | PlaylistTrack,
         time: float = 0.0,
         *,
+        expect: Any = None,
         strict: bool = False,
     ) -> Verified[bool]:
         """Place pattern clip onto playlist track at target time (experimental).
@@ -307,6 +402,11 @@ class SyncPlaylist:
         self._check_connection()
         return self._portal.call(functools.partial(self._async.list, limit=limit))
 
+    def find(self, name: str, *, limit: int = 32) -> PlaylistTrack:
+        """Find playlist track by name per 09 §3.2."""
+        self._check_connection()
+        return self._portal.call(functools.partial(self._async.find, name, limit=limit))
+
     def get_name(self, index: int | PlaylistTrack) -> str:
         """Retrieve playlist track name."""
         self._check_connection()
@@ -317,12 +417,13 @@ class SyncPlaylist:
         index: int | PlaylistTrack,
         name: str,
         *,
+        expect: str | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[str]:
         """Set playlist track name with read-back verification."""
         self._check_connection()
         return self._portal.call(
-            functools.partial(self._async.set_name, index, name, strict=strict)
+            functools.partial(self._async.set_name, index, name, expect=expect, strict=strict)
         )
 
     def get_color(self, index: int | PlaylistTrack) -> int:
@@ -333,14 +434,15 @@ class SyncPlaylist:
     def set_color(
         self,
         index: int | PlaylistTrack,
-        color: int,
+        color: int | Color | str | tuple[int, int, int],
         *,
+        expect: int | Color | str | tuple[int, int, int] | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[int]:
         """Set playlist track RGB color with read-back verification."""
         self._check_connection()
         return self._portal.call(
-            functools.partial(self._async.set_color, index, color, strict=strict)
+            functools.partial(self._async.set_color, index, color, expect=expect, strict=strict)
         )
 
     def is_muted(self, index: int | PlaylistTrack) -> bool:
@@ -353,12 +455,13 @@ class SyncPlaylist:
         index: int | PlaylistTrack,
         value: bool = True,
         *,
+        expect: bool | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[bool]:
         """Set playlist track mute state with read-back verification."""
         self._check_connection()
         return self._portal.call(
-            functools.partial(self._async.mute, index, value=value, strict=strict)
+            functools.partial(self._async.mute, index, value=value, expect=expect, strict=strict)
         )
 
     def is_solo(self, index: int | PlaylistTrack) -> bool:
@@ -371,12 +474,13 @@ class SyncPlaylist:
         index: int | PlaylistTrack,
         value: bool = True,
         *,
+        expect: bool | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[bool]:
         """Set playlist track solo state with read-back verification."""
         self._check_connection()
         return self._portal.call(
-            functools.partial(self._async.solo, index, value=value, strict=strict)
+            functools.partial(self._async.solo, index, value=value, expect=expect, strict=strict)
         )
 
     def place_pattern(
@@ -385,6 +489,7 @@ class SyncPlaylist:
         track: int | PlaylistTrack,
         time: float = 0.0,
         *,
+        expect: Any = None,
         strict: bool = False,
     ) -> Verified[bool]:
         """Place pattern clip onto playlist track at target time (experimental)."""
@@ -395,6 +500,7 @@ class SyncPlaylist:
                 pattern,
                 track,
                 time=time,
+                expect=expect,
                 strict=strict,
             )
         )

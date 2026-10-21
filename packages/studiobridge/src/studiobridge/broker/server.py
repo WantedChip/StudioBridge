@@ -471,11 +471,13 @@ class BrokerServer:
         if method == "device.call":
             op = params.get("op", "")
             args = params.get("args") or {}
+            opts = params.get("opts")
             priority = params.get("priority")
             timeout = float(params.get("timeout", 5.0))
             return await self.broker.device_call(
                 op=op,
                 args=args,
+                opts=opts,
                 client_id=client_id,
                 priority=priority,
                 timeout=timeout,

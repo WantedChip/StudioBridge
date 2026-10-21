@@ -8,12 +8,13 @@ from __future__ import annotations
 
 import contextlib
 import functools
-from typing import TYPE_CHECKING, overload
+from typing import TYPE_CHECKING, Any, overload
 
 from anyio.from_thread import BlockingPortal
 
-from studiobridge.core.errors import DisconnectedError, UnverifiedWriteError
+from studiobridge.core.errors import DisconnectedError, PreconditionError
 from studiobridge.sdk.types import MixerTrack, PluginInfo, PluginParam, Slot, Verified
+from studiobridge.sdk.verification import build_expect_guard, tolerance_matches, verify_mutation
 
 if TYPE_CHECKING:
     from studiobridge.sdk.session import Session
@@ -167,6 +168,7 @@ class AsyncPlugins:
         val: float,
         /,
         *,
+        expect: float | dict[str, Any] | None = None,
         strict: bool = False,
         tol: float = 0.01,
     ) -> Verified[float]: ...
@@ -180,6 +182,7 @@ class AsyncPlugins:
         val: float,
         /,
         *,
+        expect: float | dict[str, Any] | None = None,
         strict: bool = False,
         tol: float = 0.01,
     ) -> Verified[float]: ...
@@ -192,6 +195,7 @@ class AsyncPlugins:
         val: float | None = None,
         /,
         *,
+        expect: float | dict[str, Any] | None = None,
         strict: bool = False,
         tol: float = 0.01,
     ) -> Verified[float]:
@@ -208,46 +212,54 @@ class AsyncPlugins:
 
         before = await self.get_param(t, s, p)
 
+        call_opts: dict[str, Any] | None = None
+        if expect is not None:
+            if isinstance(expect, dict):
+                call_opts = {"expect": expect}
+                exp_eq = expect.get("eq", expect.get("value"))
+                exp_tol = expect.get("tol", tol)
+                if exp_eq is not None and not tolerance_matches(exp_eq, before.value, tol=exp_tol):
+                    raise PreconditionError(
+                        f"Precondition guard failed for plugins.setParamValue: "
+                        f"expected {exp_eq}, current value is {before.value}",
+                        code="E_PRECONDITION",
+                        details={"expected": exp_eq, "actual": before.value, "tol": exp_tol},
+                    )
+            else:
+                exp_val = float(expect)
+                guard = build_expect_guard(
+                    "plugins.setParamValue",
+                    "plugins.getParamValue",
+                    [p, t, s],
+                    exp_val,
+                    tol=tol,
+                )
+                call_opts = {"expect": guard}
+                if not tolerance_matches(exp_val, before.value, tol=tol):
+                    raise PreconditionError(
+                        f"Precondition guard failed for plugins.setParamValue: "
+                        f"expected {exp_val}, current value is {before.value}",
+                        code="E_PRECONDITION",
+                        details={"expected": exp_val, "actual": before.value, "tol": tol},
+                    )
+
         await self._session.call(
             "plugins.setParamValue",
             {"value": target_val, "paramIndex": p, "index": t, "slot": s},
+            opts=call_opts,
         )
 
         after = await self.get_param(t, s, p)
-        verified = abs(after.value - target_val) <= tol
-
-        if strict and not verified:
-            raise UnverifiedWriteError(
-                f"Failed to verify plugin (track {t}, slot {s}) param {p} value: "
-                f"requested {target_val}, got {after.value} (tol={tol})",
-                target_value=target_val,
-                actual_value=after.value,
-                details={
-                    "track": t,
-                    "slot": s,
-                    "param_id": p,
-                    "before": before.value,
-                    "after": after.value,
-                },
-                remedy="Check parameter ranges (typically 0.0..1.0) and plugin edit state.",
-            )
-
-        return Verified(
-            value=after.value,
-            requested=target_val,
-            verified=verified,
-            plane="live",
-            settled=True,
-            proof="readback",
+        return verify_mutation(
+            "plugins.setParamValue",
+            target_val,
+            after.value,
+            before=before.value,
+            tol=tol,
+            strict=strict,
             fp=self._session.fp,
-            evidence={
-                "track": t,
-                "slot": s,
-                "param_id": p,
-                "before": before.value,
-                "after": after.value,
-                "tol": tol,
-            },
+            evidence={"track": t, "slot": s, "param_id": p, "text": after.text},
+            remedy="Check parameter ranges (typically 0.0..1.0) and plugin edit state.",
         )
 
 
@@ -364,6 +376,7 @@ class SyncPlugins:
         val: float,
         /,
         *,
+        expect: float | dict[str, Any] | None = None,
         strict: bool = False,
         tol: float = 0.01,
     ) -> Verified[float]: ...
@@ -377,6 +390,7 @@ class SyncPlugins:
         val: float,
         /,
         *,
+        expect: float | dict[str, Any] | None = None,
         strict: bool = False,
         tol: float = 0.01,
     ) -> Verified[float]: ...
@@ -389,6 +403,7 @@ class SyncPlugins:
         val: float | None = None,
         /,
         *,
+        expect: float | dict[str, Any] | None = None,
         strict: bool = False,
         tol: float = 0.01,
     ) -> Verified[float]:
@@ -401,6 +416,7 @@ class SyncPlugins:
                     track_or_slot,
                     slot_or_param_id,
                     float(param_id_or_val),
+                    expect=expect,
                     strict=strict,
                     tol=tol,
                 )
@@ -412,6 +428,7 @@ class SyncPlugins:
                 slot_or_param_id,
                 int(param_id_or_val),
                 float(val if val is not None else 0.0),
+                expect=expect,
                 strict=strict,
                 tol=tol,
             )

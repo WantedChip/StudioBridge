@@ -94,6 +94,7 @@ class ScheduledRequest:
     priority: Priority
     op: str
     args: dict[str, Any] = field(default_factory=dict)
+    opts: dict[str, Any] | None = None
     created_at: float = field(default_factory=time.monotonic)
     future_event: anyio.Event = field(default_factory=anyio.Event)
     result: Any = None

@@ -526,11 +526,78 @@ class BadRefError(ArgumentError):
 
     default_code: str = "E_BADREF"
 
+    def __init__(
+        self,
+        message: str | None = None,
+        *,
+        code: str = "E_BADREF",
+        details: dict[str, Any] | None = None,
+        retryable: bool = False,
+        remedy: str | None = None,
+        docs_anchor: str | None = None,
+        target: Any = None,
+    ) -> None:
+        det = dict(details) if details else {}
+        self.target: Any = target or det.get("target")
+        if self.target is not None and "target" not in det:
+            det["target"] = self.target
+        super().__init__(
+            message=message,
+            code=code,
+            details=det,
+            retryable=retryable,
+            remedy=remedy,
+            docs_anchor=docs_anchor,
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        data = super().to_dict()
+        if self.target is not None:
+            data["target"] = self.target
+        return data
+
 
 class AmbiguousRefError(ArgumentError):
     """Raised when a name or query matches multiple target candidates."""
 
     default_code: str = "E_AMBIGUOUS"
+
+    def __init__(
+        self,
+        message: str | None = None,
+        *,
+        code: str = "E_AMBIGUOUS",
+        details: dict[str, Any] | None = None,
+        retryable: bool = False,
+        remedy: str | None = None,
+        docs_anchor: str | None = None,
+        candidates: list[Any] | None = None,
+        query: str | None = None,
+    ) -> None:
+        det = dict(details) if details else {}
+        self.candidates: list[Any] = (
+            list(candidates) if candidates is not None else list(det.get("candidates", []))
+        )
+        self.query: str | None = query or det.get("query")
+        if self.candidates and "candidates" not in det:
+            det["candidates"] = self.candidates
+        if self.query is not None and "query" not in det:
+            det["query"] = self.query
+        super().__init__(
+            message=message,
+            code=code,
+            details=det,
+            retryable=retryable,
+            remedy=remedy,
+            docs_anchor=docs_anchor,
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        data = super().to_dict()
+        data["candidates"] = self.candidates
+        if self.query is not None:
+            data["query"] = self.query
+        return data
 
 
 class OutOfRangeError(ArgumentError):
@@ -635,10 +702,16 @@ class VerificationError(StudioBridgeError):
         actual_value: Any = None,
     ) -> None:
         det = dict(details) if details else {}
-        if target_value is not None:
-            det["target_value"] = target_value
-        if actual_value is not None:
-            det["actual_value"] = actual_value
+        self.target_value: Any = (
+            target_value if target_value is not None else det.get("target_value")
+        )
+        self.actual_value: Any = (
+            actual_value if actual_value is not None else det.get("actual_value")
+        )
+        if self.target_value is not None and "target_value" not in det:
+            det["target_value"] = self.target_value
+        if self.actual_value is not None and "actual_value" not in det:
+            det["actual_value"] = self.actual_value
         super().__init__(
             message=message,
             code=code,
@@ -647,6 +720,14 @@ class VerificationError(StudioBridgeError):
             remedy=remedy,
             docs_anchor=docs_anchor,
         )
+
+    def to_dict(self) -> dict[str, Any]:
+        data = super().to_dict()
+        if self.target_value is not None:
+            data["target_value"] = self.target_value
+        if self.actual_value is not None:
+            data["actual_value"] = self.actual_value
+        return data
 
 
 class UnverifiedWriteError(VerificationError):

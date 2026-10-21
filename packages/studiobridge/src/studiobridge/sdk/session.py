@@ -437,6 +437,7 @@ class Session:
         op: str,
         args: dict[str, Any] | None = None,
         *,
+        opts: dict[str, Any] | None = None,
         priority: str | None = None,
         timeout: float = 5.0,
     ) -> Any:
@@ -481,6 +482,7 @@ class Session:
                 res = await self._broker.device_call(
                     op,
                     call_args,
+                    opts=opts,
                     client_id=self.client_id,
                     priority=priority,
                     timeout=timeout,
@@ -490,6 +492,7 @@ class Session:
                 res = await self._client.device_call(
                     op,
                     call_args,
+                    opts=opts,
                     priority=priority,
                     timeout=timeout,
                 )

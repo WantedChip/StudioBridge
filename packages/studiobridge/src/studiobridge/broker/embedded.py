@@ -220,6 +220,7 @@ class EmbeddedBroker:
         op: str,
         args: dict[str, Any] | None = None,
         *,
+        opts: dict[str, Any] | RequestOpts | None = None,
         client_id: str = "default",
         priority: str | Priority | None = None,
         timeout: float = 5.0,
@@ -248,6 +249,7 @@ class EmbeddedBroker:
             priority=p,
             op=op,
             args=call_args,
+            opts=opts if isinstance(opts, dict) else (opts.to_dict() if opts else None),
             created_at=self.clock(),
         )
 
@@ -408,10 +410,16 @@ class EmbeddedBroker:
                 if (self.session.fp and wire_op not in {"hello", "probe", "ping"})
                 else None
             )
+            req_opts = RequestOpts(fp=fp_to_send)
+            if req.opts:
+                if "expect" in req.opts:
+                    req_opts.expect = req.opts["expect"]
+                if "verify" in req.opts:
+                    req_opts.verify = req.opts["verify"]
             req_env = RequestEnvelope(
                 op=wire_op,
                 args=wire_args,
-                opts=RequestOpts(fp=fp_to_send),
+                opts=req_opts,
             )
             if self.secret is not None:
                 req_env = sign_request(self.secret, req_env)

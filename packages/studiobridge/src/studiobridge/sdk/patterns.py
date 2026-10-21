@@ -7,12 +7,15 @@ mounted on AsyncStudio.patterns and Studio.patterns per spec 09_l1_sdk.md §4.
 from __future__ import annotations
 
 import functools
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from anyio.from_thread import BlockingPortal
 
-from studiobridge.core.errors import DisconnectedError, UnverifiedWriteError
-from studiobridge.sdk.types import Pattern, Verified
+from studiobridge.core.errors import DisconnectedError, PreconditionError
+from studiobridge.sdk.refs import Pattern, resolve_reference
+from studiobridge.sdk.types import Verified
+from studiobridge.sdk.units import Color
+from studiobridge.sdk.verification import build_expect_guard, verify_mutation
 
 if TYPE_CHECKING:
     from studiobridge.sdk.session import Session
@@ -52,34 +55,46 @@ class AsyncPatterns:
         index: int | Pattern,
         name: str,
         *,
+        expect: str | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[str]:
         """Set pattern name with read-back verification."""
         num = _resolve_pattern_number(index)
         str_val = str(name)
         before = await self.get_name(num)
-        await self._session.call("patterns.setPatternName", {"index": num, "name": str_val})
+
+        call_opts: dict[str, Any] | None = None
+        if expect is not None:
+            if isinstance(expect, dict):
+                call_opts = {"expect": expect}
+            else:
+                exp_val = str(expect)
+                guard = build_expect_guard(
+                    "patterns.setPatternName", "patterns.getPatternName", [num], exp_val
+                )
+                call_opts = {"expect": guard}
+                if before != exp_val:
+                    raise PreconditionError(
+                        f"Precondition guard failed for patterns.setPatternName: "
+                        f"expected {exp_val!r}, current value is {before!r}",
+                        code="E_PRECONDITION",
+                    )
+
+        await self._session.call(
+            "patterns.setPatternName",
+            {"index": num, "name": str_val},
+            opts=call_opts,
+        )
         after = await self.get_name(num)
-        verified = after == str_val
-
-        if strict and not verified:
-            raise UnverifiedWriteError(
-                f"Failed to verify pattern {num} name: requested {str_val!r}, got {after!r}",
-                target_value=str_val,
-                actual_value=after,
-                details={"pattern": num, "before": before, "after": after},
-                remedy="Ensure pattern index exists and name is non-empty.",
-            )
-
-        return Verified(
-            value=after,
-            requested=str_val,
-            verified=verified,
-            plane="live",
-            settled=True,
-            proof="readback",
+        return verify_mutation(
+            "patterns.setPatternName",
+            str_val,
+            after,
+            before=before,
+            strict=strict,
             fp=self._session.fp,
-            evidence={"pattern": num, "before": before, "after": after},
+            evidence={"pattern": num},
+            remedy="Ensure pattern index exists and name is non-empty.",
         )
 
     async def get_color(self, index: int | Pattern) -> int:
@@ -91,37 +106,48 @@ class AsyncPatterns:
     async def set_color(
         self,
         index: int | Pattern,
-        color: int,
+        color: int | Color | str | tuple[int, int, int],
         *,
+        expect: int | Color | str | tuple[int, int, int] | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[int]:
         """Set pattern RGB color with read-back verification."""
         num = _resolve_pattern_number(index)
-        col_val = int(color)
+        col_val = int(Color(color)) if not isinstance(color, int) else int(color)
         before = await self.get_color(num)
-        await self._session.call("patterns.setPatternColor", {"index": num, "color": col_val})
+
+        call_opts: dict[str, Any] | None = None
+        if expect is not None:
+            if isinstance(expect, dict):
+                call_opts = {"expect": expect}
+            else:
+                exp_val = int(Color(expect)) if not isinstance(expect, int) else int(expect)
+                guard = build_expect_guard(
+                    "patterns.setPatternColor", "patterns.getPatternColor", [num], exp_val
+                )
+                call_opts = {"expect": guard}
+                if before != exp_val:
+                    raise PreconditionError(
+                        f"Precondition guard failed for patterns.setPatternColor: "
+                        f"expected {exp_val}, current value is {before}",
+                        code="E_PRECONDITION",
+                    )
+
+        await self._session.call(
+            "patterns.setPatternColor",
+            {"index": num, "color": col_val},
+            opts=call_opts,
+        )
         after = await self.get_color(num)
-        verified = after == col_val
-
-        if strict and not verified:
-            raise UnverifiedWriteError(
-                f"Failed to verify pattern {num} color: "
-                f"requested 0x{col_val:06X}, got 0x{after:06X}",
-                target_value=col_val,
-                actual_value=after,
-                details={"pattern": num, "before": before, "after": after},
-                remedy="Ensure color is valid 24-bit RGB integer.",
-            )
-
-        return Verified(
-            value=after,
-            requested=col_val,
-            verified=verified,
-            plane="live",
-            settled=True,
-            proof="readback",
+        return verify_mutation(
+            "patterns.setPatternColor",
+            col_val,
+            after,
+            before=before,
+            strict=strict,
             fp=self._session.fp,
-            evidence={"pattern": num, "before": before, "after": after},
+            evidence={"pattern": num},
+            remedy="Ensure color is valid 24-bit RGB integer.",
         )
 
     async def get_length(self, index: int | Pattern) -> int:
@@ -134,49 +160,62 @@ class AsyncPatterns:
         self,
         index: int | Pattern,
         *,
+        expect: int | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[int]:
         """Select active pattern (1-based) with read-back verification."""
         num = _resolve_pattern_number(index)
         before = await self.get_active_number()
-        await self._session.call("patterns.jumpToPattern", {"index": num})
+
+        call_opts: dict[str, Any] | None = None
+        if expect is not None:
+            if isinstance(expect, dict):
+                call_opts = {"expect": expect}
+            else:
+                exp_val = int(expect)
+                guard = build_expect_guard(
+                    "patterns.jumpToPattern", "patterns.patternNumber", [], exp_val
+                )
+                call_opts = {"expect": guard}
+                if before != exp_val:
+                    raise PreconditionError(
+                        f"Precondition guard failed for patterns.jumpToPattern: "
+                        f"expected {exp_val}, current value is {before}",
+                        code="E_PRECONDITION",
+                    )
+
+        await self._session.call(
+            "patterns.jumpToPattern",
+            {"index": num},
+            opts=call_opts,
+        )
         after = await self.get_active_number()
-        verified = after == num
-
-        if strict and not verified:
-            raise UnverifiedWriteError(
-                f"Failed to verify active pattern selection: "
-                f"requested pattern {num}, active is {after}",
-                target_value=num,
-                actual_value=after,
-                details={"requested": num, "before": before, "after": after},
-                remedy="Check whether pattern index exceeds patternCount.",
-            )
-
-        return Verified(
-            value=after,
-            requested=num,
-            verified=verified,
-            plane="live",
-            settled=True,
-            proof="readback",
+        return verify_mutation(
+            "patterns.jumpToPattern",
+            num,
+            after,
+            before=before,
+            strict=strict,
             fp=self._session.fp,
-            evidence={"before": before, "after": after},
+            evidence={"requested": num},
+            remedy="Check whether pattern index exceeds patternCount.",
         )
 
     async def jump(
         self,
         index: int | Pattern,
         *,
+        expect: int | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[int]:
         """Jump to target pattern (alias for set_active)."""
-        return await self.set_active(index, strict=strict)
+        return await self.set_active(index, expect=expect, strict=strict)
 
     async def clear(
         self,
         index: int | Pattern,
         *,
+        expect: Any = None,
         strict: bool = False,
     ) -> Verified[bool]:
         """Clear notes and automation data in pattern."""
@@ -211,6 +250,27 @@ class AsyncPatterns:
             length = await self.get_length(i)
             patterns.append(Pattern(number=i, name=name, color=color, length=length))
         return patterns
+
+    async def find(self, name: str) -> Pattern:
+        """Find pattern by name per 09 §3.2.
+
+        Args:
+            name: Pattern name to look up.
+
+        Returns:
+            Resolved Pattern handle.
+
+        Raises:
+            AmbiguousRefError: When multiple patterns match name.
+            BadRefError: When no pattern matches name.
+        """
+        patterns = await self.list()
+        return resolve_reference(
+            patterns,
+            name,
+            name_accessor=lambda p: p.name,
+            entity_type="pattern",
+        )
 
 
 class SyncPatterns:
@@ -249,6 +309,11 @@ class SyncPatterns:
         self._check_connection()
         return self._portal.call(self._async.list)
 
+    def find(self, name: str) -> Pattern:
+        """Find pattern by name per 09 §3.2."""
+        self._check_connection()
+        return self._portal.call(functools.partial(self._async.find, name))
+
     def get_active_number(self) -> int:
         """Retrieve 1-based index of currently active pattern."""
         self._check_connection()
@@ -258,21 +323,27 @@ class SyncPatterns:
         self,
         index: int | Pattern,
         *,
+        expect: int | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[int]:
         """Select active pattern (1-based) with read-back verification."""
         self._check_connection()
-        return self._portal.call(functools.partial(self._async.set_active, index, strict=strict))
+        return self._portal.call(
+            functools.partial(self._async.set_active, index, expect=expect, strict=strict)
+        )
 
     def jump(
         self,
         index: int | Pattern,
         *,
+        expect: int | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[int]:
         """Jump to target pattern (alias for set_active)."""
         self._check_connection()
-        return self._portal.call(functools.partial(self._async.jump, index, strict=strict))
+        return self._portal.call(
+            functools.partial(self._async.jump, index, expect=expect, strict=strict)
+        )
 
     def get_name(self, index: int | Pattern) -> str:
         """Retrieve pattern label."""
@@ -284,12 +355,13 @@ class SyncPatterns:
         index: int | Pattern,
         name: str,
         *,
+        expect: str | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[str]:
         """Set pattern name with read-back verification."""
         self._check_connection()
         return self._portal.call(
-            functools.partial(self._async.set_name, index, name, strict=strict)
+            functools.partial(self._async.set_name, index, name, expect=expect, strict=strict)
         )
 
     def get_color(self, index: int | Pattern) -> int:
@@ -300,25 +372,29 @@ class SyncPatterns:
     def set_color(
         self,
         index: int | Pattern,
-        color: int,
+        color: int | Color | str | tuple[int, int, int],
         *,
+        expect: int | Color | str | tuple[int, int, int] | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[int]:
         """Set pattern RGB color with read-back verification."""
         self._check_connection()
         return self._portal.call(
-            functools.partial(self._async.set_color, index, color, strict=strict)
+            functools.partial(self._async.set_color, index, color, expect=expect, strict=strict)
         )
 
     def clear(
         self,
         index: int | Pattern,
         *,
+        expect: Any = None,
         strict: bool = False,
     ) -> Verified[bool]:
         """Clear notes and automation data in pattern."""
         self._check_connection()
-        return self._portal.call(functools.partial(self._async.clear, index, strict=strict))
+        return self._portal.call(
+            functools.partial(self._async.clear, index, expect=expect, strict=strict)
+        )
 
     def get_length(self, index: int | Pattern) -> int:
         """Retrieve pattern length in steps or ticks."""

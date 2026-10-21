@@ -1,18 +1,21 @@
-"""Channel rack namespace for StudioBridge Python SDK.
+"""Channel rack management namespace for StudioBridge Python SDK.
 
-Provides high-level typed channel controllers (AsyncChannels and SyncChannels)
+Provides high-level typed channel rack controllers (AsyncChannels and SyncChannels)
 mounted on AsyncStudio.channels and Studio.channels per spec 09_l1_sdk.md §4.
 """
 
 from __future__ import annotations
 
 import functools
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from anyio.from_thread import BlockingPortal
 
-from studiobridge.core.errors import DisconnectedError, UnverifiedWriteError
-from studiobridge.sdk.types import Channel, Verified
+from studiobridge.core.errors import DisconnectedError, PreconditionError
+from studiobridge.sdk.refs import Channel, resolve_reference
+from studiobridge.sdk.types import Verified
+from studiobridge.sdk.units import Color, Db, Pan, Percent, Volume
+from studiobridge.sdk.verification import build_expect_guard, tolerance_matches, verify_mutation
 
 if TYPE_CHECKING:
     from studiobridge.sdk.session import Session
@@ -47,34 +50,46 @@ class AsyncChannels:
         index: int | Channel,
         name: str,
         *,
+        expect: str | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[str]:
         """Set channel display label with read-back verification."""
         idx = _resolve_channel_index(index)
         str_val = str(name)
         before = await self.get_name(idx)
-        await self._session.call("channels.setChannelName", {"index": idx, "name": str_val})
+
+        call_opts: dict[str, Any] | None = None
+        if expect is not None:
+            if isinstance(expect, dict):
+                call_opts = {"expect": expect}
+            else:
+                exp_val = str(expect)
+                guard = build_expect_guard(
+                    "channels.setChannelName", "channels.getChannelName", [idx], exp_val
+                )
+                call_opts = {"expect": guard}
+                if before != exp_val:
+                    raise PreconditionError(
+                        f"Precondition guard failed for channels.setChannelName: "
+                        f"expected {exp_val!r}, current value is {before!r}",
+                        code="E_PRECONDITION",
+                    )
+
+        await self._session.call(
+            "channels.setChannelName",
+            {"index": idx, "name": str_val},
+            opts=call_opts,
+        )
         after = await self.get_name(idx)
-        verified = after == str_val
-
-        if strict and not verified:
-            raise UnverifiedWriteError(
-                f"Failed to verify channel {idx} name: requested {str_val!r}, got {after!r}",
-                target_value=str_val,
-                actual_value=after,
-                details={"channel": idx, "before": before, "after": after},
-                remedy="Ensure channel index exists and name is valid.",
-            )
-
-        return Verified(
-            value=after,
-            requested=str_val,
-            verified=verified,
-            plane="live",
-            settled=True,
-            proof="readback",
+        return verify_mutation(
+            "channels.setChannelName",
+            str_val,
+            after,
+            before=before,
+            strict=strict,
             fp=self._session.fp,
-            evidence={"channel": idx, "before": before, "after": after},
+            evidence={"channel": idx},
+            remedy="Ensure channel index exists and name is valid.",
         )
 
     async def get_volume(self, index: int | Channel) -> float:
@@ -86,37 +101,67 @@ class AsyncChannels:
     async def set_volume(
         self,
         index: int | Channel,
-        val: float,
+        val: float | Volume | Db | Percent,
         *,
+        expect: float | Volume | Db | Percent | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[float]:
         """Set normalized channel volume with read-back verification."""
         idx = _resolve_channel_index(index)
-        vol_val = float(val)
+        vol_val = float(Volume(val)) if isinstance(val, (Volume, Db, Percent)) else float(val)
         before = await self.get_volume(idx)
-        await self._session.call("channels.setChannelVolume", {"index": idx, "volume": vol_val})
+
+        call_opts: dict[str, Any] | None = None
+        if expect is not None:
+            if isinstance(expect, dict):
+                call_opts = {"expect": expect}
+                exp_eq = expect.get("eq", expect.get("value"))
+                exp_tol = expect.get("tol", 0.01)
+                if exp_eq is not None and not tolerance_matches(exp_eq, before, tol=exp_tol):
+                    raise PreconditionError(
+                        f"Precondition guard failed for channels.setChannelVolume: "
+                        f"expected {exp_eq}, current value is {before}",
+                        code="E_PRECONDITION",
+                        details={"expected": exp_eq, "actual": before, "tol": exp_tol},
+                    )
+            else:
+                exp_val = (
+                    float(Volume(expect))
+                    if isinstance(expect, (Volume, Db, Percent))
+                    else float(expect)
+                )
+                guard = build_expect_guard(
+                    "channels.setChannelVolume",
+                    "channels.getChannelVolume",
+                    [idx],
+                    exp_val,
+                    tol=0.01,
+                )
+                call_opts = {"expect": guard}
+                if not tolerance_matches(exp_val, before, tol=0.01):
+                    raise PreconditionError(
+                        f"Precondition guard failed for channels.setChannelVolume: "
+                        f"expected {exp_val}, current value is {before}",
+                        code="E_PRECONDITION",
+                        details={"expected": exp_val, "actual": before, "tol": 0.01},
+                    )
+
+        await self._session.call(
+            "channels.setChannelVolume",
+            {"index": idx, "volume": vol_val},
+            opts=call_opts,
+        )
         after = await self.get_volume(idx)
-        tol = 0.01
-        verified = abs(after - vol_val) <= tol
-
-        if strict and not verified:
-            raise UnverifiedWriteError(
-                f"Failed to verify channel {idx} volume: requested {vol_val}, got {after}",
-                target_value=vol_val,
-                actual_value=after,
-                details={"channel": idx, "before": before, "after": after, "tol": tol},
-                remedy="Check whether channel volume is clamped within 0.0 to 1.0.",
-            )
-
-        return Verified(
-            value=after,
-            requested=vol_val,
-            verified=verified,
-            plane="live",
-            settled=True,
-            proof="readback",
+        return verify_mutation(
+            "channels.setChannelVolume",
+            vol_val,
+            after,
+            before=before,
+            tol=0.01,
+            strict=strict,
             fp=self._session.fp,
-            evidence={"channel": idx, "before": before, "after": after, "tol": tol},
+            evidence={"channel": idx},
+            remedy="Check whether channel volume is clamped within 0.0 to 1.0.",
         )
 
     async def get_pan(self, index: int | Channel) -> float:
@@ -128,37 +173,59 @@ class AsyncChannels:
     async def set_pan(
         self,
         index: int | Channel,
-        val: float,
+        val: float | Pan,
         *,
+        expect: float | Pan | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[float]:
         """Set channel pan position (-1.0 to 1.0) with read-back verification."""
         idx = _resolve_channel_index(index)
         pan_val = float(val)
         before = await self.get_pan(idx)
-        await self._session.call("channels.setChannelPan", {"index": idx, "pan": pan_val})
+
+        call_opts: dict[str, Any] | None = None
+        if expect is not None:
+            if isinstance(expect, dict):
+                call_opts = {"expect": expect}
+                exp_eq = expect.get("eq", expect.get("value"))
+                exp_tol = expect.get("tol", 0.01)
+                if exp_eq is not None and not tolerance_matches(exp_eq, before, tol=exp_tol):
+                    raise PreconditionError(
+                        f"Precondition guard failed for channels.setChannelPan: "
+                        f"expected {exp_eq}, current value is {before}",
+                        code="E_PRECONDITION",
+                        details={"expected": exp_eq, "actual": before, "tol": exp_tol},
+                    )
+            else:
+                exp_val = float(expect)
+                guard = build_expect_guard(
+                    "channels.setChannelPan", "channels.getChannelPan", [idx], exp_val, tol=0.01
+                )
+                call_opts = {"expect": guard}
+                if not tolerance_matches(exp_val, before, tol=0.01):
+                    raise PreconditionError(
+                        f"Precondition guard failed for channels.setChannelPan: "
+                        f"expected {exp_val}, current value is {before}",
+                        code="E_PRECONDITION",
+                        details={"expected": exp_val, "actual": before, "tol": 0.01},
+                    )
+
+        await self._session.call(
+            "channels.setChannelPan",
+            {"index": idx, "pan": pan_val},
+            opts=call_opts,
+        )
         after = await self.get_pan(idx)
-        tol = 0.01
-        verified = abs(after - pan_val) <= tol
-
-        if strict and not verified:
-            raise UnverifiedWriteError(
-                f"Failed to verify channel {idx} pan: requested {pan_val}, got {after}",
-                target_value=pan_val,
-                actual_value=after,
-                details={"channel": idx, "before": before, "after": after, "tol": tol},
-                remedy="Ensure pan value is within -1.0 to 1.0.",
-            )
-
-        return Verified(
-            value=after,
-            requested=pan_val,
-            verified=verified,
-            plane="live",
-            settled=True,
-            proof="readback",
+        return verify_mutation(
+            "channels.setChannelPan",
+            pan_val,
+            after,
+            before=before,
+            tol=0.01,
+            strict=strict,
             fp=self._session.fp,
-            evidence={"channel": idx, "before": before, "after": after, "tol": tol},
+            evidence={"channel": idx},
+            remedy="Check whether channel pan is within valid range [-1.0, 1.0].",
         )
 
     async def is_muted(self, index: int | Channel) -> bool:
@@ -172,36 +239,46 @@ class AsyncChannels:
         index: int | Channel,
         muted: bool = True,
         *,
+        expect: bool | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[bool]:
         """Mute or unmute channel with read-back verification."""
         idx = _resolve_channel_index(index)
         target = bool(muted)
         before = await self.is_muted(idx)
+
+        call_opts: dict[str, Any] | None = None
+        if expect is not None:
+            if isinstance(expect, dict):
+                call_opts = {"expect": expect}
+            else:
+                exp_val = bool(expect)
+                guard = build_expect_guard(
+                    "channels.muteChannel", "channels.isChannelMuted", [idx], exp_val
+                )
+                call_opts = {"expect": guard}
+                if before != exp_val:
+                    raise PreconditionError(
+                        f"Precondition guard failed for channels.muteChannel: "
+                        f"expected {exp_val}, current value is {before}",
+                        code="E_PRECONDITION",
+                    )
+
         await self._session.call(
-            "channels.muteChannel", {"index": idx, "value": 1 if target else 0}
+            "channels.muteChannel",
+            {"index": idx, "value": 1 if target else 0},
+            opts=call_opts,
         )
         after = await self.is_muted(idx)
-        verified = after == target
-
-        if strict and not verified:
-            raise UnverifiedWriteError(
-                f"Failed to verify channel {idx} mute state: requested {target}, got {after}",
-                target_value=target,
-                actual_value=after,
-                details={"channel": idx, "before": before, "after": after},
-                remedy="Check whether channel state is locked or soloed.",
-            )
-
-        return Verified(
-            value=after,
-            requested=target,
-            verified=verified,
-            plane="live",
-            settled=True,
-            proof="readback",
+        return verify_mutation(
+            "channels.muteChannel",
+            target,
+            after,
+            before=before,
+            strict=strict,
             fp=self._session.fp,
-            evidence={"channel": idx, "before": before, "after": after},
+            evidence={"channel": idx},
+            remedy="Check whether channel mute state is locked.",
         )
 
     async def is_solo(self, index: int | Channel) -> bool:
@@ -215,36 +292,46 @@ class AsyncChannels:
         index: int | Channel,
         soloed: bool = True,
         *,
+        expect: bool | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[bool]:
         """Solo or unsolo channel with read-back verification."""
         idx = _resolve_channel_index(index)
         target = bool(soloed)
         before = await self.is_solo(idx)
+
+        call_opts: dict[str, Any] | None = None
+        if expect is not None:
+            if isinstance(expect, dict):
+                call_opts = {"expect": expect}
+            else:
+                exp_val = bool(expect)
+                guard = build_expect_guard(
+                    "channels.soloChannel", "channels.isChannelSolo", [idx], exp_val
+                )
+                call_opts = {"expect": guard}
+                if before != exp_val:
+                    raise PreconditionError(
+                        f"Precondition guard failed for channels.soloChannel: "
+                        f"expected {exp_val}, current value is {before}",
+                        code="E_PRECONDITION",
+                    )
+
         await self._session.call(
-            "channels.soloChannel", {"index": idx, "value": 1 if target else 0}
+            "channels.soloChannel",
+            {"index": idx, "value": 1 if target else 0},
+            opts=call_opts,
         )
         after = await self.is_solo(idx)
-        verified = after == target
-
-        if strict and not verified:
-            raise UnverifiedWriteError(
-                f"Failed to verify channel {idx} solo state: requested {target}, got {after}",
-                target_value=target,
-                actual_value=after,
-                details={"channel": idx, "before": before, "after": after},
-                remedy="Check whether another channel has exclusive solo.",
-            )
-
-        return Verified(
-            value=after,
-            requested=target,
-            verified=verified,
-            plane="live",
-            settled=True,
-            proof="readback",
+        return verify_mutation(
+            "channels.soloChannel",
+            target,
+            after,
+            before=before,
+            strict=strict,
             fp=self._session.fp,
-            evidence={"channel": idx, "before": before, "after": after},
+            evidence={"channel": idx},
+            remedy="Check whether other channels prevent solo state changes.",
         )
 
     async def get_color(self, index: int | Channel) -> int:
@@ -256,37 +343,48 @@ class AsyncChannels:
     async def set_color(
         self,
         index: int | Channel,
-        color: int,
+        color: int | Color | str | tuple[int, int, int],
         *,
+        expect: int | Color | str | tuple[int, int, int] | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[int]:
         """Set channel RGB color with read-back verification."""
         idx = _resolve_channel_index(index)
-        col_val = int(color)
+        col_val = int(Color(color)) if not isinstance(color, int) else int(color)
         before = await self.get_color(idx)
-        await self._session.call("channels.setChannelColor", {"index": idx, "color": col_val})
+
+        call_opts: dict[str, Any] | None = None
+        if expect is not None:
+            if isinstance(expect, dict):
+                call_opts = {"expect": expect}
+            else:
+                exp_val = int(Color(expect)) if not isinstance(expect, int) else int(expect)
+                guard = build_expect_guard(
+                    "channels.setChannelColor", "channels.getChannelColor", [idx], exp_val
+                )
+                call_opts = {"expect": guard}
+                if before != exp_val:
+                    raise PreconditionError(
+                        f"Precondition guard failed for channels.setChannelColor: "
+                        f"expected {exp_val}, current value is {before}",
+                        code="E_PRECONDITION",
+                    )
+
+        await self._session.call(
+            "channels.setChannelColor",
+            {"index": idx, "color": col_val},
+            opts=call_opts,
+        )
         after = await self.get_color(idx)
-        verified = after == col_val
-
-        if strict and not verified:
-            raise UnverifiedWriteError(
-                f"Failed to verify channel {idx} color: "
-                f"requested 0x{col_val:06X}, got 0x{after:06X}",
-                target_value=col_val,
-                actual_value=after,
-                details={"channel": idx, "before": before, "after": after},
-                remedy="Ensure color is valid 24-bit RGB integer.",
-            )
-
-        return Verified(
-            value=after,
-            requested=col_val,
-            verified=verified,
-            plane="live",
-            settled=True,
-            proof="readback",
+        return verify_mutation(
+            "channels.setChannelColor",
+            col_val,
+            after,
+            before=before,
+            strict=strict,
             fp=self._session.fp,
-            evidence={"channel": idx, "before": before, "after": after},
+            evidence={"channel": idx},
+            remedy="Ensure color value is formatted as valid 24-bit RGB integer.",
         )
 
     async def get_pitch(self, index: int | Channel) -> float:
@@ -300,35 +398,110 @@ class AsyncChannels:
         index: int | Channel,
         val: float,
         *,
+        expect: float | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[float]:
         """Set channel pitch offset with read-back verification."""
         idx = _resolve_channel_index(index)
         pitch_val = float(val)
         before = await self.get_pitch(idx)
-        await self._session.call("channels.setChannelPitch", {"index": idx, "pitch": pitch_val})
+
+        call_opts: dict[str, Any] | None = None
+        if expect is not None:
+            if isinstance(expect, dict):
+                call_opts = {"expect": expect}
+                exp_eq = expect.get("eq", expect.get("value"))
+                exp_tol = expect.get("tol", 0.01)
+                if exp_eq is not None and not tolerance_matches(exp_eq, before, tol=exp_tol):
+                    raise PreconditionError(
+                        f"Precondition guard failed for channels.setChannelPitch: "
+                        f"expected {exp_eq}, current value is {before}",
+                        code="E_PRECONDITION",
+                        details={"expected": exp_eq, "actual": before, "tol": exp_tol},
+                    )
+            else:
+                exp_val = float(expect)
+                guard = build_expect_guard(
+                    "channels.setChannelPitch", "channels.getChannelPitch", [idx], exp_val, tol=0.01
+                )
+                call_opts = {"expect": guard}
+                if not tolerance_matches(exp_val, before, tol=0.01):
+                    raise PreconditionError(
+                        f"Precondition guard failed for channels.setChannelPitch: "
+                        f"expected {exp_val}, current value is {before}",
+                        code="E_PRECONDITION",
+                        details={"expected": exp_val, "actual": before, "tol": 0.01},
+                    )
+
+        await self._session.call(
+            "channels.setChannelPitch",
+            {"index": idx, "pitch": pitch_val},
+            opts=call_opts,
+        )
         after = await self.get_pitch(idx)
-        tol = 0.01
-        verified = abs(after - pitch_val) <= tol
-
-        if strict and not verified:
-            raise UnverifiedWriteError(
-                f"Failed to verify channel {idx} pitch: requested {pitch_val}, got {after}",
-                target_value=pitch_val,
-                actual_value=after,
-                details={"channel": idx, "before": before, "after": after, "tol": tol},
-                remedy="Check whether channel pitch range is constrained.",
-            )
-
-        return Verified(
-            value=after,
-            requested=pitch_val,
-            verified=verified,
-            plane="live",
-            settled=True,
-            proof="readback",
+        return verify_mutation(
+            "channels.setChannelPitch",
+            pitch_val,
+            after,
+            before=before,
+            tol=0.01,
+            strict=strict,
             fp=self._session.fp,
-            evidence={"channel": idx, "before": before, "after": after, "tol": tol},
+            evidence={"channel": idx},
+            remedy="Check whether channel pitch is supported by generator plugin.",
+        )
+
+    async def get_target_fx(self, index: int | Channel) -> int:
+        """Retrieve target mixer track index linked to channel."""
+        idx = _resolve_channel_index(index)
+        res = await self._session.call("channels.getTargetFxTrack", {"index": idx})
+        return int(res) if res is not None else 0
+
+    async def set_target_fx(
+        self,
+        index: int | Channel,
+        track: int,
+        *,
+        expect: int | dict[str, Any] | None = None,
+        strict: bool = False,
+    ) -> Verified[int]:
+        """Set target mixer track routing for channel with read-back verification."""
+        idx = _resolve_channel_index(index)
+        trk = int(track)
+        before = await self.get_target_fx(idx)
+
+        call_opts: dict[str, Any] | None = None
+        if expect is not None:
+            if isinstance(expect, dict):
+                call_opts = {"expect": expect}
+            else:
+                exp_val = int(expect)
+                guard = build_expect_guard(
+                    "channels.setTargetFxTrack", "channels.getTargetFxTrack", [idx], exp_val
+                )
+                call_opts = {"expect": guard}
+                if before != exp_val:
+                    raise PreconditionError(
+                        f"Precondition guard failed for channels.setTargetFxTrack: "
+                        f"expected {exp_val}, current value is {before}",
+                        code="E_PRECONDITION",
+                    )
+
+        await self._session.call(
+            "channels.setTargetFxTrack",
+            {"index": idx, "track": trk},
+            opts=call_opts,
+        )
+        after = await self.get_target_fx(idx)
+        return verify_mutation(
+            "channels.setTargetFxTrack",
+            trk,
+            after,
+            before=before,
+            strict=strict,
+            fp=self._session.fp,
+            evidence={"channel": idx},
+            remedy="Ensure target mixer track index exists.",
         )
 
     async def trigger_note(
@@ -338,13 +511,14 @@ class AsyncChannels:
         vel: int = 100,
         dur: int = 1,
         *,
+        expect: Any = None,
         strict: bool = False,
     ) -> Verified[bool]:
         """Audition a single note on target channel."""
         idx = _resolve_channel_index(index)
         await self._session.call(
             "channels.triggerNote",
-            {"index": idx, "note": int(note), "velocity": int(vel), "duration": int(dur)},
+            {"index": idx, "note": note, "velocity": vel, "duration": dur},
         )
         return Verified(
             value=True,
@@ -354,15 +528,15 @@ class AsyncChannels:
             settled=True,
             proof="none",
             fp=self._session.fp,
-            evidence={"channel": idx, "note": note, "velocity": vel, "duration": dur},
+            evidence={"channel": idx, "note": note, "vel": vel, "dur": dur},
         )
 
     async def get_step_grid(self, index: int | Channel) -> list[int]:
         """Retrieve channel step sequencer activation pattern as list of 0/1 integers."""
         idx = _resolve_channel_index(index)
         res = await self._session.call("channels.getStepGrid", {"index": idx})
-        if isinstance(res, (list, tuple)):
-            return [int(s) for s in res]
+        if isinstance(res, list):
+            return [int(x) for x in res]
         return [0] * 16
 
     async def set_step_grid(
@@ -370,36 +544,48 @@ class AsyncChannels:
         index: int | Channel,
         steps: list[int] | list[bool],
         *,
+        expect: list[int] | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[list[int]]:
         """Set channel step sequencer activation pattern with read-back verification."""
         idx = _resolve_channel_index(index)
-        if len(steps) < 4:
-            raise ValueError(f"Step grid must contain at least 4 steps, got {len(steps)}")
-        int_steps = [int(bool(s)) for s in steps]
+        if len(steps) != 16:
+            raise ValueError(f"Step grid must have exactly 16 steps, got {len(steps)}")
+        step_ints = [1 if s else 0 for s in steps]
         before = await self.get_step_grid(idx)
-        await self._session.call("channels.setStepGrid", {"index": idx, "steps": int_steps})
+
+        call_opts: dict[str, Any] | None = None
+        if expect is not None:
+            if isinstance(expect, dict):
+                call_opts = {"expect": expect}
+            else:
+                exp_list = [1 if s else 0 for s in expect]
+                guard = build_expect_guard(
+                    "channels.setStepGrid", "channels.getStepGrid", [idx], exp_list
+                )
+                call_opts = {"expect": guard}
+                if before != exp_list:
+                    raise PreconditionError(
+                        f"Precondition guard failed for channels.setStepGrid: "
+                        f"expected {exp_list}, current value is {before}",
+                        code="E_PRECONDITION",
+                    )
+
+        await self._session.call(
+            "channels.setStepGrid",
+            {"index": idx, "steps": step_ints},
+            opts=call_opts,
+        )
         after = await self.get_step_grid(idx)
-        verified = after == int_steps
-
-        if strict and not verified:
-            raise UnverifiedWriteError(
-                f"Failed to verify channel {idx} step grid: requested {int_steps}, got {after}",
-                target_value=int_steps,
-                actual_value=after,
-                details={"channel": idx, "before": before, "after": after},
-                remedy="Ensure step grid length matches pattern step resolution.",
-            )
-
-        return Verified(
-            value=after,
-            requested=int_steps,
-            verified=verified,
-            plane="live",
-            settled=True,
-            proof="readback",
+        return verify_mutation(
+            "channels.setStepGrid",
+            step_ints,
+            after,
+            before=before,
+            strict=strict,
             fp=self._session.fp,
-            evidence={"channel": idx, "before": before, "after": after},
+            evidence={"channel": idx},
+            remedy="Check whether step grid length matches pattern length.",
         )
 
     async def get_channel(self, index: int | Channel) -> Channel:
@@ -412,9 +598,8 @@ class AsyncChannels:
         solo = await self.is_solo(idx)
         color = await self.get_color(idx)
         pitch = await self.get_pitch(idx)
-        target_fx_res = await self._session.call("channels.getTargetFxTrack", {"index": idx})
-        target_fx = int(target_fx_res) if target_fx_res is not None else 0
-        grid = await self.get_step_grid(idx)
+        target_fx = await self.get_target_fx(idx)
+        step_grid = await self.get_step_grid(idx)
 
         return Channel(
             index=idx,
@@ -426,7 +611,7 @@ class AsyncChannels:
             color=color,
             pitch=pitch,
             target_fx=target_fx,
-            step_grid=grid,
+            step_grid=step_grid,
         )
 
     async def list(self) -> list[Channel]:
@@ -436,6 +621,27 @@ class AsyncChannels:
         for i in range(total):
             channels.append(await self.get_channel(i))
         return channels
+
+    async def find(self, name: str) -> Channel:
+        """Find channel rack item by name per 09 §3.2.
+
+        Args:
+            name: Channel name to look up.
+
+        Returns:
+            Resolved Channel handle.
+
+        Raises:
+            AmbiguousRefError: When multiple channels match name.
+            BadRefError: When no channel matches name.
+        """
+        channels = await self.list()
+        return resolve_reference(
+            channels,
+            name,
+            name_accessor=lambda c: c.name,
+            entity_type="channel",
+        )
 
 
 class SyncChannels:
@@ -474,6 +680,11 @@ class SyncChannels:
         self._check_connection()
         return self._portal.call(self._async.list)
 
+    def find(self, name: str) -> Channel:
+        """Find channel rack item by name per 09 §3.2."""
+        self._check_connection()
+        return self._portal.call(functools.partial(self._async.find, name))
+
     def get_name(self, index: int | Channel) -> str:
         """Retrieve channel name."""
         self._check_connection()
@@ -484,12 +695,13 @@ class SyncChannels:
         index: int | Channel,
         name: str,
         *,
+        expect: str | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[str]:
         """Set channel display label with read-back verification."""
         self._check_connection()
         return self._portal.call(
-            functools.partial(self._async.set_name, index, name, strict=strict)
+            functools.partial(self._async.set_name, index, name, expect=expect, strict=strict)
         )
 
     def get_volume(self, index: int | Channel) -> float:
@@ -500,14 +712,15 @@ class SyncChannels:
     def set_volume(
         self,
         index: int | Channel,
-        val: float,
+        val: float | Volume | Db | Percent,
         *,
+        expect: float | Volume | Db | Percent | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[float]:
         """Set normalized channel volume with read-back verification."""
         self._check_connection()
         return self._portal.call(
-            functools.partial(self._async.set_volume, index, val, strict=strict)
+            functools.partial(self._async.set_volume, index, val, expect=expect, strict=strict)
         )
 
     def get_pan(self, index: int | Channel) -> float:
@@ -518,13 +731,16 @@ class SyncChannels:
     def set_pan(
         self,
         index: int | Channel,
-        val: float,
+        val: float | Pan,
         *,
+        expect: float | Pan | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[float]:
         """Set channel pan position (-1.0 to 1.0) with read-back verification."""
         self._check_connection()
-        return self._portal.call(functools.partial(self._async.set_pan, index, val, strict=strict))
+        return self._portal.call(
+            functools.partial(self._async.set_pan, index, val, expect=expect, strict=strict)
+        )
 
     def is_muted(self, index: int | Channel) -> bool:
         """Query whether channel is muted."""
@@ -536,12 +752,13 @@ class SyncChannels:
         index: int | Channel,
         muted: bool = True,
         *,
+        expect: bool | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[bool]:
         """Mute or unmute channel with read-back verification."""
         self._check_connection()
         return self._portal.call(
-            functools.partial(self._async.mute, index, muted=muted, strict=strict)
+            functools.partial(self._async.mute, index, muted=muted, expect=expect, strict=strict)
         )
 
     def is_solo(self, index: int | Channel) -> bool:
@@ -554,12 +771,13 @@ class SyncChannels:
         index: int | Channel,
         soloed: bool = True,
         *,
+        expect: bool | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[bool]:
         """Solo or unsolo channel with read-back verification."""
         self._check_connection()
         return self._portal.call(
-            functools.partial(self._async.solo, index, soloed=soloed, strict=strict)
+            functools.partial(self._async.solo, index, soloed=soloed, expect=expect, strict=strict)
         )
 
     def get_color(self, index: int | Channel) -> int:
@@ -570,14 +788,15 @@ class SyncChannels:
     def set_color(
         self,
         index: int | Channel,
-        color: int,
+        color: int | Color | str | tuple[int, int, int],
         *,
+        expect: int | Color | str | tuple[int, int, int] | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[int]:
         """Set channel RGB color with read-back verification."""
         self._check_connection()
         return self._portal.call(
-            functools.partial(self._async.set_color, index, color, strict=strict)
+            functools.partial(self._async.set_color, index, color, expect=expect, strict=strict)
         )
 
     def get_pitch(self, index: int | Channel) -> float:
@@ -590,12 +809,13 @@ class SyncChannels:
         index: int | Channel,
         val: float,
         *,
+        expect: float | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[float]:
         """Set channel pitch offset with read-back verification."""
         self._check_connection()
         return self._portal.call(
-            functools.partial(self._async.set_pitch, index, val, strict=strict)
+            functools.partial(self._async.set_pitch, index, val, expect=expect, strict=strict)
         )
 
     def trigger_note(
@@ -605,6 +825,7 @@ class SyncChannels:
         vel: int = 100,
         dur: int = 1,
         *,
+        expect: Any = None,
         strict: bool = False,
     ) -> Verified[bool]:
         """Audition a single note on target channel."""
@@ -616,6 +837,7 @@ class SyncChannels:
                 note=note,
                 vel=vel,
                 dur=dur,
+                expect=expect,
                 strict=strict,
             )
         )
@@ -630,12 +852,13 @@ class SyncChannels:
         index: int | Channel,
         steps: list[int] | list[bool],
         *,
+        expect: list[int] | dict[str, Any] | None = None,
         strict: bool = False,
     ) -> Verified[list[int]]:
         """Set channel step sequencer activation pattern with read-back verification."""
         self._check_connection()
         return self._portal.call(
-            functools.partial(self._async.set_step_grid, index, steps, strict=strict)
+            functools.partial(self._async.set_step_grid, index, steps, expect=expect, strict=strict)
         )
 
 

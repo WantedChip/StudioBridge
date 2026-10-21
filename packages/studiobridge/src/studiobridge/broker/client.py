@@ -513,11 +513,14 @@ class BrokerClient:
         op: str,
         args: dict[str, Any] | None = None,
         *,
+        opts: dict[str, Any] | None = None,
         priority: str | None = None,
         timeout: float = 5.0,
     ) -> Any:
         """Call a device operation through the broker."""
         params: dict[str, Any] = {"op": op, "args": args or {}, "timeout": timeout}
+        if opts is not None:
+            params["opts"] = opts
         if priority is not None:
             params["priority"] = priority
         return await self.call("device.call", params, timeout=timeout + 2.0)
