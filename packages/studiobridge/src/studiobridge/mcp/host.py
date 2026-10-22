@@ -19,6 +19,7 @@ import anyio
 
 from studiobridge._version import __version__
 from studiobridge.core.errors import ProtocolError, StudioBridgeError
+from studiobridge.mcp.instructions import DEFAULT_INSTRUCTIONS
 
 logger = logging.getLogger("studiobridge.mcp.host")
 
@@ -31,14 +32,6 @@ SUPPORTED_PROTOCOL_VERSIONS: tuple[str, ...] = (
 )
 LATEST_PROTOCOL_VERSION: str = "2026-07-28"
 EARLIEST_PROTOCOL_VERSION: str = "2025-03-26"
-
-# Server instructions per spec 10_l2_interfaces.md §7 (summary in <= 120 words)
-DEFAULT_INSTRUCTIONS: str = (
-    "First tool call in any session SHOULD be studio_status. "
-    "StudioBridge provides safe control of Image-Line FL Studio. "
-    "Modes: read_only (default), write (requires confirmation), unsafe. "
-    "Mutations are verified via read-back and recorded to the session mutation journal."
-)
 
 
 class JsonRpcErrorCode(enum.IntEnum):
@@ -248,13 +241,31 @@ class McpHost:
         if method == "resources/list":
             if is_notification:
                 return None
-            return {"jsonrpc": "2.0", "id": req_id, "result": {"resources": []}}
+            return self._handle_resources_list(req_id, params)
 
-        # 7. prompts/list
+        # 7. resources/templates/list
+        if method == "resources/templates/list":
+            if is_notification:
+                return None
+            return self._handle_resources_templates_list(req_id, params)
+
+        # 8. resources/read
+        if method == "resources/read":
+            if is_notification:
+                return None
+            return self._handle_resources_read(req_id, params)
+
+        # 9. prompts/list
         if method == "prompts/list":
             if is_notification:
                 return None
-            return {"jsonrpc": "2.0", "id": req_id, "result": {"prompts": []}}
+            return self._handle_prompts_list(req_id, params)
+
+        # 10. prompts/get
+        if method == "prompts/get":
+            if is_notification:
+                return None
+            return self._handle_prompts_get(req_id, params)
 
         # Unknown method
         if is_notification:
@@ -435,6 +446,156 @@ class McpHost:
             "structuredContent": res,
             "isError": False,
         }
+
+    def _handle_resources_list(self, req_id: Any, params: dict[str, Any]) -> dict[str, Any]:
+        """Process 'resources/list' request and return registered resources."""
+        if self.server and hasattr(self.server, "get_resources"):
+            resources = self.server.get_resources()
+        else:
+            from studiobridge.mcp.resources import get_default_resources
+
+            resources = get_default_resources(server=self.server)
+
+        formatted = [r.to_mcp_dict() if hasattr(r, "to_mcp_dict") else r for r in resources]
+        return {
+            "jsonrpc": "2.0",
+            "id": req_id,
+            "result": {"resources": formatted},
+        }
+
+    def _handle_resources_templates_list(
+        self, req_id: Any, params: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Process 'resources/templates/list' request and return registered resource templates."""
+        if self.server and hasattr(self.server, "get_resource_templates"):
+            templates = self.server.get_resource_templates()
+        else:
+            from studiobridge.mcp.resources import get_default_resource_templates
+
+            templates = get_default_resource_templates()
+
+        formatted = [t.to_mcp_dict() if hasattr(t, "to_mcp_dict") else t for t in templates]
+        return {
+            "jsonrpc": "2.0",
+            "id": req_id,
+            "result": {"resourceTemplates": formatted},
+        }
+
+    def _handle_resources_read(self, req_id: Any, params: dict[str, Any]) -> dict[str, Any]:
+        """Process 'resources/read' request and resolve requested resource URI."""
+        if not isinstance(params, dict):
+            return self._make_error_frame(
+                req_id=req_id,
+                code=JsonRpcErrorCode.INVALID_PARAMS,
+                message="Invalid params: params must be an object",
+            )
+
+        uri = params.get("uri")
+        if not uri or not isinstance(uri, str):
+            return self._make_error_frame(
+                req_id=req_id,
+                code=JsonRpcErrorCode.INVALID_PARAMS,
+                message="Invalid params: 'uri' is required and must be a string",
+            )
+
+        try:
+            if self.server and hasattr(self.server, "read_resource"):
+                content = self.server.read_resource(uri)
+            else:
+                from studiobridge.mcp.resources import read_resource
+
+                content = read_resource(uri, server=self.server)
+
+            formatted = content.to_mcp_dict() if hasattr(content, "to_mcp_dict") else content
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"contents": [formatted]},
+            }
+        except ValueError as exc:
+            return self._make_error_frame(
+                req_id=req_id,
+                code=JsonRpcErrorCode.INVALID_PARAMS,
+                message=str(exc),
+                data={"code": "E_BADREF", "uri": uri},
+            )
+        except Exception as exc:
+            return self._make_error_frame(
+                req_id=req_id,
+                code=JsonRpcErrorCode.INTERNAL_ERROR,
+                message=f"Failed to read resource '{uri}': {exc}",
+                data={"code": "E_RESOURCE", "uri": uri},
+            )
+
+    def _handle_prompts_list(self, req_id: Any, params: dict[str, Any]) -> dict[str, Any]:
+        """Process 'prompts/list' request and return registered prompt templates."""
+        if self.server and hasattr(self.server, "get_prompts"):
+            prompts = self.server.get_prompts()
+        else:
+            from studiobridge.mcp.prompts import get_default_prompts
+
+            prompts = get_default_prompts(server=self.server)
+
+        formatted = [p.to_mcp_dict() if hasattr(p, "to_mcp_dict") else p for p in prompts]
+        return {
+            "jsonrpc": "2.0",
+            "id": req_id,
+            "result": {"prompts": formatted},
+        }
+
+    def _handle_prompts_get(self, req_id: Any, params: dict[str, Any]) -> dict[str, Any]:
+        """Process 'prompts/get' request and render prompt template messages."""
+        if not isinstance(params, dict):
+            return self._make_error_frame(
+                req_id=req_id,
+                code=JsonRpcErrorCode.INVALID_PARAMS,
+                message="Invalid params: params must be an object",
+            )
+
+        name = params.get("name")
+        if not name or not isinstance(name, str):
+            return self._make_error_frame(
+                req_id=req_id,
+                code=JsonRpcErrorCode.INVALID_PARAMS,
+                message="Invalid params: 'name' is required and must be a string",
+            )
+
+        arguments = params.get("arguments") or {}
+        if not isinstance(arguments, dict):
+            return self._make_error_frame(
+                req_id=req_id,
+                code=JsonRpcErrorCode.INVALID_PARAMS,
+                message="Invalid params: 'arguments' must be an object",
+            )
+
+        try:
+            if self.server and hasattr(self.server, "get_prompt"):
+                res = self.server.get_prompt(name, arguments)
+            else:
+                from studiobridge.mcp.prompts import get_prompt
+
+                res = get_prompt(name, arguments)
+
+            formatted = res.to_mcp_dict() if hasattr(res, "to_mcp_dict") else res
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": formatted,
+            }
+        except ValueError as exc:
+            return self._make_error_frame(
+                req_id=req_id,
+                code=JsonRpcErrorCode.INVALID_PARAMS,
+                message=str(exc),
+                data={"code": "E_ARGS", "name": name},
+            )
+        except Exception as exc:
+            return self._make_error_frame(
+                req_id=req_id,
+                code=JsonRpcErrorCode.INTERNAL_ERROR,
+                message=f"Failed to get prompt '{name}': {exc}",
+                data={"code": "E_PROMPT", "name": name},
+            )
 
     def _make_error_frame(
         self,

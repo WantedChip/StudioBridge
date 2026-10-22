@@ -13,7 +13,19 @@ from dataclasses import dataclass, field
 from typing import Any, TextIO
 
 from studiobridge._version import __version__
-from studiobridge.mcp.host import DEFAULT_INSTRUCTIONS, McpHost
+from studiobridge.mcp.host import McpHost
+from studiobridge.mcp.instructions import SERVER_INSTRUCTIONS
+from studiobridge.mcp.prompts import (
+    PromptDefinition,
+    PromptProvider,
+    PromptResult,
+)
+from studiobridge.mcp.resources import (
+    ResourceContent,
+    ResourceDefinition,
+    ResourceProvider,
+    ResourceTemplate,
+)
 
 # All recognized toolset identifiers per spec 10_l2_interfaces.md §2.2
 VALID_TOOLSETS: frozenset[str] = frozenset(
@@ -42,7 +54,7 @@ DEFAULT_TOOLSETS: frozenset[str] = frozenset(
     }
 )
 
-MCP_SERVER_INSTRUCTIONS: str = DEFAULT_INSTRUCTIONS
+MCP_SERVER_INSTRUCTIONS: str = SERVER_INSTRUCTIONS
 
 
 @dataclass(frozen=True)
@@ -170,6 +182,10 @@ class StudioMcpServer:
         self.client = client
         self._tools: dict[str, ToolDefinition] = {}
 
+        # Resource and prompt providers
+        self._resource_provider = ResourceProvider(client=self.client, server=self)
+        self._prompt_provider = PromptProvider(client=self.client, server=self)
+
         # Register built-in tool suites (core and inspect)
         self._register_default_tools()
 
@@ -234,6 +250,26 @@ class StudioMcpServer:
             }
 
         return self.host._execute_tool_handler(tool.handler, arguments)
+
+    def get_resources(self) -> list[ResourceDefinition]:
+        """Return registered MCP resources."""
+        return self._resource_provider.get_resources()
+
+    def get_resource_templates(self) -> list[ResourceTemplate]:
+        """Return registered MCP resource templates."""
+        return self._resource_provider.get_resource_templates()
+
+    def read_resource(self, uri: str) -> ResourceContent:
+        """Resolve and read resource by URI."""
+        return self._resource_provider.read_resource(uri)
+
+    def get_prompts(self) -> list[PromptDefinition]:
+        """Return registered MCP prompt templates."""
+        return self._prompt_provider.get_prompts()
+
+    def get_prompt(self, name: str, arguments: dict[str, Any] | None = None) -> PromptResult:
+        """Render prompt template by name."""
+        return self._prompt_provider.get_prompt(name, arguments)
 
     def run_stdio(self, reader: TextIO | None = None, writer: TextIO | None = None) -> None:
         """Start the stdio JSON-RPC transport loop."""
