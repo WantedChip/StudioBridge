@@ -1,0 +1,52 @@
+{
+  "name": "studio_doctor",
+  "title": "Studio Doctor",
+  "description": "Run diagnostic health checks across environment, FL Studio installation, loopback MIDI ports, and scripts, returning status and remedies.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "skip_live": {
+        "type": "boolean",
+        "default": false,
+        "description": "Skip checks requiring live FL Studio connection"
+      },
+      "fix": {
+        "type": "boolean",
+        "default": false,
+        "description": "Attempt safe automatic repairs for failed checks"
+      }
+    },
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "status": { "type": "string" },
+      "has_errors": { "type": "boolean" },
+      "checks": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string" },
+            "name": { "type": "string" },
+            "status": { "type": "string" },
+            "details": { "type": "string" },
+            "remedy": { "type": ["string", "null"] }
+          },
+          "required": ["id", "name", "status"]
+        }
+      },
+      "summary": {
+        "type": "object",
+        "properties": {
+          "pass": { "type": "integer" },
+          "fail": { "type": "integer" },
+          "warn": { "type": "integer" },
+          "skip": { "type": "integer" }
+        }
+      }
+    },
+    "required": ["status", "has_errors", "checks"]
+  }
+}

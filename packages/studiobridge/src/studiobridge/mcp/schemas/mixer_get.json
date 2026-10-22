@@ -1,0 +1,35 @@
+{
+  "name": "mixer_get",
+  "title": "Mixer Get",
+  "description": "Get detailed status, levels, peak metering, and routing for a single mixer track by index or name.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "track": {
+        "type": ["integer", "string"],
+        "description": "Track index (0-126; 0=Master) or track name"
+      }
+    },
+    "required": ["track"],
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "index": { "type": "integer" },
+      "name": { "type": "string" },
+      "volume": { "type": "number" },
+      "volume_db": { "type": "number" },
+      "pan": { "type": "number" },
+      "muted": { "type": "boolean" },
+      "solo": { "type": "boolean" },
+      "armed": { "type": "boolean" },
+      "color": { "type": ["string", "integer"] },
+      "peak": {
+        "type": ["number", "array"],
+        "description": "Peak level float or [left, right] peaks"
+      }
+    },
+    "required": ["index", "name", "volume", "pan", "muted", "solo"]
+  }
+}

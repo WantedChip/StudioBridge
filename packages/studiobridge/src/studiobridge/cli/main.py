@@ -13,10 +13,17 @@ import sys
 from collections.abc import Sequence
 
 from studiobridge._version import __version__
+from studiobridge.cli.commands.api import handle_api
 from studiobridge.cli.commands.broker import handle_broker
 from studiobridge.cli.commands.diag import handle_diag
 from studiobridge.cli.commands.doctor import handle_doctor
 from studiobridge.cli.commands.hello import handle_hello
+from studiobridge.cli.commands.inspect import (
+    handle_channels,
+    handle_mixer,
+    handle_patterns,
+    handle_transport,
+)
 from studiobridge.cli.commands.manifest import handle_manifest
 from studiobridge.cli.commands.mcp import handle_mcp
 from studiobridge.cli.commands.ports import handle_ports
@@ -326,6 +333,157 @@ def build_parser() -> argparse.ArgumentParser:
         help="Emit output formatted as machine-readable JSON",
     )
     mcp_p.set_defaults(handler=handle_mcp)
+
+    # 11. sbridge api
+    api_p = subparsers.add_parser(
+        "api", help="FL Studio scripting API documentation search, describe, and export"
+    )
+    api_sub = api_p.add_subparsers(dest="api_action", metavar="<search|describe|list|export>")
+
+    api_search_p = api_sub.add_parser("search", help="Search FL scripting API functions")
+    api_search_p.add_argument("query", nargs="?", default="", help="Search query string")
+    api_search_p.add_argument("--query", dest="named_query", type=str, default=None)
+    api_search_p.add_argument("--module", type=str, default=None, help="Filter by API module")
+    api_search_p.add_argument("--limit", type=int, default=20, help="Maximum results to return")
+    api_search_p.add_argument(
+        "--constants", action="store_true", default=False, help="Include module constants"
+    )
+    api_search_p.set_defaults(handler=handle_api)
+
+    api_desc_p = api_sub.add_parser(
+        "describe", help="Show signature, since-version, quirks, and examples for a function"
+    )
+    api_desc_p.add_argument("function", help="Function name (e.g. 'mixer.setTrackVolume')")
+    api_desc_p.add_argument("--module", type=str, default=None, help="Module name if not prefixed")
+    api_desc_p.set_defaults(handler=handle_api)
+
+    api_list_p = api_sub.add_parser("list", help="List all API modules or functions in a module")
+    api_list_p.add_argument("module", nargs="?", default=None, help="Optional module name")
+    api_list_p.set_defaults(handler=handle_api)
+
+    api_export_p = api_sub.add_parser(
+        "export", help="Export API manifest in json, pyi, or md format"
+    )
+    api_export_p.add_argument(
+        "--format", choices=["json", "pyi", "md"], default="json", help="Export format"
+    )
+    api_export_p.add_argument("--out", type=str, default=None, help="Output destination path")
+    api_export_p.set_defaults(handler=handle_api)
+
+    for p in (api_p, api_search_p, api_desc_p, api_list_p, api_export_p):
+        p.add_argument(
+            "--json",
+            action="store_true",
+            default=False,
+            help="Emit output formatted as machine-readable JSON",
+        )
+    api_p.set_defaults(handler=handle_api)
+
+    # 12. sbridge transport
+    trans_p = subparsers.add_parser(
+        "transport", help="Inspect and query FL Studio playback transport"
+    )
+    trans_sub = trans_p.add_subparsers(dest="transport_action", metavar="<get>")
+    trans_get_p = trans_sub.add_parser(
+        "get", help="Get current playback status, tempo, and position"
+    )
+    trans_get_p.set_defaults(handler=handle_transport)
+
+    for p in (trans_p, trans_get_p):
+        p.add_argument(
+            "--json",
+            action="store_true",
+            default=False,
+            help="Emit output formatted as machine-readable JSON",
+        )
+    trans_p.set_defaults(handler=handle_transport, transport_action="get")
+
+    # 13. sbridge mixer
+    mixer_p = subparsers.add_parser(
+        "mixer", help="Inspect FL Studio mixer tracks, levels, and routing"
+    )
+    mixer_sub = mixer_p.add_subparsers(dest="mixer_action", metavar="<list|get>")
+
+    mix_list_p = mixer_sub.add_parser("list", help="List mixer tracks with volume, pan, peaks")
+    mix_list_p.add_argument(
+        "--limit", type=int, default=40, help="Maximum tracks to list (default: 40)"
+    )
+    mix_list_p.add_argument(
+        "--cursor", type=int, default=0, help="Starting track index (default: 0)"
+    )
+    mix_list_p.add_argument(
+        "--fields", type=str, default=None, help="Comma-separated field list or 'all'"
+    )
+    mix_list_p.set_defaults(handler=handle_mixer)
+
+    mix_get_p = mixer_sub.add_parser(
+        "get", help="Get mixer track status and metering by index or name"
+    )
+    mix_get_p.add_argument("track", help="Track index (0-126) or name")
+    mix_get_p.set_defaults(handler=handle_mixer)
+
+    for p in (mixer_p, mix_list_p, mix_get_p):
+        p.add_argument(
+            "--json",
+            action="store_true",
+            default=False,
+            help="Emit output formatted as machine-readable JSON",
+        )
+    mixer_p.set_defaults(handler=handle_mixer, mixer_action="list")
+
+    # 14. sbridge channels
+    chan_p = subparsers.add_parser("channels", help="Inspect FL Studio generator channel rack")
+    chan_sub = chan_p.add_subparsers(dest="channels_action", metavar="<list|get>")
+
+    chan_list_p = chan_sub.add_parser("list", help="List channels with volume, pan, and step bits")
+    chan_list_p.add_argument(
+        "--limit", type=int, default=20, help="Maximum channels to list (default: 20)"
+    )
+    chan_list_p.add_argument(
+        "--cursor", type=int, default=0, help="Starting channel index (default: 0)"
+    )
+    chan_list_p.add_argument(
+        "--fields", type=str, default=None, help="Comma-separated field list or 'all'"
+    )
+    chan_list_p.set_defaults(handler=handle_channels)
+
+    chan_get_p = chan_sub.add_parser("get", help="Get channel properties and step sequencer grid")
+    chan_get_p.add_argument("channel", help="Channel index or name")
+    chan_get_p.set_defaults(handler=handle_channels)
+
+    for p in (chan_p, chan_list_p, chan_get_p):
+        p.add_argument(
+            "--json",
+            action="store_true",
+            default=False,
+            help="Emit output formatted as machine-readable JSON",
+        )
+    chan_p.set_defaults(handler=handle_channels, channels_action="list")
+
+    # 15. sbridge patterns
+    pat_p = subparsers.add_parser("patterns", help="Inspect FL Studio patterns")
+    pat_sub = pat_p.add_subparsers(dest="patterns_action", metavar="<list>")
+
+    pat_list_p = pat_sub.add_parser("list", help="List patterns with lengths and active indicator")
+    pat_list_p.add_argument(
+        "--limit", type=int, default=20, help="Maximum patterns to list (default: 20)"
+    )
+    pat_list_p.add_argument(
+        "--cursor", type=int, default=1, help="Starting pattern number (default: 1)"
+    )
+    pat_list_p.add_argument(
+        "--fields", type=str, default=None, help="Comma-separated field list or 'all'"
+    )
+    pat_list_p.set_defaults(handler=handle_patterns)
+
+    for p in (pat_p, pat_list_p):
+        p.add_argument(
+            "--json",
+            action="store_true",
+            default=False,
+            help="Emit output formatted as machine-readable JSON",
+        )
+    pat_p.set_defaults(handler=handle_patterns, patterns_action="list")
 
     return parser
 

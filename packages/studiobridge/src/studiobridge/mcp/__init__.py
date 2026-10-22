@@ -19,11 +19,19 @@ from studiobridge.mcp.server import (
     ToolResult,
     parse_toolsets,
 )
+from studiobridge.mcp.tools import (
+    CoreTools,
+    InspectTools,
+    get_core_tools,
+    get_inspect_tools,
+)
 
 __all__ = [
+    "CoreTools",
     "DEFAULT_INSTRUCTIONS",
     "DEFAULT_TOOLSETS",
     "EARLIEST_PROTOCOL_VERSION",
+    "InspectTools",
     "JsonRpcErrorCode",
     "LATEST_PROTOCOL_VERSION",
     "McpHost",
@@ -32,6 +40,8 @@ __all__ = [
     "ToolDefinition",
     "ToolResult",
     "VALID_TOOLSETS",
+    "get_core_tools",
+    "get_inspect_tools",
     "negotiate_protocol_version",
     "parse_toolsets",
 ]

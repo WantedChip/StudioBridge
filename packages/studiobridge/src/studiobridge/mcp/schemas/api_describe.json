@@ -1,0 +1,42 @@
+{
+  "name": "api_describe",
+  "title": "API Describe",
+  "description": "Retrieve full documentation, signature, since-version, parameters, return type, empirical quirks, and usage examples for an FL scripting function.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "function": {
+        "type": "string",
+        "description": "Function name (e.g. 'mixer.setTrackVolume' or 'setTrackVolume')"
+      },
+      "module": {
+        "type": "string",
+        "description": "Module name if not prefixed in function name (e.g. 'mixer')"
+      }
+    },
+    "required": ["function"],
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "module": { "type": "string" },
+      "function": { "type": "string" },
+      "signature": { "type": "string" },
+      "since": { "type": "integer" },
+      "summary": { "type": "string" },
+      "args": {
+        "type": "array",
+        "items": { "type": "object" }
+      },
+      "ret": { "type": "string" },
+      "mutating": { "type": "boolean" },
+      "protected": { "type": "boolean" },
+      "undo": { "type": "string" },
+      "plane": { "type": "string" },
+      "quirks": { "type": ["object", "null"] },
+      "example": { "type": "string" }
+    },
+    "required": ["module", "function", "signature", "since", "args", "ret", "mutating"]
+  }
+}

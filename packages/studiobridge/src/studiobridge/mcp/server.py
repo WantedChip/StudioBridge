@@ -151,6 +151,7 @@ class StudioMcpServer:
         name: str = "studiobridge",
         version: str | None = None,
         instructions: str | None = None,
+        client: Any = None,
     ) -> None:
         """Initialize MCP server with specified toolsets and adapter.
 
@@ -160,15 +161,30 @@ class StudioMcpServer:
             name: Server name reported in handshake.
             version: Server version reported in handshake.
             instructions: System guidance string reported in handshake.
+            client: Optional Studio SDK client instance.
         """
         self.active_toolsets: frozenset[str] = parse_toolsets(toolsets)
         self.name: str = name
         self.version: str = version or __version__
         self.instructions: str = instructions or MCP_SERVER_INSTRUCTIONS
+        self.client = client
         self._tools: dict[str, ToolDefinition] = {}
+
+        # Register built-in tool suites (core and inspect)
+        self._register_default_tools()
 
         # Instantiate McpHost adapter
         self.host = McpHost(server=self, adapter=adapter)
+
+    def _register_default_tools(self) -> None:
+        """Register built-in tool definitions for standard toolsets."""
+        from studiobridge.mcp.tools.core import get_core_tools
+        from studiobridge.mcp.tools.inspect import get_inspect_tools
+
+        for tool in get_core_tools(client=self.client, server=self):
+            self.register_tool(tool)
+        for tool in get_inspect_tools(client=self.client, server=self):
+            self.register_tool(tool)
 
     def register_tool(self, tool: ToolDefinition) -> None:
         """Register a tool definition in the server catalog."""

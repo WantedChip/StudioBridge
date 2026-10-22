@@ -484,6 +484,7 @@ class AsyncEventManager:
         self.session: Session = session
         self.cache: CacheManager | None = cache
         self._subscriptions: list[AsyncEventSubscription] = []
+        self._history: collections.deque[StudioEvent] = collections.deque(maxlen=256)
         self._callbacks: dict[str, list[Callable[[StudioEvent], Any]]] = collections.defaultdict(
             list
         )
@@ -544,11 +545,14 @@ class AsyncEventManager:
         if self.cache is not None:
             self.cache.on_event(event)
 
-        # 2. Push to matching subscriptions
+        # 2. Record to local event history buffer
+        self._history.append(event)
+
+        # 3. Push to matching subscriptions
         for sub in list(self._subscriptions):
             sub.push(event)
 
-        # 3. Invoke matching callbacks
+        # 4. Invoke matching callbacks
         for pattern, cbs in list(self._callbacks.items()):
             if topic_matches(pattern, topic):
                 for cb in list(cbs):
@@ -564,6 +568,24 @@ class AsyncEventManager:
                         )
 
         return event
+
+    def get_recent(
+        self,
+        limit: int = 20,
+        cursor: int = 0,
+        topic: str | None = None,
+    ) -> list[StudioEvent]:
+        """Retrieve recent events from the in-memory ring buffer (most recent first)."""
+        events = list(reversed(self._history))
+        if topic:
+            events = [e for e in events if topic_matches(topic, e.topic)]
+        return events[cursor : cursor + limit]
+
+    def count_recent(self, topic: str | None = None) -> int:
+        """Count total recent events matching an optional topic pattern."""
+        if not topic:
+            return len(self._history)
+        return sum(1 for e in self._history if topic_matches(topic, e.topic))
 
     def close(self) -> None:
         """Close event manager and all active subscriptions."""
@@ -620,6 +642,19 @@ class SyncEventManager:
     ) -> StudioEvent:
         """Dispatch event synchronously."""
         return self._portal.call(self._async.dispatch, topic, data, seq, timestamp)
+
+    def get_recent(
+        self,
+        limit: int = 20,
+        cursor: int = 0,
+        topic: str | None = None,
+    ) -> list[StudioEvent]:
+        """Retrieve recent events from the in-memory ring buffer (most recent first)."""
+        return self._portal.call(self._async.get_recent, limit, cursor, topic)
+
+    def count_recent(self, topic: str | None = None) -> int:
+        """Count total recent events matching an optional topic pattern."""
+        return self._portal.call(self._async.count_recent, topic)
 
     def close(self) -> None:
         """Close event manager."""

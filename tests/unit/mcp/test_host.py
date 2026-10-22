@@ -505,8 +505,8 @@ class TestStdioTransportSession:
         # 3. tools/list response
         assert output_lines[2]["id"] == 3
         tools = output_lines[2]["result"]["tools"]
-        assert len(tools) == 1
-        assert tools[0]["name"] == "studio_status"
+        assert len(tools) >= 1
+        assert any(t["name"] == "studio_status" for t in tools)
 
         # 4. tools/call response
         assert output_lines[3]["id"] == 4

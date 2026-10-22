@@ -1,0 +1,42 @@
+{
+  "name": "events_recent",
+  "title": "Events Recent",
+  "description": "Retrieve recent events dispatched by the broker and FL Studio device script with topic filtering and pagination.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "limit": {
+        "type": "integer",
+        "default": 20,
+        "minimum": 1,
+        "maximum": 100,
+        "description": "Maximum events to return (default: 20)"
+      },
+      "cursor": {
+        "type": "integer",
+        "default": 0,
+        "minimum": 0,
+        "description": "Starting event offset"
+      },
+      "topic": {
+        "type": "string",
+        "description": "Optional topic pattern filter (e.g. 'transport', 'dirty.*', 'beat')"
+      }
+    },
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "events": {
+        "type": "array",
+        "items": { "type": "object" }
+      },
+      "total": { "type": "integer" },
+      "limit": { "type": "integer" },
+      "cursor": { "type": "integer" },
+      "next_cursor": { "type": ["integer", "null"] }
+    },
+    "required": ["events", "total", "limit", "cursor"]
+  }
+}

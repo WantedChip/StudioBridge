@@ -1,0 +1,44 @@
+{
+  "name": "mixer_list",
+  "title": "Mixer List",
+  "description": "List mixer tracks with volume, pan, peak meters, mute/solo states, and routing. Supports pagination with limit/cursor and field projection.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "limit": {
+        "type": "integer",
+        "default": 40,
+        "minimum": 1,
+        "maximum": 127,
+        "description": "Maximum number of tracks to return (default: 40)"
+      },
+      "cursor": {
+        "type": "integer",
+        "default": 0,
+        "minimum": 0,
+        "maximum": 126,
+        "description": "Starting track index (0-based; 0 is Master)"
+      },
+      "fields": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Fields to include in each track object or 'all'"
+      }
+    },
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "tracks": {
+        "type": "array",
+        "items": { "type": "object" }
+      },
+      "total": { "type": "integer" },
+      "limit": { "type": "integer" },
+      "cursor": { "type": "integer" },
+      "next_cursor": { "type": ["integer", "null"] }
+    },
+    "required": ["tracks", "total", "limit", "cursor"]
+  }
+}

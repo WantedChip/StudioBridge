@@ -1,0 +1,45 @@
+{
+  "name": "project_snapshot",
+  "title": "Project Snapshot",
+  "description": "Compact overview of active project: tempo, time signature, playing state, channel count and names, pattern count, and active mixer tracks (<= 1.5k tokens).",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "include_empty": {
+        "type": "boolean",
+        "default": false,
+        "description": "Include unused/empty mixer tracks (default: active/named only)"
+      }
+    },
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "project": { "type": ["string", "null"] },
+      "tempo": { "type": "number" },
+      "time_signature": {
+        "type": "array",
+        "items": { "type": "integer" }
+      },
+      "is_playing": { "type": "boolean" },
+      "channel_count": { "type": "integer" },
+      "channels": {
+        "type": "array",
+        "items": { "type": "object" }
+      },
+      "pattern_count": { "type": "integer" },
+      "active_pattern": { "type": "integer" },
+      "patterns": {
+        "type": "array",
+        "items": { "type": "object" }
+      },
+      "mixer_track_count": { "type": "integer" },
+      "mixer_tracks": {
+        "type": "array",
+        "items": { "type": "object" }
+      }
+    },
+    "required": ["tempo", "is_playing", "channel_count", "pattern_count", "active_pattern"]
+  }
+}

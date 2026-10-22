@@ -1,0 +1,46 @@
+{
+  "name": "studio_status",
+  "title": "Studio Status",
+  "description": "Report connection status, FL Studio and API versions, active safety mode, playback transport state, and background broker health.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "connected": { "type": "boolean" },
+      "fl_version": { "type": ["string", "null"] },
+      "api": { "type": ["integer", "null"] },
+      "mode": { "type": "string" },
+      "project": { "type": ["string", "null"] },
+      "transport": {
+        "type": ["object", "null"],
+        "properties": {
+          "is_playing": { "type": "boolean" },
+          "tempo": { "type": "number" },
+          "song_pos": { "type": "integer" },
+          "time_signature": {
+            "type": "array",
+            "items": { "type": "integer" }
+          }
+        }
+      },
+      "broker": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string" },
+          "running": { "type": "boolean" },
+          "pid": { "type": ["integer", "null"] },
+          "port": { "type": ["integer", "null"] },
+          "uptime_s": { "type": ["number", "string", "null"] },
+          "lease_holder": { "type": ["string", "null"] },
+          "message": { "type": ["string", "null"] }
+        },
+        "required": ["status", "running"]
+      }
+    },
+    "required": ["connected", "mode", "broker"]
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "transport_get",
+  "title": "Transport Get",
+  "description": "Get current FL Studio transport state including playback status, tempo BPM, song position in ticks/beats/bars, loop mode, and time signature.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "is_playing": { "type": "boolean" },
+      "tempo": { "type": "number" },
+      "song_pos": { "type": "integer" },
+      "song_time_s": { "type": "number" },
+      "loop_mode": { "type": "string" },
+      "time_signature": {
+        "type": "array",
+        "items": { "type": "integer" }
+      }
+    },
+    "required": ["is_playing", "tempo", "song_pos", "time_signature"]
+  }
+}

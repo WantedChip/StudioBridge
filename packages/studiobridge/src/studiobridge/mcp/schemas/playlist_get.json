@@ -1,0 +1,43 @@
+{
+  "name": "playlist_get",
+  "title": "Playlist Get",
+  "description": "Get playlist track information, track counts, names, mute/solo states, and performance mode settings.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "limit": {
+        "type": "integer",
+        "default": 40,
+        "minimum": 1,
+        "maximum": 500,
+        "description": "Maximum tracks to return (default: 40)"
+      },
+      "cursor": {
+        "type": "integer",
+        "default": 1,
+        "minimum": 1,
+        "description": "Starting track number (1-based)"
+      },
+      "fields": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Fields to include in each track object or 'all'"
+      }
+    },
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "track_count": { "type": "integer" },
+      "tracks": {
+        "type": "array",
+        "items": { "type": "object" }
+      },
+      "limit": { "type": "integer" },
+      "cursor": { "type": "integer" },
+      "next_cursor": { "type": ["integer", "null"] }
+    },
+    "required": ["track_count", "tracks", "limit", "cursor"]
+  }
+}

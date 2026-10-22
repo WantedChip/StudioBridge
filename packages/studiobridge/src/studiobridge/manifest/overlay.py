@@ -145,6 +145,13 @@ class QuirksOverlay:
 
     entries: list[OverlayEntry] = field(default_factory=list)
 
+    def get(self, fn: str) -> OverlayEntry | None:
+        """Find and return an overlay entry by function name or None."""
+        for entry in self.entries:
+            if entry.fn == fn:
+                return entry
+        return None
+
     def validate(self) -> list[str]:
         """Validate all entries against [MAN-02] rules."""
         errors: list[str] = []

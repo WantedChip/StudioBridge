@@ -1,0 +1,40 @@
+{
+  "name": "plugin_param_get",
+  "title": "Plugin Param Get",
+  "description": "Get the current value and metadata of a specific plugin parameter on a mixer track slot.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "track": {
+        "type": "integer",
+        "description": "Mixer track index (0-126)"
+      },
+      "slot": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9,
+        "description": "Effect slot index (0-9)"
+      },
+      "param_id": {
+        "type": "integer",
+        "description": "Parameter index / ID"
+      }
+    },
+    "required": ["track", "slot", "param_id"],
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "track": { "type": "integer" },
+      "slot": { "type": "integer" },
+      "param_id": { "type": "integer" },
+      "name": { "type": "string" },
+      "value": { "type": "number" },
+      "min_value": { "type": "number" },
+      "max_value": { "type": "number" },
+      "text": { "type": "string" }
+    },
+    "required": ["track", "slot", "param_id", "name", "value"]
+  }
+}

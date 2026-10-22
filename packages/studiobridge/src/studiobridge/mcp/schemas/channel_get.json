@@ -1,0 +1,35 @@
+{
+  "name": "channel_get",
+  "title": "Channel Get",
+  "description": "Get detailed properties of a single generator channel by index or name, including volume, pan, pitch, mute, solo, and step sequencer grid.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "channel": {
+        "type": ["integer", "string"],
+        "description": "Channel index (0-based) or channel name"
+      }
+    },
+    "required": ["channel"],
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "index": { "type": "integer" },
+      "name": { "type": "string" },
+      "color": { "type": ["string", "integer"] },
+      "volume": { "type": "number" },
+      "pan": { "type": "number" },
+      "pitch": { "type": "number" },
+      "muted": { "type": "boolean" },
+      "solo": { "type": "boolean" },
+      "step_grid": {
+        "type": "array",
+        "items": { "type": ["boolean", "integer"] }
+      },
+      "step_bits": { "type": "integer" }
+    },
+    "required": ["index", "name", "volume", "pan", "muted", "solo"]
+  }
+}

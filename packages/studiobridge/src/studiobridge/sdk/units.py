@@ -35,6 +35,9 @@ class Db:
     def __float__(self) -> float:
         return float(self.value)
 
+    def __round__(self, ndigits: int = 0) -> float:
+        return round(self.value, ndigits)
+
     @classmethod
     def unity(cls) -> Db:
         """Create 0 dB unity gain representation."""
@@ -57,6 +60,9 @@ class Percent:
 
     def __float__(self) -> float:
         return float(self.value)
+
+    def __round__(self, ndigits: int = 0) -> float:
+        return round(self.value, ndigits)
 
     @classmethod
     def unity(cls) -> Percent:

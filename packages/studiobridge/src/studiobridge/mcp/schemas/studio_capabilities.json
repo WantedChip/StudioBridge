@@ -1,0 +1,58 @@
+{
+  "name": "studio_capabilities",
+  "title": "Studio Capabilities",
+  "description": "Inspect the capability matrix, availability states (available, degraded, unavailable), prerequisites, and alternative workflows.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "capability": {
+        "type": "string",
+        "description": "Specific capability ID to inspect"
+      },
+      "state": {
+        "type": "string",
+        "enum": ["available", "degraded", "unavailable", "unknown"],
+        "description": "Filter by capability availability state"
+      }
+    },
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "summary": {
+        "type": "object",
+        "properties": {
+          "total": { "type": "integer" },
+          "available": { "type": "integer" },
+          "degraded": { "type": "integer" },
+          "unavailable": { "type": "integer" },
+          "unknown": { "type": "integer" }
+        }
+      },
+      "capabilities": {
+        "type": "object"
+      },
+      "capability": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "state": { "type": "string" },
+          "reason": { "type": ["string", "null"] },
+          "requires": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "alternatives": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "evidence": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}
