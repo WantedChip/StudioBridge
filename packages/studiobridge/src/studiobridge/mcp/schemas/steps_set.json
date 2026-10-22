@@ -1,0 +1,43 @@
+{
+  "name": "steps_set",
+  "title": "Steps Set",
+  "description": "Set 16-step sequencer grid activation bits for a rhythm or generator channel.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "channel": {
+        "type": ["integer", "string"],
+        "description": "Channel index (0-based) or channel name"
+      },
+      "steps": {
+        "type": "array",
+        "items": { "type": ["integer", "boolean"] },
+        "description": "Array of exactly 16 step values (0/1 or false/true)"
+      },
+      "confirm_token": {
+        "type": "string",
+        "description": "One-time human confirmation challenge token"
+      },
+      "verify": {
+        "type": "boolean",
+        "description": "Whether to perform read-back verification after mutation"
+      }
+    },
+    "required": ["channel", "steps"],
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "verified": { "type": "boolean" },
+      "plane": { "type": "string" },
+      "journal_id": { "type": "integer" },
+      "channel": { "type": "integer" },
+      "step_grid": {
+        "type": "array",
+        "items": { "type": "integer" }
+      }
+    },
+    "required": ["verified", "plane", "journal_id", "channel"]
+  }
+}

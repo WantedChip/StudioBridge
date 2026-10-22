@@ -1,0 +1,36 @@
+{
+  "name": "journal_list",
+  "title": "Journal List",
+  "description": "Inspect recent session modification records from the append-only mutation journal.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "limit": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 200,
+        "description": "Maximum number of recent entries to return (default: 50)"
+      },
+      "since": {
+        "type": "number",
+        "description": "Filter entries recorded at or after this epoch timestamp"
+      },
+      "op": {
+        "type": "string",
+        "description": "Filter entries by operation name prefix"
+      }
+    },
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "entries": {
+        "type": "array",
+        "items": { "type": "object" }
+      },
+      "count": { "type": "integer" }
+    },
+    "required": ["entries", "count"]
+  }
+}

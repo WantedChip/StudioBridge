@@ -1,0 +1,48 @@
+{
+  "name": "pattern_edit",
+  "title": "Pattern Edit",
+  "description": "Select active pattern, rename, set color, or clear notes and automations.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "pattern": {
+        "type": "integer",
+        "description": "Pattern number (1-based index)"
+      },
+      "action": {
+        "type": "string",
+        "enum": ["select", "rename", "color", "clear"],
+        "description": "Edit action: select, rename, color, or clear"
+      },
+      "name": {
+        "type": "string",
+        "description": "New display name when action is 'rename'"
+      },
+      "color": {
+        "type": ["string", "integer"],
+        "description": "Color hex string ('#RRGGBB') or integer RGB value when action is 'color'"
+      },
+      "confirm_token": {
+        "type": "string",
+        "description": "One-time human confirmation challenge token"
+      },
+      "verify": {
+        "type": "boolean",
+        "description": "Whether to perform read-back verification after mutation"
+      }
+    },
+    "required": ["pattern", "action"],
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "verified": { "type": "boolean" },
+      "plane": { "type": "string" },
+      "journal_id": { "type": "integer" },
+      "pattern": { "type": "integer" },
+      "action": { "type": "string" }
+    },
+    "required": ["verified", "plane", "journal_id", "pattern", "action"]
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "name": "studio_set_mode",
+  "title": "Studio Set Mode",
+  "description": "Switch session safety mode: 'read_only' (default), 'write' (with confirmation), or 'unsafe'.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "mode": {
+        "type": "string",
+        "enum": ["read_only", "write", "unsafe"],
+        "description": "Target safety mode to switch to"
+      },
+      "reason": {
+        "type": "string",
+        "description": "Human or agent rationale for requesting mode change"
+      },
+      "confirm_token": {
+        "type": "string",
+        "description": "One-time human confirmation challenge token"
+      }
+    },
+    "required": ["mode"],
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "mode": { "type": "string" },
+      "status": { "type": "string" },
+      "message": { "type": "string" }
+    },
+    "required": ["mode", "status"]
+  }
+}

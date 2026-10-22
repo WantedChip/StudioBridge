@@ -1,0 +1,60 @@
+{
+  "name": "channel_set",
+  "title": "Channel Set",
+  "description": "Modify channel properties: volume, pan, mute, solo, name, and 16-step sequencer pattern.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "channel": {
+        "type": ["integer", "string"],
+        "description": "Channel index (0-based) or channel name"
+      },
+      "volume": {
+        "type": "number",
+        "description": "Normalized volume (0.0 to 1.0)"
+      },
+      "pan": {
+        "type": "number",
+        "description": "Normalized pan (-1.0 to 1.0)"
+      },
+      "mute": {
+        "type": "boolean",
+        "description": "Mute state"
+      },
+      "solo": {
+        "type": "boolean",
+        "description": "Solo state"
+      },
+      "name": {
+        "type": "string",
+        "description": "Channel display name"
+      },
+      "steps": {
+        "type": "array",
+        "items": { "type": ["integer", "boolean"] },
+        "description": "16-step sequencer grid activation pattern"
+      },
+      "confirm_token": {
+        "type": "string",
+        "description": "One-time human confirmation challenge token"
+      },
+      "verify": {
+        "type": "boolean",
+        "description": "Whether to perform read-back verification after mutation"
+      }
+    },
+    "required": ["channel"],
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "verified": { "type": "boolean" },
+      "plane": { "type": "string" },
+      "journal_id": { "type": "integer" },
+      "channel": { "type": "integer" },
+      "receipts": { "type": "array" }
+    },
+    "required": ["verified", "plane", "journal_id", "channel"]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "checkpoint_rollback",
+  "title": "Checkpoint Rollback",
+  "description": "Revert session mutations and restore previous state toward a recorded checkpoint.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "checkpoint_id": {
+        "type": "string",
+        "description": "Checkpoint ID or label to restore toward (default: latest checkpoint)"
+      },
+      "confirm_token": {
+        "type": "string",
+        "description": "One-time human confirmation challenge token"
+      }
+    },
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "checkpoint_id": { "type": "string" },
+      "guarantee": { "type": "string" },
+      "restored_count": { "type": "integer" },
+      "verified": { "type": "boolean" },
+      "plane": { "type": "string" },
+      "journal_id": { "type": "integer" }
+    },
+    "required": ["checkpoint_id", "guarantee", "restored_count", "verified", "plane", "journal_id"]
+  }
+}

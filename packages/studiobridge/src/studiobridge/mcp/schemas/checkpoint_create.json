@@ -1,0 +1,26 @@
+{
+  "name": "checkpoint_create",
+  "title": "Checkpoint Create",
+  "description": "Record a named rollback checkpoint preserving current session state.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "Descriptive checkpoint label (default: 'checkpoint')"
+      }
+    },
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "checkpoint_id": { "type": "string" },
+      "name": { "type": "string" },
+      "verified": { "type": "boolean" },
+      "plane": { "type": "string" },
+      "journal_id": { "type": "integer" }
+    },
+    "required": ["checkpoint_id", "name", "verified", "plane", "journal_id"]
+  }
+}

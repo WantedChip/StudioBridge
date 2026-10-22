@@ -15,6 +15,12 @@ from collections.abc import Sequence
 from studiobridge._version import __version__
 from studiobridge.cli.commands.api import handle_api
 from studiobridge.cli.commands.broker import handle_broker
+from studiobridge.cli.commands.control import (
+    handle_channels_set,
+    handle_mixer_set,
+    handle_patterns_control,
+    handle_transport_control,
+)
 from studiobridge.cli.commands.diag import handle_diag
 from studiobridge.cli.commands.doctor import handle_doctor
 from studiobridge.cli.commands.hello import handle_hello
@@ -28,6 +34,11 @@ from studiobridge.cli.commands.manifest import handle_manifest
 from studiobridge.cli.commands.mcp import handle_mcp
 from studiobridge.cli.commands.ports import handle_ports
 from studiobridge.cli.commands.probe import handle_probe
+from studiobridge.cli.commands.safety import (
+    handle_batch,
+    handle_call,
+    handle_safety,
+)
 from studiobridge.cli.commands.setup import handle_setup
 from studiobridge.cli.commands.status import handle_status
 from studiobridge.core.errors import StudioBridgeError
@@ -381,15 +392,53 @@ def build_parser() -> argparse.ArgumentParser:
 
     # 12. sbridge transport
     trans_p = subparsers.add_parser(
-        "transport", help="Inspect and query FL Studio playback transport"
+        "transport", help="Inspect and control FL Studio playback transport"
     )
-    trans_sub = trans_p.add_subparsers(dest="transport_action", metavar="<get>")
+    trans_sub = trans_p.add_subparsers(
+        dest="transport_action", metavar="<get|play|stop|record|tempo|pos>"
+    )
     trans_get_p = trans_sub.add_parser(
         "get", help="Get current playback status, tempo, and position"
     )
-    trans_get_p.set_defaults(handler=handle_transport)
+    trans_get_p.set_defaults(handler=handle_transport, transport_action="get")
 
-    for p in (trans_p, trans_get_p):
+    trans_play_p = trans_sub.add_parser("play", help="Start or resume playback")
+    trans_play_p.add_argument("--confirm-token", type=str, default=None, help="Confirmation token")
+    trans_play_p.set_defaults(handler=handle_transport_control, transport_action="play")
+
+    trans_stop_p = trans_sub.add_parser("stop", help="Stop playback")
+    trans_stop_p.add_argument("--confirm-token", type=str, default=None, help="Confirmation token")
+    trans_stop_p.set_defaults(handler=handle_transport_control, transport_action="stop")
+
+    trans_rec_p = trans_sub.add_parser("record", help="Toggle or engage recording mode")
+    trans_rec_p.add_argument("--confirm-token", type=str, default=None, help="Confirmation token")
+    trans_rec_p.set_defaults(handler=handle_transport_control, transport_action="record")
+
+    trans_tempo_p = trans_sub.add_parser("tempo", help="Set project tempo in BPM")
+    trans_tempo_p.add_argument("bpm", type=float, help="Target tempo in BPM")
+    trans_tempo_p.add_argument(
+        "--allow-protected",
+        action="store_true",
+        default=False,
+        help="Allow adjusting protected tempo",
+    )
+    trans_tempo_p.add_argument("--confirm-token", type=str, default=None, help="Confirmation token")
+    trans_tempo_p.set_defaults(handler=handle_transport_control, transport_action="tempo")
+
+    trans_pos_p = trans_sub.add_parser("pos", help="Set song position (ticks or normalized)")
+    trans_pos_p.add_argument("ticks", type=float, help="Position in ticks or normalized 0.0-1.0")
+    trans_pos_p.add_argument("--confirm-token", type=str, default=None, help="Confirmation token")
+    trans_pos_p.set_defaults(handler=handle_transport_control, transport_action="pos")
+
+    for p in (
+        trans_p,
+        trans_get_p,
+        trans_play_p,
+        trans_stop_p,
+        trans_rec_p,
+        trans_tempo_p,
+        trans_pos_p,
+    ):
         p.add_argument(
             "--json",
             action="store_true",
@@ -400,9 +449,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     # 13. sbridge mixer
     mixer_p = subparsers.add_parser(
-        "mixer", help="Inspect FL Studio mixer tracks, levels, and routing"
+        "mixer", help="Inspect and adjust FL Studio mixer tracks, levels, and routing"
     )
-    mixer_sub = mixer_p.add_subparsers(dest="mixer_action", metavar="<list|get>")
+    mixer_sub = mixer_p.add_subparsers(dest="mixer_action", metavar="<list|get|set>")
 
     mix_list_p = mixer_sub.add_parser("list", help="List mixer tracks with volume, pan, peaks")
     mix_list_p.add_argument(
@@ -422,7 +471,31 @@ def build_parser() -> argparse.ArgumentParser:
     mix_get_p.add_argument("track", help="Track index (0-126) or name")
     mix_get_p.set_defaults(handler=handle_mixer)
 
-    for p in (mixer_p, mix_list_p, mix_get_p):
+    mix_set_p = mixer_sub.add_parser(
+        "set", help="Set mixer track properties (volume, pan, mute, solo, name)"
+    )
+    mix_set_p.add_argument("track", help="Track index (0-126) or name")
+    mix_set_p.add_argument(
+        "--vol", "--volume", dest="volume", type=float, default=None, help="Volume (0.0-1.0 or dB)"
+    )
+    mix_set_p.add_argument("--pan", type=float, default=None, help="Pan (-1.0 to 1.0)")
+    mix_set_p.add_argument(
+        "--mute", action=argparse.BooleanOptionalAction, default=None, help="Mute state"
+    )
+    mix_set_p.add_argument(
+        "--solo", action=argparse.BooleanOptionalAction, default=None, help="Solo state"
+    )
+    mix_set_p.add_argument("--name", type=str, default=None, help="Track name")
+    mix_set_p.add_argument(
+        "--allow-protected",
+        action="store_true",
+        default=False,
+        help="Allow modifying protected master track (track 0)",
+    )
+    mix_set_p.add_argument("--confirm-token", type=str, default=None, help="Confirmation token")
+    mix_set_p.set_defaults(handler=handle_mixer_set, mixer_action="set")
+
+    for p in (mixer_p, mix_list_p, mix_get_p, mix_set_p):
         p.add_argument(
             "--json",
             action="store_true",
@@ -432,8 +505,10 @@ def build_parser() -> argparse.ArgumentParser:
     mixer_p.set_defaults(handler=handle_mixer, mixer_action="list")
 
     # 14. sbridge channels
-    chan_p = subparsers.add_parser("channels", help="Inspect FL Studio generator channel rack")
-    chan_sub = chan_p.add_subparsers(dest="channels_action", metavar="<list|get>")
+    chan_p = subparsers.add_parser(
+        "channels", help="Inspect and modify FL Studio generator channel rack"
+    )
+    chan_sub = chan_p.add_subparsers(dest="channels_action", metavar="<list|get|set>")
 
     chan_list_p = chan_sub.add_parser("list", help="List channels with volume, pan, and step bits")
     chan_list_p.add_argument(
@@ -451,7 +526,28 @@ def build_parser() -> argparse.ArgumentParser:
     chan_get_p.add_argument("channel", help="Channel index or name")
     chan_get_p.set_defaults(handler=handle_channels)
 
-    for p in (chan_p, chan_list_p, chan_get_p):
+    chan_set_p = chan_sub.add_parser(
+        "set", help="Set channel properties (volume, pan, name, mute, solo, steps)"
+    )
+    chan_set_p.add_argument("channel", help="Channel index or name")
+    chan_set_p.add_argument(
+        "--vol", "--volume", dest="volume", type=float, default=None, help="Volume (0.0-1.0)"
+    )
+    chan_set_p.add_argument("--pan", type=float, default=None, help="Pan (-1.0 to 1.0)")
+    chan_set_p.add_argument("--name", type=str, default=None, help="Channel name")
+    chan_set_p.add_argument(
+        "--mute", action=argparse.BooleanOptionalAction, default=None, help="Mute state"
+    )
+    chan_set_p.add_argument(
+        "--solo", action=argparse.BooleanOptionalAction, default=None, help="Solo state"
+    )
+    chan_set_p.add_argument(
+        "--steps", type=str, default=None, help="Comma-separated 16-step grid (e.g. 1,0,0,0,1...)"
+    )
+    chan_set_p.add_argument("--confirm-token", type=str, default=None, help="Confirmation token")
+    chan_set_p.set_defaults(handler=handle_channels_set, channels_action="set")
+
+    for p in (chan_p, chan_list_p, chan_get_p, chan_set_p):
         p.add_argument(
             "--json",
             action="store_true",
@@ -461,8 +557,8 @@ def build_parser() -> argparse.ArgumentParser:
     chan_p.set_defaults(handler=handle_channels, channels_action="list")
 
     # 15. sbridge patterns
-    pat_p = subparsers.add_parser("patterns", help="Inspect FL Studio patterns")
-    pat_sub = pat_p.add_subparsers(dest="patterns_action", metavar="<list>")
+    pat_p = subparsers.add_parser("patterns", help="Inspect and edit FL Studio patterns")
+    pat_sub = pat_p.add_subparsers(dest="patterns_action", metavar="<list|select|rename>")
 
     pat_list_p = pat_sub.add_parser("list", help="List patterns with lengths and active indicator")
     pat_list_p.add_argument(
@@ -476,7 +572,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
     pat_list_p.set_defaults(handler=handle_patterns)
 
-    for p in (pat_p, pat_list_p):
+    pat_sel_p = pat_sub.add_parser("select", help="Select active pattern by number")
+    pat_sel_p.add_argument("pattern", type=int, help="Pattern number (1-based)")
+    pat_sel_p.add_argument("--confirm-token", type=str, default=None, help="Confirmation token")
+    pat_sel_p.set_defaults(handler=handle_patterns_control, patterns_action="select")
+
+    pat_ren_p = pat_sub.add_parser("rename", help="Rename pattern")
+    pat_ren_p.add_argument("pattern", type=int, help="Pattern number (1-based)")
+    pat_ren_p.add_argument("name", type=str, help="New pattern name")
+    pat_ren_p.add_argument("--confirm-token", type=str, default=None, help="Confirmation token")
+    pat_ren_p.set_defaults(handler=handle_patterns_control, patterns_action="rename")
+
+    for p in (pat_p, pat_list_p, pat_sel_p, pat_ren_p):
         p.add_argument(
             "--json",
             action="store_true",
@@ -484,6 +591,91 @@ def build_parser() -> argparse.ArgumentParser:
             help="Emit output formatted as machine-readable JSON",
         )
     pat_p.set_defaults(handler=handle_patterns, patterns_action="list")
+
+    # 16. sbridge safety
+    safety_p = subparsers.add_parser(
+        "safety", help="Session safety modes, checkpoints, rollback, and journal"
+    )
+    safety_sub = safety_p.add_subparsers(
+        dest="safety_action", metavar="<mode|checkpoint|rollback|journal>"
+    )
+
+    sm_p = safety_sub.add_parser("mode", help="Switch session safety mode (read_only|write|unsafe)")
+    sm_p.add_argument("mode", choices=["read_only", "write", "unsafe"], help="Target safety mode")
+    sm_p.add_argument("--reason", type=str, default=None, help="Rationale for mode change")
+    sm_p.add_argument(
+        "--confirm-token", type=str, default=None, help="Confirmation challenge token"
+    )
+    sm_p.set_defaults(handler=handle_safety, safety_action="mode")
+
+    sc_p = safety_sub.add_parser("checkpoint", help="Record named rollback checkpoint")
+    sc_p.add_argument("name", nargs="?", default="checkpoint", help="Checkpoint name")
+    sc_p.set_defaults(handler=handle_safety, safety_action="checkpoint")
+
+    sr_p = safety_sub.add_parser("rollback", help="Revert session mutations toward checkpoint")
+    sr_p.add_argument("checkpoint_id", nargs="?", default=None, help="Checkpoint ID or name")
+    sr_p.add_argument(
+        "--confirm-token", type=str, default=None, help="Confirmation challenge token"
+    )
+    sr_p.set_defaults(handler=handle_safety, safety_action="rollback")
+
+    sj_p = safety_sub.add_parser("journal", help="Inspect session mutation audit journal")
+    sj_p.add_argument("--limit", type=int, default=50, help="Maximum entries to list (default: 50)")
+    sj_p.add_argument("--since", type=float, default=None, help="Minimum epoch timestamp")
+    sj_p.add_argument("--op", type=str, default=None, help="Operation name filter")
+    sj_p.set_defaults(handler=handle_safety, safety_action="journal")
+
+    for p in (safety_p, sm_p, sc_p, sr_p, sj_p):
+        p.add_argument(
+            "--json",
+            action="store_true",
+            default=False,
+            help="Emit output formatted as machine-readable JSON",
+        )
+    safety_p.set_defaults(handler=handle_safety, safety_action="mode")
+
+    # 17. sbridge call
+    call_p = subparsers.add_parser(
+        "call", help="Execute raw allowlisted FL Studio Python API function"
+    )
+    call_p.add_argument("function", help="Function name (e.g. 'mixer.setTrackVolume')")
+    call_p.add_argument("args", nargs="*", help="Function arguments (positional or key=value)")
+    call_p.add_argument(
+        "--verify", action="store_true", default=True, help="Verify write with read-back"
+    )
+    call_p.add_argument(
+        "--allow-protected",
+        action="store_true",
+        default=False,
+        help="Allow modifying protected targets",
+    )
+    call_p.add_argument(
+        "--confirm-token", type=str, default=None, help="Confirmation challenge token"
+    )
+    call_p.add_argument(
+        "--json",
+        action="store_true",
+        default=False,
+        help="Emit output formatted as machine-readable JSON",
+    )
+    call_p.set_defaults(handler=handle_call)
+
+    # 18. sbridge batch
+    batch_p = subparsers.add_parser("batch", help="Execute batch mutations with rollback on error")
+    batch_p.add_argument("file", help="Path to batch JSON/NDJSON file, or '-' for stdin")
+    batch_p.add_argument(
+        "--allow-protected",
+        action="store_true",
+        default=False,
+        help="Allow modifying protected targets",
+    )
+    batch_p.add_argument(
+        "--json",
+        action="store_true",
+        default=False,
+        help="Emit output formatted as machine-readable JSON",
+    )
+    batch_p.set_defaults(handler=handle_batch)
 
     return parser
 
