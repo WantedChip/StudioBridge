@@ -1,0 +1,61 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schema/server.json",
+  "name": "io.github.wantedchip/studiobridge",
+  "title": "StudioBridge",
+  "description": "AI agent & developer bridge to Image-Line FL Studio (transport, mixer, channel rack, plugins, and project automation).",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WantedChip/studiobridge.git"
+  },
+  "website": "https://github.com/WantedChip/studiobridge",
+  "license": "MIT",
+  "environmentVariables": {
+    "SBRIDGE_TOOLSETS": {
+      "description": "Comma-separated list of active toolsets (core, inspect, control, safety). Defaults to all active.",
+      "required": false
+    },
+    "SBRIDGE_MODE": {
+      "description": "Default safety mode (read_only, write, unsafe). Defaults to read_only.",
+      "required": false
+    }
+  },
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "studiobridge",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": {
+        "SBRIDGE_TOOLSETS": {
+          "description": "Comma-separated list of active toolsets (core, inspect, control, safety). Defaults to all active.",
+          "required": false
+        },
+        "SBRIDGE_MODE": {
+          "description": "Default safety mode (read_only, write, unsafe). Defaults to read_only.",
+          "required": false
+        }
+      }
+    },
+    {
+      "registryType": "npm",
+      "identifier": "studiobridge",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": {
+        "SBRIDGE_TOOLSETS": {
+          "description": "Comma-separated list of active toolsets (core, inspect, control, safety). Defaults to all active.",
+          "required": false
+        },
+        "SBRIDGE_MODE": {
+          "description": "Default safety mode (read_only, write, unsafe). Defaults to read_only.",
+          "required": false
+        }
+      }
+    }
+  ]
+}

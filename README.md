@@ -1,4 +1,5 @@
 # StudioBridge
+<!-- mcp-name: io.github.wantedchip/studiobridge -->
 
 > A unified, open-source toolchain that enables developers and AI coding agents to inspect, control, edit, and render FL Studio projects.
 

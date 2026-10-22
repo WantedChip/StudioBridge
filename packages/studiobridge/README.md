@@ -1,4 +1,5 @@
 # StudioBridge
+<!-- mcp-name: io.github.wantedchip/studiobridge -->
 
 AI agent & developer bridge to Image-Line FL Studio.
 

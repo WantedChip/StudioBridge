@@ -56,3 +56,11 @@ Issues = "https://github.com/WantedChip/studiobridge/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/studiobridge"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src/studiobridge",
+    "/README.md",
+    "/LICENSE",
+]
+

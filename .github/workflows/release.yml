@@ -1,0 +1,67 @@
+name: Release Dry-Run & Packaging Verification
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Perform packaging and validation dry run"
+        required: false
+        default: true
+        type: boolean
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  verify-packaging:
+    name: Package Build & Registry Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install workspace dependencies
+        run: uv sync --all-groups
+
+      - name: Build wheel and sdist with hatchling
+        run: uv build --package studiobridge
+
+      - name: Verify built distribution artifacts
+        run: |
+          ls -la dist/
+          test -f dist/studiobridge-0.1.0-py3-none-any.whl
+          test -f dist/studiobridge-0.1.0.tar.gz
+
+      - name: Run packaging verification test suite
+        run: uv run pytest tests/unit/pkg/test_packaging.py -v
+
+      - name: Verify npm package launcher syntax
+        run: node --check npm/studiobridge/bin/sbridge.js
+
+      - name: Verify npm package packing dry run
+        run: npm pack --dry-run ./npm/studiobridge
+
+      - name: Validate server.json MCP Registry schema and tokens
+        run: |
+          uv run python -c "
+          import json, pathlib
+          data = json.loads(pathlib.Path('server.json').read_text(encoding='utf-8'))
+          assert data['name'] == 'io.github.wantedchip/studiobridge', 'Registry name mismatch'
+          assert len(data['packages']) >= 2, 'PyPI and npm packages required'
+          types = {p['registryType'] for p in data['packages']}
+          assert 'pypi' in types and 'npm' in types, 'Missing pypi or npm registry package'
+          print('server.json validation passed.')
+          "

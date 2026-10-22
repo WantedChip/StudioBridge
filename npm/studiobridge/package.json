@@ -1,0 +1,38 @@
+{
+  "name": "studiobridge",
+  "version": "0.1.0",
+  "description": "Zero-dependency npm launcher shim for StudioBridge (FL Studio AI agent & developer bridge)",
+  "bin": {
+    "studiobridge": "./bin/sbridge.js",
+    "sbridge": "./bin/sbridge.js",
+    "studiobridge-mcp": "./bin/sbridge.js"
+  },
+  "mcpName": "io.github.wantedchip/studiobridge",
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "bin/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "flstudio",
+    "mcp",
+    "ai-agent",
+    "midi",
+    "music-production",
+    "sbridge",
+    "model-context-protocol"
+  ],
+  "author": "WantedChip <ty121rt@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WantedChip/studiobridge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/WantedChip/studiobridge/issues"
+  },
+  "homepage": "https://github.com/WantedChip/studiobridge"
+}
