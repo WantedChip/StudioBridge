@@ -18,6 +18,7 @@ from studiobridge.cli.commands.diag import handle_diag
 from studiobridge.cli.commands.doctor import handle_doctor
 from studiobridge.cli.commands.hello import handle_hello
 from studiobridge.cli.commands.manifest import handle_manifest
+from studiobridge.cli.commands.mcp import handle_mcp
 from studiobridge.cli.commands.ports import handle_ports
 from studiobridge.cli.commands.probe import handle_probe
 from studiobridge.cli.commands.setup import handle_setup
@@ -288,6 +289,43 @@ def build_parser() -> argparse.ArgumentParser:
         )
 
     manifest_p.set_defaults(handler=handle_manifest)
+
+    # 10. sbridge mcp
+    mcp_p = subparsers.add_parser("mcp", help="Run Model Context Protocol (MCP) server over stdio")
+    mcp_p.add_argument(
+        "--toolsets",
+        type=str,
+        default=None,
+        help=(
+            "Comma-separated active toolsets (core,inspect,control,notes,safety,render,flp,unsafe)"
+        ),
+    )
+    mcp_p.add_argument(
+        "--stdio",
+        action="store_true",
+        default=True,
+        help="Use stdio transport (default)",
+    )
+    mcp_p.add_argument(
+        "--adapter",
+        type=str,
+        choices=["auto", "fallback", "sdk"],
+        default="auto",
+        help="MCP host adapter (auto, fallback, sdk)",
+    )
+    mcp_p.add_argument(
+        "--dry-run",
+        action="store_true",
+        default=False,
+        help="Validate toolsets and exit without starting stdio loop",
+    )
+    mcp_p.add_argument(
+        "--json",
+        action="store_true",
+        default=False,
+        help="Emit output formatted as machine-readable JSON",
+    )
+    mcp_p.set_defaults(handler=handle_mcp)
 
     return parser
 

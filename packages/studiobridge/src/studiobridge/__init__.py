@@ -64,6 +64,12 @@ from studiobridge.errors import (
     VersionMismatch,
     VersionMismatchError,
 )
+from studiobridge.mcp import (
+    McpHost,
+    StudioMcpServer,
+    ToolDefinition,
+    ToolResult,
+)
 from studiobridge.sdk import (
     ALLOWED_SAFETY_MODES,
     DEFAULT_BEATS_PER_BAR,
@@ -240,6 +246,7 @@ __all__ = [
     "Lease",
     "LeaseError",
     "LogEvent",
+    "McpHost",
     "MixerTrack",
     "MutationJournal",
     "NoBroker",
@@ -289,6 +296,7 @@ __all__ = [
     "Studio",
     "StudioBridgeError",
     "StudioEvent",
+    "StudioMcpServer",
     "SyncBatchContext",
     "SyncCacheManager",
     "SyncChannels",
@@ -309,6 +317,8 @@ __all__ = [
     "Tempo",
     "Ticks",
     "TimeoutError",
+    "ToolDefinition",
+    "ToolResult",
     "TraceContext",
     "TraceRecord",
     "Transaction",
