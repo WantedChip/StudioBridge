@@ -30,6 +30,7 @@ def handle_mcp(args: argparse.Namespace) -> int:
     toolsets_arg = getattr(args, "toolsets", None)
     adapter_arg = getattr(args, "adapter", "auto")
     is_dry_run = getattr(args, "dry_run", False)
+    is_check = getattr(args, "check", False)
     use_json = getattr(args, "json", False)
 
     try:
@@ -40,6 +41,64 @@ def handle_mcp(args: argparse.Namespace) -> int:
         else:
             print(f"Error: {exc}", file=sys.stderr)
         return EXIT_USAGE
+
+    if is_check:
+        init_req = {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "initialize",
+            "params": {
+                "protocolVersion": "2026-07-28",
+                "capabilities": {},
+                "clientInfo": {"name": "sbridge-check", "version": "1.0"},
+            },
+        }
+        init_res = server.host.handle_request(init_req)
+        if not init_res or "error" in init_res:
+            err_msg = (init_res or {}).get("error", {}).get("message", "Handshake failed")
+            if use_json:
+                print(json.dumps({"status": "error", "code": "E_INTERNAL", "message": err_msg}))
+            else:
+                print(f"Error: MCP initialize failed: {err_msg}", file=sys.stderr)
+            return EXIT_ERROR
+
+        tools_req = {"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}}
+        tools_res = server.host.handle_request(tools_req)
+        if not tools_res or "error" in tools_res:
+            err_msg = (tools_res or {}).get("error", {}).get("message", "Tools list failed")
+            if use_json:
+                print(json.dumps({"status": "error", "code": "E_INTERNAL", "message": err_msg}))
+            else:
+                print(f"Error: MCP tools/list failed: {err_msg}", file=sys.stderr)
+            return EXIT_ERROR
+
+        tools_list = (tools_res or {}).get("result", {}).get("tools", [])
+        tools_count = len(tools_list)
+        active = sorted(server.active_toolsets)
+
+        if use_json:
+            print(
+                json.dumps(
+                    {
+                        "status": "ok",
+                        "check": "passed",
+                        "tools_count": tools_count,
+                        "active_toolsets": active,
+                        "adapter": server.host.adapter_mode,
+                        "protocol_version": (init_res or {})
+                        .get("result", {})
+                        .get("protocolVersion"),
+                    },
+                    indent=2,
+                )
+            )
+        else:
+            active_str = ", ".join(active)
+            print(
+                f"MCP check passed: {tools_count} tools registered across toolsets: "
+                f"{active_str} (adapter: {server.host.adapter_mode})"
+            )
+        return EXIT_OK
 
     if is_dry_run:
         active = sorted(server.active_toolsets)

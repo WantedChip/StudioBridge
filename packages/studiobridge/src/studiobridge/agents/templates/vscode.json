@@ -1,0 +1,12 @@
+{
+  "servers": {
+    "{DIST}": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "{DIST}",
+        "mcp"
+      ]
+    }
+  }
+}

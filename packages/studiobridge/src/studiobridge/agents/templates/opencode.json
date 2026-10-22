@@ -1,0 +1,14 @@
+{
+  "mcp": {
+    "{DIST}": {
+      "type": "local",
+      "command": [
+        "uvx",
+        "{DIST}",
+        "mcp"
+      ],
+      "environment": {},
+      "enabled": true
+    }
+  }
+}

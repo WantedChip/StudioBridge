@@ -3,6 +3,11 @@
 from __future__ import annotations
 
 from studiobridge._version import __version__
+from studiobridge.agents import (
+    AgentInstaller,
+    AgentTarget,
+    InstallResult,
+)
 from studiobridge.core.capabilities import (
     Capability,
     CapabilityRegistry,
@@ -196,6 +201,8 @@ from studiobridge.sdk import (
 
 __all__ = [
     "ALLOWED_SAFETY_MODES",
+    "AgentInstaller",
+    "AgentTarget",
     "AmbiguousRef",
     "AmbiguousRefError",
     "ArgumentError",
@@ -257,6 +264,7 @@ __all__ = [
     "FlpInvariantViolationError",
     "FlpParseError",
     "FlpVersionUnsupportedError",
+    "InstallResult",
     "InvalidOutputError",
     "JournalEntry",
     "Lease",

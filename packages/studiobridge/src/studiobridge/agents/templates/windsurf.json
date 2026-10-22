@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "{DIST}": {
+      "command": "uvx",
+      "args": [
+        "{DIST}",
+        "mcp"
+      ]
+    }
+  }
+}

@@ -13,6 +13,7 @@ import sys
 from collections.abc import Sequence
 
 from studiobridge._version import __version__
+from studiobridge.cli.commands.agent import handle_agent
 from studiobridge.cli.commands.api import handle_api
 from studiobridge.cli.commands.broker import handle_broker
 from studiobridge.cli.commands.control import (
@@ -336,6 +337,12 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         default=False,
         help="Validate toolsets and exit without starting stdio loop",
+    )
+    mcp_p.add_argument(
+        "--check",
+        action="store_true",
+        default=False,
+        help="Verify MCP server startup and active tools, then exit",
     )
     mcp_p.add_argument(
         "--json",
@@ -676,6 +683,79 @@ def build_parser() -> argparse.ArgumentParser:
         help="Emit output formatted as machine-readable JSON",
     )
     batch_p.set_defaults(handler=handle_batch)
+
+    # 19. sbridge agent
+    agent_p = subparsers.add_parser(
+        "agent", help="Manage AI coding agent configurations and templates"
+    )
+    agent_sub = agent_p.add_subparsers(dest="agent_action", metavar="<list|install|snippet>")
+
+    agent_list_p = agent_sub.add_parser(
+        "list", help="List detected AI coding agents and installation status"
+    )
+    agent_list_p.set_defaults(handler=handle_agent, agent_action="list")
+
+    agent_install_p = agent_sub.add_parser(
+        "install", help="Install StudioBridge MCP server in target agent configuration"
+    )
+    agent_install_p.add_argument(
+        "agent",
+        help="Target agent identifier (e.g. 'cursor', 'claude-desktop', 'codex', 'all')",
+    )
+    agent_install_p.add_argument(
+        "--scope",
+        choices=["user", "project"],
+        default=None,
+        help="Target configuration scope",
+    )
+    agent_install_p.add_argument(
+        "--dry-run",
+        action="store_true",
+        default=False,
+        help="Preview configuration diff without modifying files",
+    )
+    agent_install_p.add_argument(
+        "--npm",
+        action="store_true",
+        default=False,
+        help="Use npm launcher ('cmd /c npx' on Windows)",
+    )
+    agent_install_p.add_argument(
+        "--uvx",
+        action="store_true",
+        default=False,
+        help="Use uvx launcher (default)",
+    )
+    agent_install_p.add_argument(
+        "--force",
+        action="store_true",
+        default=False,
+        help="Re-apply configuration even if already present",
+    )
+    agent_install_p.set_defaults(handler=handle_agent, agent_action="install")
+
+    agent_snippet_p = agent_sub.add_parser(
+        "snippet", help="Print copy-pasteable MCP server configuration snippet"
+    )
+    agent_snippet_p.add_argument(
+        "agent", help="Target agent identifier (e.g. 'cursor', 'codex', 'generic')"
+    )
+    agent_snippet_p.add_argument(
+        "--npm", action="store_true", default=False, help="Use npm launcher"
+    )
+    agent_snippet_p.add_argument(
+        "--uvx", action="store_true", default=False, help="Use uvx launcher (default)"
+    )
+    agent_snippet_p.set_defaults(handler=handle_agent, agent_action="snippet")
+
+    for p in (agent_p, agent_list_p, agent_install_p, agent_snippet_p):
+        p.add_argument(
+            "--json",
+            action="store_true",
+            default=False,
+            help="Emit output formatted as machine-readable JSON",
+        )
+    agent_p.set_defaults(handler=handle_agent, agent_action="list")
 
     return parser
 

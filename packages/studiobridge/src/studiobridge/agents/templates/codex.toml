@@ -1,0 +1,4 @@
+[mcp_servers.{DIST}]
+command = "uvx"
+args = ["{DIST}", "mcp"]
+tool_timeout_sec = 120

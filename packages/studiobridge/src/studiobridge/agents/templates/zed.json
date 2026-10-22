@@ -1,0 +1,11 @@
+{
+  "context_servers": {
+    "{DIST}": {
+      "command": "uvx",
+      "args": [
+        "{DIST}",
+        "mcp"
+      ]
+    }
+  }
+}
