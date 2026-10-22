@@ -41,6 +41,7 @@ from studiobridge.cli.commands.safety import (
     handle_safety,
 )
 from studiobridge.cli.commands.setup import handle_setup
+from studiobridge.cli.commands.skill import handle_skill
 from studiobridge.cli.commands.status import handle_status
 from studiobridge.core.errors import StudioBridgeError
 
@@ -756,6 +757,85 @@ def build_parser() -> argparse.ArgumentParser:
             help="Emit output formatted as machine-readable JSON",
         )
     agent_p.set_defaults(handler=handle_agent, agent_action="list")
+
+    # 20. sbridge skill
+    skill_p = subparsers.add_parser(
+        "skill", help="Manage StudioBridge agent skills and rules (SKILL.md, AGENTS.md)"
+    )
+    skill_sub = skill_p.add_subparsers(dest="skill_action", metavar="<install|list|info>")
+
+    skill_install_p = skill_sub.add_parser(
+        "install", help="Install StudioBridge skill bundle to project or user agent directory"
+    )
+    skill_install_p.add_argument(
+        "--agent",
+        default=".agents",
+        help=(
+            "Target agent identifier "
+            "(e.g. '.agents', 'claude', 'cursor', 'codex', 'gemini', 'opencode', 'all')"
+        ),
+    )
+    skill_install_p.add_argument(
+        "--scope",
+        choices=["user", "project"],
+        default="project",
+        help="Target configuration scope (project or user)",
+    )
+    skill_install_p.add_argument(
+        "--dest",
+        type=str,
+        default=None,
+        help="Custom destination directory for skill installation",
+    )
+    skill_install_p.add_argument(
+        "--dry-run",
+        action="store_true",
+        default=False,
+        help="Preview installation changes without modifying files",
+    )
+    skill_install_p.add_argument(
+        "--rules",
+        dest="rules",
+        action="store_true",
+        default=True,
+        help="Install/update AGENTS.md rules snippet (default: enabled)",
+    )
+    skill_install_p.add_argument(
+        "--no-rules",
+        dest="rules",
+        action="store_false",
+        help="Do not install/update AGENTS.md rules snippet",
+    )
+    skill_install_p.add_argument(
+        "--force",
+        action="store_true",
+        default=False,
+        help="Re-copy files even if already up to date",
+    )
+    skill_install_p.set_defaults(handler=handle_skill, skill_action="install")
+
+    skill_list_p = skill_sub.add_parser("list", help="List installed StudioBridge skill locations")
+    skill_list_p.add_argument(
+        "--scope",
+        choices=["user", "project", "all"],
+        default="all",
+        help="Filter installations by scope",
+    )
+    skill_list_p.set_defaults(handler=handle_skill, skill_action="list")
+
+    skill_info_p = skill_sub.add_parser(
+        "info", help="Show metadata, files, and AGENTS rules snippet for StudioBridge skill"
+    )
+    skill_info_p.set_defaults(handler=handle_skill, skill_action="info")
+
+    for p in (skill_p, skill_install_p, skill_list_p, skill_info_p):
+        p.add_argument(
+            "--json",
+            action="store_true",
+            default=False,
+            help="Emit output formatted as machine-readable JSON",
+        )
+    skill_p.set_defaults(handler=handle_skill, skill_action="info")
 
     return parser
 

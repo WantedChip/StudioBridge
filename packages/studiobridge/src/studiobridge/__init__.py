@@ -7,6 +7,9 @@ from studiobridge.agents import (
     AgentInstaller,
     AgentTarget,
     InstallResult,
+    SkillInstaller,
+    SkillInstallResult,
+    SkillTarget,
 )
 from studiobridge.core.capabilities import (
     Capability,
@@ -322,6 +325,9 @@ __all__ = [
     "ScopedCacheContext",
     "Session",
     "ShutdownEvent",
+    "SkillInstallResult",
+    "SkillInstaller",
+    "SkillTarget",
     "Slot",
     "StatsAccumulator",
     "Status",
