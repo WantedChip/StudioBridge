@@ -141,3 +141,130 @@ def test_cli_flp_roundtrip_json(tmp_path: Path, capsys: pytest.CaptureFixture[st
     assert payload["status"] == "ok"
     assert payload["byte_identical"] is True
     assert payload["size_bytes"] > 0
+
+
+# =============================================================================
+# sbridge flp edit tests
+# =============================================================================
+
+
+def test_cli_flp_edit_text(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """sbridge flp edit applies mutations and saves to output file."""
+    # req: FLP-30, FLP-31
+    flp_path = _create_test_flp(tmp_path / "song.flp", title="Old Title", tempo=120.0)
+    out_path = tmp_path / "edited.flp"
+
+    code = cli_entry(
+        [
+            "flp",
+            "edit",
+            str(flp_path),
+            "--tempo",
+            "138",
+            "--title",
+            "Brand New Title",
+            "--rename-channel",
+            "0:808 Sub",
+            "--out",
+            str(out_path),
+        ]
+    )
+    assert code == 0
+
+    captured = capsys.readouterr()
+    assert "[OK] Applied 3 mutations; saved atomically to edited.flp" in captured.out
+    assert out_path.is_file()
+
+    # Verify re-parsed values
+    from studiobridge.flp import Project
+
+    re_proj = Project.load(out_path)
+    assert re_proj.tempo == 138.0
+    assert re_proj.title == "Brand New Title"
+    assert re_proj.channels[0].name == "808 Sub"
+
+
+def test_cli_flp_edit_json(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """sbridge flp edit --json outputs structured mutation audit log."""
+    # req: FLP-30, FLP-31
+    flp_path = _create_test_flp(tmp_path / "song.flp", tempo=120.0)
+    out_path = tmp_path / "edited.flp"
+
+    code = cli_entry(
+        [
+            "flp",
+            "edit",
+            str(flp_path),
+            "--tempo",
+            "140",
+            "--out",
+            str(out_path),
+            "--json",
+        ]
+    )
+    assert code == 0
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    assert payload["status"] == "ok"
+    assert payload["mutations_applied"] == 1
+    assert payload["destination"] == str(out_path.resolve())
+
+
+def test_cli_flp_edit_dry_run(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """sbridge flp edit --dry-run validates mutations without modifying files."""
+    # req: FLP-30
+    flp_path = _create_test_flp(tmp_path / "song.flp", tempo=120.0)
+    out_path = tmp_path / "should_not_exist.flp"
+
+    code = cli_entry(
+        [
+            "flp",
+            "edit",
+            str(flp_path),
+            "--tempo",
+            "150",
+            "--out",
+            str(out_path),
+            "--dry-run",
+        ]
+    )
+    assert code == 0
+    assert not out_path.exists()
+
+    captured = capsys.readouterr()
+    assert "[DRY-RUN] Verified 1 mutations" in captured.out
+
+
+def test_cli_flp_edit_in_place_creates_backup(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """sbridge flp edit --in-place modifies file and creates backup file."""
+    # req: FLP-31
+    flp_path = _create_test_flp(tmp_path / "song.flp", tempo=120.0)
+
+    code = cli_entry(
+        [
+            "flp",
+            "edit",
+            str(flp_path),
+            "--tempo",
+            "160",
+            "--in-place",
+        ]
+    )
+    assert code == 0
+
+    backups = list(tmp_path.glob("song.flp.bak-*"))
+    assert len(backups) == 1
+
+    from studiobridge.flp import Project
+
+    re_proj = Project.load(flp_path)
+    assert re_proj.tempo == 160.0
+
+
+def test_cli_flp_edit_file_not_found(capsys: pytest.CaptureFixture[str]) -> None:
+    """sbridge flp edit on missing file returns exit code 1."""
+    code = cli_entry(["flp", "edit", "non_existent.flp", "--tempo", "130"])
+    assert code == 1

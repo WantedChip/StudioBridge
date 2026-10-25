@@ -34,6 +34,7 @@ from studiobridge.flp.schema.text import decode_text, decode_version_string
 
 if TYPE_CHECKING:
     from studiobridge.flp.diff import ProjectDiff
+    from studiobridge.flp.mutate.mutator import ProjectMutator
 
 
 @dataclass
@@ -60,16 +61,22 @@ class Project:
     unmodeled_events: list[UnmodeledEvent] = field(default_factory=list)
     source_file: FlpFile | None = None
     profile: VersionProfile | None = None
+    file_path: Path | None = None
+    _mutator: Any = field(default=None, repr=False, compare=False)
 
     @classmethod
     def load(cls, path_or_bytes: Path | str | bytes) -> Project:
         """Load and hydrate a Project object model from an FLP file or raw bytes [FLP-20]."""
+        file_path: Path | None = None
         if isinstance(path_or_bytes, bytes):
             flp_file = parse(path_or_bytes)
         else:
-            flp_file = parse(Path(path_or_bytes))
+            file_path = Path(path_or_bytes).resolve()
+            flp_file = parse(file_path)
 
-        return cls._hydrate(flp_file)
+        project = cls._hydrate(flp_file)
+        project.file_path = file_path
+        return project
 
     @classmethod
     def _hydrate(cls, flp_file: FlpFile) -> Project:
@@ -161,6 +168,7 @@ class Project:
             # 7. Channel rack creation (64 - NewChan)
             elif ev.id == 64:
                 consumed_indices.add(i)
+                current_pattern = None
                 ch_idx = len(channels)
                 current_channel = Channel(
                     index=ch_idx,
@@ -169,12 +177,16 @@ class Project:
                 )
                 channels.append(current_channel)
 
-            # 8. Channel name (200 - Text/ChannelName)
+            # 8. Entity name (200 - Text/ChannelName or PatternName)
             elif ev.id == 200:
                 if current_channel is not None:
                     consumed_indices.add(i)
                     current_channel.name = decode_text(ev.raw, encoding=text_encoding)
                     current_channel.source_events.append(i)
+                elif current_pattern is not None:
+                    consumed_indices.add(i)
+                    current_pattern.name = decode_text(ev.raw, encoding=text_encoding)
+                    current_pattern.source_events.append(i)
 
             # 9. Plugin wrapper data (213)
             elif ev.id == 213:
@@ -199,6 +211,7 @@ class Project:
             # 11. Pattern selector (65 - NewPat)
             elif ev.id == 65:
                 consumed_indices.add(i)
+                current_channel = None
                 pat_num = ev.as_int()
                 if pat_num <= 0:
                     pat_num = len(patterns) + 1
@@ -390,3 +403,65 @@ class Project:
         proj_a = a if isinstance(a, Project) else cls.load(a)
         proj_b = b if isinstance(b, Project) else cls.load(b)
         return diff_projects(proj_a, proj_b)
+
+    def mutate(self) -> ProjectMutator:
+        """Return a ProjectMutator bound to this project for validated editing."""
+        from studiobridge.flp.mutate.mutator import ProjectMutator
+
+        if self._mutator is None:
+            self._mutator = ProjectMutator(self)
+        return self._mutator
+
+    def validate(self) -> list[str]:
+        """Validate project structural invariants and return list of violations."""
+        from studiobridge.flp.validate.invariants import validate_invariants
+
+        return validate_invariants(self)
+
+    def check_invariants(self) -> None:
+        """Check structural invariants and raise FlpInvariantViolationError if violated."""
+        from studiobridge.flp.validate.invariants import check_invariants
+
+        check_invariants(self)
+
+    def save_as(
+        self,
+        path: Path | str,
+        *,
+        force_unknown_version: bool = False,
+    ) -> Path:
+        """Save project to a new destination path atomically [FLP-31]."""
+        from studiobridge.flp.atomic import atomic_save
+
+        return atomic_save(
+            self,
+            dest_path=path,
+            in_place=False,
+            force_unknown_version=force_unknown_version,
+        )
+
+    def save(
+        self,
+        *,
+        in_place: bool = False,
+        force_unknown_version: bool = False,
+        make_backup: bool = True,
+    ) -> Path:
+        """Save project to its source file path [FLP-31].
+
+        Requires in_place=True if overwriting an existing file, which creates
+        a timestamped backup copy.
+        """
+        if self.file_path is None:
+            raise ValueError(
+                "Project was not loaded from a file path and has no target path; use save_as(path)."
+            )
+        from studiobridge.flp.atomic import atomic_save
+
+        return atomic_save(
+            self,
+            dest_path=self.file_path,
+            in_place=in_place,
+            force_unknown_version=force_unknown_version,
+            make_backup=make_backup,
+        )

@@ -964,6 +964,17 @@ class FlpInvariantViolationError(OfflineError):
     default_code: str = "E_FLP_INVARIANT"
 
 
+class FlpWriteRiskError(OfflineError):
+    """Raised when an offline write carries high risk of file corruption [FLP-32]."""
+
+    default_code: str = "E_FLP_WRITE_RISK"
+
+
+FlpInvariantViolation = FlpInvariantViolationError
+FlpVersionUnsupported = FlpVersionUnsupportedError
+FlpWriteRisk = FlpWriteRiskError
+
+
 class RenderError(StudioBridgeError):
     """Base exception for render orchestration failures."""
 

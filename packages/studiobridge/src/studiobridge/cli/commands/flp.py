@@ -13,13 +13,16 @@ import json
 import sys
 from pathlib import Path
 
+from studiobridge.core.errors import StudioBridgeError
+from studiobridge.flp.atomic import atomic_save
 from studiobridge.flp.codec.reader import FlpFile
 from studiobridge.flp.diff import diff_projects
 from studiobridge.flp.model.project import Project
+from studiobridge.flp.validate.invariants import check_invariants
 
 
 def handle_flp(args: argparse.Namespace) -> int:
-    """Dispatch FLP subcommands (inspect, diff, roundtrip)."""
+    """Dispatch FLP subcommands (inspect, diff, roundtrip, edit)."""
     action = getattr(args, "flp_action", None)
     if action == "inspect":
         return _handle_inspect(args)
@@ -27,6 +30,8 @@ def handle_flp(args: argparse.Namespace) -> int:
         return _handle_diff(args)
     if action == "roundtrip":
         return _handle_roundtrip(args)
+    if action == "edit":
+        return _handle_edit(args)
 
     print(f"Unknown flp action: {action}", file=sys.stderr)
     return 2
@@ -202,3 +207,184 @@ def _handle_roundtrip(args: argparse.Namespace) -> int:
             file=sys.stderr,
         )
     return 7
+
+
+def _handle_edit(args: argparse.Namespace) -> int:
+    """Handle `sbridge flp edit <file> [options...]`."""
+    file_path = Path(args.file)
+    if not file_path.is_file():
+        if getattr(args, "json", False):
+            print(json.dumps({"status": "error", "message": f"File not found: {file_path}"}))
+        else:
+            print(f"Error: File not found: {file_path}", file=sys.stderr)
+        return 1
+
+    try:
+        project = Project.load(file_path)
+    except Exception as exc:
+        if getattr(args, "json", False):
+            print(json.dumps({"status": "error", "message": f"Failed to load project: {exc}"}))
+        else:
+            print(f"Error: Failed to load project: {exc}", file=sys.stderr)
+        return 7
+
+    mutator = project.mutate()
+
+    # Apply command line mutations
+    try:
+        if getattr(args, "tempo", None) is not None:
+            mutator.set_tempo(float(args.tempo))
+        if getattr(args, "title", None) is not None:
+            mutator.set_title(str(args.title))
+        if getattr(args, "author", None) is not None:
+            mutator.set_author(str(args.author))
+        if getattr(args, "comments", None) is not None:
+            mutator.set_comments(str(args.comments))
+
+        # Channel mutations
+        for entry in getattr(args, "rename_channel", None) or []:
+            parts = entry.split(":", 1)
+            if len(parts) == 2:
+                mutator.rename_channel(int(parts[0]), parts[1])
+        for entry in getattr(args, "channel_volume", None) or []:
+            parts = entry.split(":", 1)
+            if len(parts) == 2:
+                mutator.set_channel_volume(int(parts[0]), float(parts[1]))
+        for entry in getattr(args, "channel_pan", None) or []:
+            parts = entry.split(":", 1)
+            if len(parts) == 2:
+                mutator.set_channel_pan(int(parts[0]), float(parts[1]))
+
+        # Pattern mutations
+        for entry in getattr(args, "rename_pattern", None) or []:
+            parts = entry.split(":", 1)
+            if len(parts) == 2:
+                mutator.rename_pattern(int(parts[0]), parts[1])
+        for pat_num in getattr(args, "clear_pattern", None) or []:
+            mutator.clear_pattern(int(pat_num))
+
+        # Mixer mutations
+        for entry in getattr(args, "rename_track", None) or []:
+            parts = entry.split(":", 1)
+            if len(parts) == 2:
+                mutator.rename_track(int(parts[0]), parts[1])
+        for entry in getattr(args, "track_volume", None) or []:
+            parts = entry.split(":", 1)
+            if len(parts) == 2:
+                mutator.set_track_volume(int(parts[0]), float(parts[1]))
+        for trk_idx in getattr(args, "track_mute", None) or []:
+            mutator.set_track_mute(int(trk_idx), True)
+        for trk_idx in getattr(args, "track_solo", None) or []:
+            mutator.set_track_solo(int(trk_idx), True)
+
+        # Playlist mutations
+        for entry in getattr(args, "add_marker", None) or []:
+            parts = entry.split(":", 1)
+            if len(parts) == 2:
+                mutator.add_marker(parts[0], int(parts[1]))
+
+        # Check invariants
+        check_invariants(project)
+
+    except StudioBridgeError as err:
+        if getattr(args, "json", False):
+            print(
+                json.dumps(
+                    {
+                        "status": "error",
+                        "code": err.code,
+                        "message": str(err),
+                        "details": err.details,
+                    },
+                    indent=2,
+                )
+            )
+        else:
+            print(f"Error [{err.code}]: {err}", file=sys.stderr)
+        return 7
+    except Exception as exc:
+        if getattr(args, "json", False):
+            print(json.dumps({"status": "error", "message": f"Mutation error: {exc}"}))
+        else:
+            print(f"Error: Mutation error: {exc}", file=sys.stderr)
+        return 7
+
+    # Dry-run handling
+    if getattr(args, "dry_run", False):
+        if getattr(args, "json", False):
+            print(
+                json.dumps(
+                    {
+                        "status": "ok",
+                        "dry_run": True,
+                        "file": str(file_path),
+                        "mutations_applied": len(mutator.records),
+                        "mutations": [r.to_dict() for r in mutator.records],
+                    },
+                    indent=2,
+                )
+            )
+        else:
+            print(
+                f"[DRY-RUN] Verified {len(mutator.records)} mutations for {file_path.name}; "
+                f"invariants hold."
+            )
+        return 0
+
+    # Determine destination
+    in_place = getattr(args, "in_place", False)
+    if getattr(args, "out", None):
+        dest_path = Path(args.out)
+    elif in_place:
+        dest_path = file_path
+    else:
+        dest_path = file_path.with_name(f"{file_path.stem}.sb{file_path.suffix}")
+
+    try:
+        saved_path = atomic_save(
+            project,
+            dest_path,
+            in_place=in_place,
+            force_unknown_version=getattr(args, "force_unknown_version", False),
+        )
+    except StudioBridgeError as err:
+        if getattr(args, "json", False):
+            print(
+                json.dumps(
+                    {
+                        "status": "error",
+                        "code": err.code,
+                        "message": str(err),
+                        "details": err.details,
+                    },
+                    indent=2,
+                )
+            )
+        else:
+            print(f"Error [{err.code}]: {err}", file=sys.stderr)
+        return 7
+    except Exception as exc:
+        if getattr(args, "json", False):
+            print(json.dumps({"status": "error", "message": f"Save error: {exc}"}))
+        else:
+            print(f"Error during save: {exc}", file=sys.stderr)
+        return 7
+
+    if getattr(args, "json", False):
+        print(
+            json.dumps(
+                {
+                    "status": "ok",
+                    "file": str(file_path),
+                    "destination": str(saved_path),
+                    "mutations_applied": len(mutator.records),
+                    "mutations": [r.to_dict() for r in mutator.records],
+                },
+                indent=2,
+            )
+        )
+    else:
+        print(
+            f"[OK] Applied {len(mutator.records)} mutations; saved atomically to {saved_path.name}"
+        )
+    return 0

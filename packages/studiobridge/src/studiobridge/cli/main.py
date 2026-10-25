@@ -1001,7 +1001,7 @@ def build_parser() -> argparse.ArgumentParser:
     flp_p = subparsers.add_parser(
         "flp", help="Offline FL Studio project file (.flp) inspection, diffing, and validation"
     )
-    flp_sub = flp_p.add_subparsers(dest="flp_action", metavar="<inspect|diff|roundtrip>")
+    flp_sub = flp_p.add_subparsers(dest="flp_action", metavar="<inspect|diff|roundtrip|edit>")
 
     flp_inspect_p = flp_sub.add_parser(
         "inspect", help="Inspect .flp project structure, metadata, and tracks"
@@ -1022,7 +1022,99 @@ def build_parser() -> argparse.ArgumentParser:
     flp_roundtrip_p.add_argument("file", help="Path to FL Studio project file (.flp)")
     flp_roundtrip_p.set_defaults(handler=handle_flp, flp_action="roundtrip")
 
-    for p in (flp_p, flp_inspect_p, flp_diff_p, flp_roundtrip_p):
+    flp_edit_p = flp_sub.add_parser(
+        "edit", help="Apply validated mutations and atomic saves to an .flp project"
+    )
+    flp_edit_p.add_argument("file", help="Path to FL Studio project file (.flp)")
+    flp_edit_p.add_argument("--out", help="Destination output file path")
+    flp_edit_p.add_argument(
+        "--in-place",
+        action="store_true",
+        default=False,
+        help="Allow in-place overwrite with timestamped backup",
+    )
+    flp_edit_p.add_argument("--tempo", type=float, help="Set project tempo in BPM")
+    flp_edit_p.add_argument("--title", help="Set project title")
+    flp_edit_p.add_argument("--author", help="Set project author")
+    flp_edit_p.add_argument("--comments", help="Set project comments")
+    flp_edit_p.add_argument(
+        "--rename-channel",
+        action="append",
+        metavar="INDEX:NAME",
+        help="Rename channel (e.g. '0:Kick')",
+    )
+    flp_edit_p.add_argument(
+        "--channel-volume",
+        action="append",
+        metavar="INDEX:VOL",
+        help="Set channel volume (e.g. '0:0.8')",
+    )
+    flp_edit_p.add_argument(
+        "--channel-pan",
+        action="append",
+        metavar="INDEX:PAN",
+        help="Set channel pan (e.g. '0:-0.5')",
+    )
+    flp_edit_p.add_argument(
+        "--rename-pattern",
+        action="append",
+        metavar="NUM:NAME",
+        help="Rename pattern (e.g. '1:Drums')",
+    )
+    flp_edit_p.add_argument(
+        "--clear-pattern",
+        action="append",
+        type=int,
+        metavar="NUM",
+        help="Clear notes in pattern",
+    )
+    flp_edit_p.add_argument(
+        "--rename-track",
+        action="append",
+        metavar="INDEX:NAME",
+        help="Rename mixer track (e.g. '1:Drums')",
+    )
+    flp_edit_p.add_argument(
+        "--track-volume",
+        action="append",
+        metavar="INDEX:VOL",
+        help="Set mixer track volume (e.g. '1:0.75')",
+    )
+    flp_edit_p.add_argument(
+        "--track-mute",
+        action="append",
+        type=int,
+        metavar="INDEX",
+        help="Mute mixer track",
+    )
+    flp_edit_p.add_argument(
+        "--track-solo",
+        action="append",
+        type=int,
+        metavar="INDEX",
+        help="Solo mixer track",
+    )
+    flp_edit_p.add_argument(
+        "--add-marker",
+        action="append",
+        metavar="NAME:TICKS",
+        help="Add timeline marker (e.g. 'Verse:384')",
+    )
+    flp_edit_p.add_argument(
+        "--force-unknown-version",
+        action="store_true",
+        default=False,
+        help="Allow writing on unverified or newer FL Studio versions",
+    )
+    flp_edit_p.add_argument(
+        "--dry-run",
+        action="store_true",
+        default=False,
+        help="Validate mutations and invariants without writing output file",
+    )
+    flp_edit_p.set_defaults(handler=handle_flp, flp_action="edit")
+
+    for p in (flp_p, flp_inspect_p, flp_diff_p, flp_roundtrip_p, flp_edit_p):
         p.add_argument(
             "--json",
             action="store_true",

@@ -3,10 +3,15 @@
 from __future__ import annotations
 
 from studiobridge.core.errors import (
+    FlpInvariantViolation,
     FlpInvariantViolationError,
     FlpParseError,
+    FlpVersionUnsupported,
     FlpVersionUnsupportedError,
+    FlpWriteRisk,
+    FlpWriteRiskError,
 )
+from studiobridge.flp.atomic import atomic_save
 from studiobridge.flp.codec import (
     Chunk,
     Event,
@@ -38,6 +43,11 @@ from studiobridge.flp.model import (
     Slot,
     UnmodeledEvent,
 )
+from studiobridge.flp.mutate import (
+    MutationRecord,
+    ProjectMutator,
+    serialize_project,
+)
 from studiobridge.flp.schema import (
     EventMeaning,
     PlaylistItemRecord,
@@ -58,6 +68,10 @@ from studiobridge.flp.schema import (
     resolve_profile_from_events,
     resolve_profile_from_file,
 )
+from studiobridge.flp.validate import (
+    check_invariants,
+    validate_invariants,
+)
 
 __all__ = [
     "Arrangement",
@@ -70,13 +84,18 @@ __all__ = [
     "EventMeaning",
     "FlpFile",
     "FlpHeader",
+    "FlpInvariantViolation",
     "FlpInvariantViolationError",
     "FlpParseError",
+    "FlpVersionUnsupported",
     "FlpVersionUnsupportedError",
+    "FlpWriteRisk",
+    "FlpWriteRiskError",
     "HeaderChunk",
     "LenEnc",
     "Marker",
     "MixerTrack",
+    "MutationRecord",
     "Note",
     "OpaquePlugin",
     "Pattern",
@@ -86,6 +105,7 @@ __all__ = [
     "ProfileResolver",
     "Project",
     "ProjectDiff",
+    "ProjectMutator",
     "RawChunk",
     "ResolutionResult",
     "Slot",
@@ -93,6 +113,8 @@ __all__ = [
     "TrackDataRecord",
     "UnmodeledEvent",
     "VersionProfile",
+    "atomic_save",
+    "check_invariants",
     "decode_playlist_items",
     "decode_text",
     "decode_track_data",
@@ -109,4 +131,6 @@ __all__ = [
     "resolve_profile_from_events",
     "resolve_profile_from_file",
     "serialize",
+    "serialize_project",
+    "validate_invariants",
 ]
