@@ -22,7 +22,7 @@ from studiobridge.flp.validate.invariants import check_invariants
 
 
 def handle_flp(args: argparse.Namespace) -> int:
-    """Dispatch FLP subcommands (inspect, diff, roundtrip, edit, new, template)."""
+    """Dispatch FLP subcommands (inspect, diff, roundtrip, edit, validate, new, template)."""
     action = getattr(args, "flp_action", None)
     if action == "inspect":
         return _handle_inspect(args)
@@ -32,6 +32,8 @@ def handle_flp(args: argparse.Namespace) -> int:
         return _handle_roundtrip(args)
     if action == "edit":
         return _handle_edit(args)
+    if action == "validate":
+        return _handle_validate(args)
     if action in ("new", "template"):
         from studiobridge.cli.commands.flp_template import handle_flp_template
 
@@ -391,4 +393,113 @@ def _handle_edit(args: argparse.Namespace) -> int:
         print(
             f"[OK] Applied {len(mutator.records)} mutations; saved atomically to {saved_path.name}"
         )
+    return 0
+
+
+def _handle_validate(args: argparse.Namespace) -> int:
+    """Handle `sbridge flp validate <file> [--in-fl] [--timeout SECONDS] [--json]` [FLP-50]."""
+    file_path = Path(args.file)
+    if not file_path.is_file():
+        if getattr(args, "json", False):
+            print(json.dumps({"status": "error", "message": f"File not found: {file_path}"}))
+        else:
+            print(f"Error: File not found: {file_path}", file=sys.stderr)
+        return 1
+
+    try:
+        project = Project.load(file_path)
+    except Exception as exc:
+        if getattr(args, "json", False):
+            print(json.dumps({"status": "error", "message": f"Failed to load project: {exc}"}))
+        else:
+            print(f"Error: Failed to load project: {exc}", file=sys.stderr)
+        return 7
+
+    from studiobridge.flp.validate.invariants import validate_invariants
+    from studiobridge.flp.validate.risk import calculate_project_risk
+
+    violations = validate_invariants(project)
+    risk_report = calculate_project_risk(project)
+
+    in_fl = getattr(args, "in_fl", False)
+    load_result = None
+    live_result = None
+
+    if in_fl:
+        timeout_s = float(getattr(args, "timeout", 30.0) or 30.0)
+        from studiobridge.flp.validate.fl_load import FlLoadHarness
+
+        harness = FlLoadHarness()
+        try:
+            load_result = harness.run(file_path, timeout_s=timeout_s)
+        except Exception as exc:
+            if getattr(args, "json", False):
+                print(
+                    json.dumps(
+                        {
+                            "status": "error",
+                            "file": str(file_path),
+                            "message": f"Headless FL-load failed: {exc}",
+                        }
+                    )
+                )
+            else:
+                print(f"Error: Headless FL-load failed: {exc}", file=sys.stderr)
+            return 7
+
+        # Also check if live bridge session is active
+        live_result = harness.verify_live_bridge(project)
+
+    is_ok = len(violations) == 0 and (load_result is None or load_result.is_ok)
+    status_str = "ok" if is_ok else "error"
+
+    if getattr(args, "json", False):
+        output = {
+            "status": status_str,
+            "file": str(file_path),
+            "invariants": {
+                "valid": len(violations) == 0,
+                "violations": violations,
+            },
+            "risk": risk_report.to_dict(),
+            "fl_load": load_result.to_dict() if load_result else None,
+            "live_verification": live_result.to_dict() if live_result else None,
+        }
+        print(json.dumps(output, indent=2))
+    else:
+        print(f"Validating: {file_path.name}")
+        inv_status = (
+            "PASS (0 violations)" if not violations else f"FAIL ({len(violations)} violations)"
+        )
+        print(f"  Structural Invariants: {inv_status}")
+        for v in violations:
+            print(f"    - {v}")
+
+        risk_state = "safe to load" if risk_report.is_safe_to_load else "elevated risk"
+        print(
+            f"  Risk Assessment: {risk_report.level.upper()} "
+            f"(Score: {risk_report.score}/100, {risk_state})"
+        )
+        for factor in risk_report.factors:
+            print(f"    - [{factor.category}] {factor.message}")
+
+        if in_fl and load_result:
+            outcome_display = load_result.outcome.upper()
+            print(
+                f"  FL-Load Preflight: {outcome_display} "
+                f"(duration: {load_result.duration_s:.1f}s, exit code: {load_result.exit_code})"
+            )
+            if load_result.dialog_title:
+                print(f"    Dialog Title: '{load_result.dialog_title}'")
+            if load_result.error_message:
+                print(f"    Details: {load_result.error_message}")
+
+        if live_result and live_result.available:
+            live_status = "PASS" if live_result.matches else "FAIL"
+            print(f"  Live Bridge Integrity: {live_status} ({live_result.message})")
+
+    if violations:
+        return 5  # Verification failed
+    if in_fl and load_result and not load_result.is_ok:
+        return 7  # Offline FLP error / load freeze or crash
     return 0

@@ -1002,7 +1002,7 @@ def build_parser() -> argparse.ArgumentParser:
         "flp", help="Offline FL Studio project file (.flp) inspection, diffing, and validation"
     )
     flp_sub = flp_p.add_subparsers(
-        dest="flp_action", metavar="<inspect|diff|roundtrip|edit|new|template>"
+        dest="flp_action", metavar="<inspect|diff|roundtrip|edit|validate|new|template>"
     )
 
     flp_inspect_p = flp_sub.add_parser(
@@ -1023,6 +1023,24 @@ def build_parser() -> argparse.ArgumentParser:
     )
     flp_roundtrip_p.add_argument("file", help="Path to FL Studio project file (.flp)")
     flp_roundtrip_p.set_defaults(handler=handle_flp, flp_action="roundtrip")
+
+    flp_validate_p = flp_sub.add_parser(
+        "validate", help="Validate project structural invariants, static risk, and FL-load status"
+    )
+    flp_validate_p.add_argument("file", help="Path to FL Studio project file (.flp)")
+    flp_validate_p.add_argument(
+        "--in-fl",
+        action="store_true",
+        default=False,
+        help="Perform headless load verification in real FL Studio [FLP-50]",
+    )
+    flp_validate_p.add_argument(
+        "--timeout",
+        type=float,
+        default=30.0,
+        help="Watchdog timeout in seconds for FL load test (default: 30.0)",
+    )
+    flp_validate_p.set_defaults(handler=handle_flp, flp_action="validate")
 
     flp_edit_p = flp_sub.add_parser(
         "edit", help="Apply validated mutations and atomic saves to an .flp project"
@@ -1165,6 +1183,7 @@ def build_parser() -> argparse.ArgumentParser:
         flp_inspect_p,
         flp_diff_p,
         flp_roundtrip_p,
+        flp_validate_p,
         flp_edit_p,
         flp_new_p,
         flp_template_p,

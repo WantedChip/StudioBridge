@@ -44,6 +44,8 @@ class OpaquePlugin:
     wrapper_kind: str = "opaque"
     name_hint: str = ""
     source_events: list[int] = field(default_factory=list)
+    is_modified: bool = False
+    is_synthesized: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         """Convert plugin to dictionary representation."""
@@ -57,6 +59,8 @@ class OpaquePlugin:
                 else base64.b64encode(self.data).decode("ascii")
             ),
             "source_events": list(self.source_events),
+            "is_modified": self.is_modified,
+            "is_synthesized": self.is_synthesized,
         }
 
 
@@ -123,6 +127,7 @@ class Channel:
     plugin: Plugin | None = None
     source_events: list[int] = field(default_factory=list)
     _fragment_events: list[Event] = field(default_factory=list, repr=False, compare=False)
+    provenance: Any = field(default=None, compare=False)
 
     @property
     def mixer_track(self) -> int:
@@ -148,6 +153,9 @@ class Channel:
             "has_plugin": self.plugin is not None,
             "plugin": self.plugin.to_dict() if self.plugin else None,
             "source_events": list(self.source_events),
+            "provenance": (
+                self.provenance.to_dict() if hasattr(self.provenance, "to_dict") else None
+            ),
         }
 
 

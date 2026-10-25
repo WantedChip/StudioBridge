@@ -35,6 +35,7 @@ from studiobridge.flp.schema.text import decode_text, decode_version_string
 if TYPE_CHECKING:
     from studiobridge.flp.diff import ProjectDiff
     from studiobridge.flp.mutate.mutator import ProjectMutator
+    from studiobridge.flp.validate import ValidationReport
 
 
 @dataclass
@@ -420,11 +421,37 @@ class Project:
             self._mutator = ProjectMutator(self)
         return self._mutator
 
-    def validate(self) -> list[str]:
-        """Validate project structural invariants and return list of violations."""
-        from studiobridge.flp.validate.invariants import validate_invariants
+    def validate(
+        self,
+        *,
+        test_fl_load: bool = False,
+        timeout_s: float = 30.0,
+    ) -> ValidationReport:
+        """Validate project structural invariants and static risk assessment [07 §5, §8].
 
-        return validate_invariants(self)
+        Optionally tests headless FL-load verification in real FL Studio if test_fl_load=True.
+
+        Returns:
+            ValidationReport with invariant violations, static risk report, and optional load
+            result.
+        """
+        from studiobridge.flp.validate import ValidationReport
+        from studiobridge.flp.validate.fl_load import FlLoadHarness
+        from studiobridge.flp.validate.invariants import validate_invariants
+        from studiobridge.flp.validate.risk import calculate_project_risk
+
+        invariants = validate_invariants(self)
+        risk = calculate_project_risk(self)
+        fl_load = None
+        if test_fl_load:
+            harness = FlLoadHarness()
+            fl_load = harness.run(self, timeout_s=timeout_s)
+
+        return ValidationReport(
+            invariants=invariants,
+            risk=risk,
+            fl_load=fl_load,
+        )
 
     def check_invariants(self) -> None:
         """Check structural invariants and raise FlpInvariantViolationError if violated."""

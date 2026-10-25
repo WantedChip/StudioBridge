@@ -10,6 +10,7 @@ import io
 import json
 import struct
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -335,3 +336,64 @@ def test_cli_flp_template_add_entry(tmp_path: Path, capsys: pytest.CaptureFixtur
     assert data["status"] == "ok"
     assert data["fragment"]["name"] == "Kick Fragment"
     assert data["fragment"]["provenance"]["author"] == "Drum Programmer"
+
+
+def test_cli_flp_validate_text(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """sbridge flp validate <file> outputs text validation report (# req: FLP-50)."""
+    flp_path = _create_test_flp(tmp_path / "valid.flp")
+    code = cli_entry(["flp", "validate", str(flp_path)])
+    assert code == 0
+
+    captured = capsys.readouterr()
+    assert "Validating: valid.flp" in captured.out
+    assert "Structural Invariants: PASS" in captured.out
+    assert "Risk Assessment: LOW" in captured.out
+
+
+def test_cli_flp_validate_json(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """sbridge flp validate <file> --json outputs machine-readable JSON (# req: FLP-50)."""
+    flp_path = _create_test_flp(tmp_path / "valid.flp")
+    code = cli_entry(["flp", "validate", str(flp_path), "--json"])
+    assert code == 0
+
+    captured = capsys.readouterr()
+    data = json.loads(captured.out)
+    assert data["status"] == "ok"
+    assert data["invariants"]["valid"] is True
+    assert data["risk"]["level"] == "low"
+    assert data["risk"]["is_safe_to_load"] is True
+
+
+def test_cli_flp_validate_file_not_found(capsys: pytest.CaptureFixture[str]) -> None:
+    """sbridge flp validate missing file returns exit code 1."""
+    code = cli_entry(["flp", "validate", "nonexistent.flp"])
+    assert code == 1
+
+
+def test_cli_flp_validate_in_fl_mocked(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """sbridge flp validate <file> --in-fl executes headless preflight (# req: FLP-50)."""
+    flp_path = _create_test_flp(tmp_path / "song.flp")
+
+    from studiobridge.flp.validate.fl_load import FlLoadHarness, FlLoadResult
+
+    def fake_run(self: Any, project: Any, timeout_s: float = 30.0) -> FlLoadResult:
+        return FlLoadResult(
+            outcome="ok",
+            exit_code=0,
+            duration_s=1.2,
+            output_generated=True,
+        )
+
+    monkeypatch.setattr(FlLoadHarness, "run", fake_run)
+
+    code = cli_entry(["flp", "validate", str(flp_path), "--in-fl", "--json"])
+    assert code == 0
+
+    captured = capsys.readouterr()
+    data = json.loads(captured.out)
+    assert data["status"] == "ok"
+    assert data["fl_load"] is not None
+    assert data["fl_load"]["outcome"] == "ok"
+    assert data["fl_load"]["is_ok"] is True

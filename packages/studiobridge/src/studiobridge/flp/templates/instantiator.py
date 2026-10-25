@@ -657,6 +657,7 @@ def instantiate_channel(
         pan=new_pan,
         plugin=opaque_plugin,
         _fragment_events=relocated_events,
+        provenance=fragment.provenance,
     )
 
     project.channels.append(channel)
