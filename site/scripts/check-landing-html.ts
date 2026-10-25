@@ -33,6 +33,11 @@ const checks = [
   { name: 'Channel CH 02 // OFFLINE FLP', test: html.includes('CH 02 // OFFLINE FLP') },
   { name: 'Channel CH 03 // HEADLESS RENDER', test: html.includes('CH 03 // HEADLESS RENDER') },
   { name: 'Channel CH 04 // UI ACTUATION', test: html.includes('CH 04 // UI ACTUATION') },
+  { name: 'Section 04 / CAPABILITIES', test: html.includes('04 / CAPABILITIES') },
+  { name: 'Capabilities: Section anchor #capabilities', test: html.includes('id="capabilities"') },
+  { name: 'Capabilities: Exact capability truth heading', test: html.includes('Exact capability truth') },
+  { name: 'Capabilities: Dual selector radiogroups', test: html.includes('fl-build-label') && html.includes('arch-label') },
+  { name: 'Capabilities: Diagnostic bundle reference', test: html.includes('DIAG-ARM64') || html.includes('DIAG-X64') },
   { name: 'Section 05 / INTERLOCKS', test: html.includes('05 / INTERLOCKS') },
   { name: 'Interlock: Read-Only Default Mode', test: html.includes('Read-Only Default Mode') },
   { name: 'Interlock: Read-Back Verification', test: html.includes('Read-Back Verification') },
@@ -62,7 +67,7 @@ const checks = [
   { name: 'FAQ answers trademark non-affiliation', test: faqIncludes('What is the relationship between StudioBridge and Image-Line?') },
   { name: 'Verbatim prominent non-affiliation statement in footer (18 §11)', test: html.includes('StudioBridge is an independent open-source project. FL Studio is a trademark of Image-Line. Not affiliated with or endorsed by Image-Line.') },
   { name: 'Footer links to llms.txt', test: html.includes('href="/llms.txt"') },
-  { name: 'Numbered technical catalogue styling across sections', test: html.includes('01 /') && html.includes('02 /') && html.includes('03 /') && html.includes('05 /') && html.includes('06 /') && html.includes('07 /') && html.includes('08 /') && html.includes('09 /') },
+  { name: 'Numbered technical catalogue styling across sections', test: html.includes('01 /') && html.includes('02 /') && html.includes('03 /') && html.includes('04 /') && html.includes('05 /') && html.includes('06 /') && html.includes('07 /') && html.includes('08 /') && html.includes('09 /') },
 ];
 
 function faqIncludes(str: string): boolean {

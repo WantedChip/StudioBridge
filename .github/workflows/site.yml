@@ -55,6 +55,9 @@ jobs:
       - name: Validate console demo island & session playback
         run: npm run test:demo
 
+      - name: Validate capability matrix & compatibility page
+        run: npm run test:compat
+
       - name: Verify build artifacts
         run: |
           test -d dist

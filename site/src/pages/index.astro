@@ -5,6 +5,7 @@ import Hero from '../components/Hero.astro';
 import SectionWorksWith from '../components/SectionWorksWith.astro';
 import ConsoleDemo from '../components/islands/ConsoleDemo.tsx';
 import SectionControlPlanes from '../components/SectionControlPlanes.astro';
+import CapabilityMatrix from '../components/islands/CapabilityMatrix.tsx';
 import SectionSafety from '../components/SectionSafety.astro';
 import InstallTabs from '../components/islands/InstallTabs.tsx';
 import SectionLimits from '../components/SectionLimits.astro';
@@ -66,6 +67,9 @@ import Footer from '../components/Footer.astro';
 
       <!-- Section: 03 / CONTROL SURFACES (Four Channel Strips) -->
       <SectionControlPlanes />
+
+      <!-- Section: 04 / CAPABILITIES (Truth Table & Capability Explorer Island) -->
+      <CapabilityMatrix client:visible />
 
       <!-- Section: 05 / INTERLOCKS (Safety Architecture) -->
       <SectionSafety />

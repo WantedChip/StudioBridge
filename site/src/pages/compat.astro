@@ -1,0 +1,470 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import CapabilityMatrix from '../components/islands/CapabilityMatrix.tsx';
+import rawCompatData from '../data/compat.json';
+
+const compatData = rawCompatData;
+const { meta, capabilitiesList } = compatData;
+const matrix = compatData.matrix as Record<string, any>;
+const { machineA, machineB } = meta.testedEnvironments;
+
+// Matrix configurations for the full comparison table
+const configurations = [
+  { id: '26.1.3-ARM64', label: 'FL 26.1.3', arch: 'ARM64', rig: 'Machine A', diag: 'DIAG-ARM64-26-01' },
+  { id: '26.1.3-x64', label: 'FL 26.1.3', arch: 'x64', rig: 'Machine B', diag: 'DIAG-X64-26-01' },
+  { id: '25.2.3-ARM64', label: 'FL 25.2.3', arch: 'ARM64', rig: 'Machine A', diag: 'DIAG-ARM64-25-01' },
+  { id: '25.2.3-x64', label: 'FL 25.2.3', arch: 'x64', rig: 'Machine B', diag: 'DIAG-X64-25-01' },
+  { id: '21.2-ARM64', label: 'FL 21.2.3', arch: 'ARM64', rig: 'Machine A', diag: 'DIAG-ARM64-21-01' },
+  { id: '21.2-x64', label: 'FL 21.2.3', arch: 'x64', rig: 'Machine B', diag: 'DIAG-X64-21-01' },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Comprehensive StudioBridge capability matrix, host compatibility test reports, and hardware diagnostic receipts for FL Studio on Windows ARM64 and x64."
+    />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#F3F0E8" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0F0F0D" media="(prefers-color-scheme: dark)" />
+
+    <link rel="preload" href="/fonts/bricolage-grotesque-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="/fonts/inter-tight-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Compatibility Matrix &amp; Hardware Diagnostics — StudioBridge</title>
+
+    <script is:inline>
+      (function () {
+        try {
+          var theme = localStorage.getItem('sb-theme');
+          if (theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+          } else if (theme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+          } else {
+            document.documentElement.removeAttribute('data-theme');
+          }
+        } catch (_) {}
+      })();
+    </script>
+  </head>
+  <body class="min-h-screen bg-bg text-ink font-sans antialiased selection:bg-signal selection:text-white">
+    <!-- Header with accessible skip link -->
+    <Header />
+
+    <main id="main-content" class="py-12 sm:py-16">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Breadcrumb Navigation Back to Home -->
+        <nav aria-label="Breadcrumb" class="mb-8">
+          <ol class="flex items-center gap-2 font-mono text-xs text-ink-muted">
+            <li>
+              <a href="/" class="hover:text-ink transition-colors focus-ring rounded-[1px]">
+                Home
+              </a>
+            </li>
+            <li aria-hidden="true" class="text-line">&sol;</li>
+            <li aria-current="page" class="text-ink font-semibold">
+              Compatibility Matrix
+            </li>
+          </ol>
+        </nav>
+
+        <!-- Page Hero Banner -->
+        <div class="border-b border-line pb-10 mb-12">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="font-mono text-xs uppercase tracking-wider text-signal font-bold">
+              HOST VERIFICATION &amp; CAPABILITY MATRIX
+            </span>
+            <span class="h-px w-8 bg-line" aria-hidden="true"></span>
+            <span class="font-mono text-xs uppercase tracking-wider text-ink-muted">
+              AUTHENTIC HARDWARE PROVENANCE
+            </span>
+          </div>
+
+          <h1 class="font-display text-4xl sm:text-5xl font-extrabold tracking-tight text-ink mb-4">
+            Tested Compatibility Matrix
+          </h1>
+          <p class="font-sans text-base sm:text-lg text-ink-muted max-w-3xl leading-relaxed">
+            StudioBridge provides full transparency into what works, what runs degraded, and what is host-limited.
+            Every row in this matrix is verified against authentic hardware runs and recorded in diagnostic bundles.
+          </p>
+
+          <div class="mt-6 flex flex-wrap items-center gap-4 text-xs font-mono text-ink-muted">
+            <div class="bg-surface border border-line px-3 py-1.5 rounded-[1px]">
+              SPEC: <span class="text-ink font-semibold">18 &sect;5, &sect;6.2 (T-WEB-07)</span>
+            </div>
+            <div class="bg-surface border border-line px-3 py-1.5 rounded-[1px]">
+              GENERATED: <span class="text-ink font-semibold">{new Date(meta.generatedAt).toISOString().split('T')[0]}</span>
+            </div>
+            <div class="bg-surface border border-line px-3 py-1.5 rounded-[1px]">
+              TOTAL COMBINATIONS: <span class="text-signal font-semibold">6 TESTED RIGS</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 1: Interactive Capability Explorer Island -->
+        <div class="mb-16">
+          <div class="mb-6">
+            <h2 class="font-display text-2xl font-bold tracking-tight text-ink">
+              Interactive Explorer
+            </h2>
+            <p class="font-sans text-sm text-ink-muted mt-1">
+              Filter by specific FL Studio release and host architecture to view active status LEDs and expandable technical workarounds.
+            </p>
+          </div>
+
+          <!-- Embed CapabilityMatrix island -->
+          <CapabilityMatrix client:load />
+        </div>
+
+        <!-- Section 2: Complete Side-by-Side Comparison Matrix (Zero-JS Full Table) -->
+        <section id="full-matrix" class="mb-16" aria-labelledby="full-matrix-heading">
+          <div class="border-b border-line pb-4 mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <div class="font-mono text-xs uppercase tracking-wider text-signal font-bold mb-1">
+                SIDE-BY-SIDE MATRIX
+              </div>
+              <h2 id="full-matrix-heading" class="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">
+                All Host Environments At A Glance
+              </h2>
+            </div>
+            <p class="font-sans text-xs text-ink-muted max-w-md">
+              Zero-JS complete reference matrix comparing every tested FL Studio version across Qualcomm Snapdragon ARM64 and AMD/Intel x64 hardware.
+            </p>
+          </div>
+
+          <div class="border border-line bg-surface rounded-[2px] overflow-x-auto shadow-xs">
+            <table class="w-full text-left border-collapse min-w-[800px]" aria-label="Comprehensive Capability Comparison Table">
+              <thead>
+                <tr class="border-b border-line bg-bg font-mono text-[11px] uppercase tracking-wider text-ink-muted">
+                  <th scope="col" class="py-3 px-4 font-semibold w-1/4 sticky left-0 bg-bg z-10 border-r border-line">
+                    Capability Identifier
+                  </th>
+                  {configurations.map((cfg) => (
+                    <th scope="col" class="py-3 px-3 font-semibold text-center border-r border-line last:border-r-0">
+                      <div>{cfg.label}</div>
+                      <div class="text-[10px] text-signal font-normal mt-0.5">{cfg.arch}</div>
+                      <div class="text-[9px] text-ink-muted font-normal mt-0.5">{cfg.diag}</div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-line font-sans text-xs">
+                {capabilitiesList.map((cap) => (
+                  <tr class="hover:bg-bg/40 transition-colors">
+                    {/* Capability Name & ID (Sticky Column) */}
+                    <td class="py-3 px-4 sticky left-0 bg-surface z-10 border-r border-line">
+                      <div class="font-display text-xs font-bold text-ink">
+                        {cap.name}
+                      </div>
+                      <div class="font-mono text-[10px] text-signal font-medium">
+                        {cap.id}
+                      </div>
+                    </td>
+
+                    {/* Columns for each configuration */}
+                    {configurations.map((cfg) => {
+                      const entry = matrix[cfg.id];
+                      const item = entry ? entry.capabilities[cap.id] : null;
+                      if (!item) {
+                        return <td class="py-3 px-3 text-center border-r border-line last:border-r-0 text-ink-muted">&mdash;</td>;
+                      }
+
+                      return (
+                        <td class="py-3 px-3 text-center border-r border-line last:border-r-0">
+                          <div class="inline-flex items-center gap-1.5 font-mono text-[11px] font-bold">
+                            <span
+                              class={`w-2 h-2 rounded-[1px] shrink-0 ${
+                                item.state === 'available'
+                                  ? 'bg-ok'
+                                  : item.state === 'degraded'
+                                    ? 'bg-warn'
+                                    : 'bg-err'
+                              }`}
+                              aria-hidden="true"
+                            ></span>
+                            <span
+                              class={
+                                item.state === 'available'
+                                  ? 'text-ok'
+                                  : item.state === 'degraded'
+                                    ? 'text-warn'
+                                    : 'text-err'
+                              }
+                            >
+                              {item.state === 'available' && '✓'}
+                              {item.state === 'degraded' && '▲'}
+                              {item.state === 'unavailable' && '✕'}
+                            </span>
+                            <span
+                              class={`text-[10px] tracking-wide uppercase ${
+                                item.state === 'available'
+                                  ? 'text-ok'
+                                  : item.state === 'degraded'
+                                    ? 'text-warn'
+                                    : 'text-err'
+                              }`}
+                            >
+                              {item.statusLabel}
+                            </span>
+                          </div>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Section 3: Technical Deep-Dives on Degraded & Unavailable Boundaries -->
+        <section id="deep-dives" class="mb-16" aria-labelledby="deep-dives-heading">
+          <div class="border-b border-line pb-4 mb-8">
+            <div class="font-mono text-xs uppercase tracking-wider text-signal font-bold mb-1">
+              ENGINEERING BOUNDARIES
+            </div>
+            <h2 id="deep-dives-heading" class="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">
+              Honest Rationale &amp; Technical Limits
+            </h2>
+            <p class="font-sans text-sm text-ink-muted mt-1 max-w-2xl leading-relaxed">
+              We reject the industry habit of obscuring boundary conditions. Here is precisely why specific capabilities are constrained and the architectural remedies we implemented.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Deep Dive 1: Plugin Instantiation -->
+            <article class="border border-line bg-surface p-6 rounded-[2px] shadow-xs">
+              <div class="flex items-center justify-between border-b border-line pb-3 mb-4">
+                <span class="font-mono text-xs text-signal font-semibold">CAP_PLUGIN_INSTANTIATE</span>
+                <span class="inline-flex items-center gap-1 font-mono text-[10px] text-err font-bold uppercase">
+                  <span class="w-2 h-2 rounded-[1px] bg-err" aria-hidden="true"></span>
+                  ✕ UNAVAILABLE
+                </span>
+              </div>
+              <h3 class="font-display text-xl font-bold text-ink mb-2">
+                Third-Party Plugin Instantiation
+              </h3>
+              <p class="font-sans text-xs text-ink-muted leading-relaxed mb-4">
+                <strong>Host Boundary:</strong> FL Studio's controller script runtime exposes no API endpoint to load arbitrary VST, VST3, or CLAP plugin binaries into the channel rack or mixer insert slots dynamically.
+              </p>
+              <div class="bg-bg p-3.5 border border-line rounded-[1px] text-xs">
+                <div class="font-mono text-[10px] uppercase tracking-wider text-ink-muted font-semibold mb-1">
+                  OFFICIAL WORKAROUND
+                </div>
+                <p class="text-ink leading-relaxed font-mono text-[11px]">
+                  Use StudioBridge seed templates (<code class="text-signal">sbridge flp template add</code>) to inject pre-configured instrument wrappers into binary .flp files, or scaffold projects from template files containing your preferred plugin suites.
+                </p>
+              </div>
+            </article>
+
+            <!-- Deep Dive 2: Windows ARM64 Emulation -->
+            <article class="border border-line bg-surface p-6 rounded-[2px] shadow-xs">
+              <div class="flex items-center justify-between border-b border-line pb-3 mb-4">
+                <span class="font-mono text-xs text-signal font-semibold">CAP_HOST_NATIVE_ARM64</span>
+                <span class="inline-flex items-center gap-1 font-mono text-[10px] text-warn font-bold uppercase">
+                  <span class="w-2 h-2 rounded-[1px] bg-warn" aria-hidden="true"></span>
+                  ▲ DEGRADED (HOST)
+                </span>
+              </div>
+              <h3 class="font-display text-xl font-bold text-ink mb-2">
+                FL Studio Host Under Prism Emulation
+              </h3>
+              <p class="font-sans text-xs text-ink-muted leading-relaxed mb-4">
+                <strong>Host Boundary:</strong> On Windows on ARM devices (Qualcomm Snapdragon X Elite/Plus), FL Studio executes under Microsoft Prism x64 binary translation because Image-Line has not yet compiled a native ARM64 host binary.
+              </p>
+              <div class="bg-bg p-3.5 border border-line rounded-[1px] text-xs">
+                <div class="font-mono text-[10px] uppercase tracking-wider text-ink-muted font-semibold mb-1">
+                  OFFICIAL WORKAROUND
+                </div>
+                <p class="text-ink leading-relaxed font-mono text-[11px]">
+                  StudioBridge's ctypes WinMM MIDI backend and CLI execute <strong>100% natively on ARM64</strong>. Render supervisor watchdogs automatically apply a 50% timeout scaling factor to absorb Prism emulation jitter without false timeouts.
+                </p>
+              </div>
+            </article>
+
+            <!-- Deep Dive 3: FL 26 Playlist Chunk Creation -->
+            <article class="border border-line bg-surface p-6 rounded-[2px] shadow-xs">
+              <div class="flex items-center justify-between border-b border-line pb-3 mb-4">
+                <span class="font-mono text-xs text-signal font-semibold">CAP_FLP_PLAYLIST_WRITE</span>
+                <span class="inline-flex items-center gap-1 font-mono text-[10px] text-warn font-bold uppercase">
+                  <span class="w-2 h-2 rounded-[1px] bg-warn" aria-hidden="true"></span>
+                  ▲ EXPERIMENTAL (FL 26)
+                </span>
+              </div>
+              <h3 class="font-display text-xl font-bold text-ink mb-2">
+                Playlist Clip Creation in FL Studio 26
+              </h3>
+              <p class="font-sans text-xs text-ink-muted leading-relaxed mb-4">
+                <strong>Host Boundary:</strong> FL Studio 26 introduced evolving 88-byte chunk containers with variable-length container headers that differ from FL 21–25 specifications.
+              </p>
+              <div class="bg-bg p-3.5 border border-line rounded-[1px] text-xs">
+                <div class="font-mono text-[10px] uppercase tracking-wider text-ink-muted font-semibold mb-1">
+                  OFFICIAL WORKAROUND
+                </div>
+                <p class="text-ink leading-relaxed font-mono text-[11px]">
+                  Modifying existing playlist items, markers, and pattern clips is 100% verified. Authoring brand-new timeline clips in FL 26 requires passing <code class="text-signal">--allow-experimental-chunks</code>. In FL 21–25, timeline writing is fully supported.
+                </p>
+              </div>
+            </article>
+
+            <!-- Deep Dive 4: Zero Kernel Drivers -->
+            <article class="border border-line bg-surface p-6 rounded-[2px] shadow-xs">
+              <div class="flex items-center justify-between border-b border-line pb-3 mb-4">
+                <span class="font-mono text-xs text-signal font-semibold">CAP_ZERO_KERNEL_DRIVERS</span>
+                <span class="inline-flex items-center gap-1 font-mono text-[10px] text-ok font-bold uppercase">
+                  <span class="w-2 h-2 rounded-[1px] bg-ok" aria-hidden="true"></span>
+                  ✓ BY DESIGN
+                </span>
+              </div>
+              <h3 class="font-display text-xl font-bold text-ink mb-2">
+                Zero Proprietary Kernel Drivers
+              </h3>
+              <p class="font-sans text-xs text-ink-muted leading-relaxed mb-4">
+                <strong>Architecture Decision:</strong> StudioBridge strictly refuses to bundle or require proprietary kernel-mode virtual MIDI drivers (loopMIDI, virtualMIDI) that cause BSOD crashes and code-signing hazards.
+              </p>
+              <div class="bg-bg p-3.5 border border-line rounded-[1px] text-xs">
+                <div class="font-mono text-[10px] uppercase tracking-wider text-ink-muted font-semibold mb-1">
+                  OFFICIAL SOLUTION
+                </div>
+                <p class="text-ink leading-relaxed font-mono text-[11px]">
+                  Primary routing uses native Windows MIDI Services (WMS) virtual loopback endpoints or physical MIDI loopback jacks, maintaining zero native C-extension dependencies on both ARM64 and x64.
+                </p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 4: Tested Hardware Provenance & Diagnostic Bundles -->
+        <section id="hardware-provenance" class="mb-16" aria-labelledby="hardware-heading">
+          <div class="border-b border-line pb-4 mb-8">
+            <div class="font-mono text-xs uppercase tracking-wider text-signal font-bold mb-1">
+              TEST LAB PROVENANCE
+            </div>
+            <h2 id="hardware-heading" class="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">
+              Tested Hardware Specifications &amp; Diagnostics
+            </h2>
+            <p class="font-sans text-sm text-ink-muted mt-1 max-w-2xl leading-relaxed">
+              Every data point is captured from genuine hardware test rigs using <code class="font-mono text-ink">sbridge diag</code> bundles with strict secret redaction.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Machine A (ARM64) */}
+            <div class="border border-line bg-surface p-6 rounded-[2px] shadow-xs">
+              <div class="flex items-center justify-between border-b border-line pb-3 mb-4">
+                <div class="font-mono text-xs font-bold text-ink flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-[1px] bg-signal inline-block" aria-hidden="true"></span>
+                  <span>{machineA.machineId}: {machineA.hardware}</span>
+                </div>
+                <span class="font-mono text-[10px] px-2 py-0.5 bg-signal/15 text-signal font-bold rounded-[1px]">
+                  ARM64 REFERENCE
+                </span>
+              </div>
+
+              <dl class="space-y-3 font-mono text-xs">
+                <div class="flex flex-col sm:flex-row sm:justify-between py-1 border-b border-line/60">
+                  <dt class="text-ink-muted">CPU Processor:</dt>
+                  <dd class="text-ink font-semibold">{machineA.cpu}</dd>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:justify-between py-1 border-b border-line/60">
+                  <dt class="text-ink-muted">System Memory:</dt>
+                  <dd class="text-ink font-semibold">{machineA.ram}</dd>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:justify-between py-1 border-b border-line/60">
+                  <dt class="text-ink-muted">Operating System:</dt>
+                  <dd class="text-ink font-semibold">{machineA.os}</dd>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:justify-between py-1 border-b border-line/60">
+                  <dt class="text-ink-muted">MIDI Subsystem:</dt>
+                  <dd class="text-ink font-semibold text-right">{machineA.midiBackend}</dd>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:justify-between py-1 border-b border-line/60">
+                  <dt class="text-ink-muted">Python Runtime:</dt>
+                  <dd class="text-ink font-semibold">{machineA.pythonRuntime}</dd>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:justify-between py-1 border-b border-line/60">
+                  <dt class="text-ink-muted">Doctor Diagnostic:</dt>
+                  <dd class="text-ok font-semibold">{machineA.doctorStatus}</dd>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:justify-between py-1">
+                  <dt class="text-ink-muted">Verification Receipt:</dt>
+                  <dd class="text-signal font-semibold">DIAG-ARM64-26-01 / DIAG-ARM64-25-01</dd>
+                </div>
+              </dl>
+            </div>
+
+            {/* Machine B (x64) */}
+            <div class="border border-line bg-surface p-6 rounded-[2px] shadow-xs">
+              <div class="flex items-center justify-between border-b border-line pb-3 mb-4">
+                <div class="font-mono text-xs font-bold text-ink flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-[1px] bg-ink inline-block" aria-hidden="true"></span>
+                  <span>{machineB.machineId}: {machineB.hardware}</span>
+                </div>
+                <span class="font-mono text-[10px] px-2 py-0.5 bg-ink/10 text-ink font-bold rounded-[1px]">
+                  x64 REFERENCE
+                </span>
+              </div>
+
+              <dl class="space-y-3 font-mono text-xs">
+                <div class="flex flex-col sm:flex-row sm:justify-between py-1 border-b border-line/60">
+                  <dt class="text-ink-muted">CPU Processor:</dt>
+                  <dd class="text-ink font-semibold">{machineB.cpu}</dd>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:justify-between py-1 border-b border-line/60">
+                  <dt class="text-ink-muted">System Memory:</dt>
+                  <dd class="text-ink font-semibold">{machineB.ram}</dd>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:justify-between py-1 border-b border-line/60">
+                  <dt class="text-ink-muted">Operating System:</dt>
+                  <dd class="text-ink font-semibold">{machineB.os}</dd>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:justify-between py-1 border-b border-line/60">
+                  <dt class="text-ink-muted">MIDI Subsystem:</dt>
+                  <dd class="text-ink font-semibold text-right">{machineB.midiBackend}</dd>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:justify-between py-1 border-b border-line/60">
+                  <dt class="text-ink-muted">Python Runtime:</dt>
+                  <dd class="text-ink font-semibold">{machineB.pythonRuntime}</dd>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:justify-between py-1 border-b border-line/60">
+                  <dt class="text-ink-muted">Doctor Diagnostic:</dt>
+                  <dd class="text-ok font-semibold">{machineB.doctorStatus}</dd>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:justify-between py-1">
+                  <dt class="text-ink-muted">Verification Receipt:</dt>
+                  <dd class="text-signal font-semibold">DIAG-X64-26-01 / DIAG-X64-25-01</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+
+          <!-- Diagnostic Verification Note -->
+          <div class="mt-8 border border-line bg-surface p-4 rounded-[1px] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-mono text-xs text-ink-muted">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-[1px] bg-ok" aria-hidden="true"></span>
+              <span>Run <code class="text-ink font-bold">sbridge diag</code> locally to generate your own redacted diagnostic bundle and verify environment parity.</span>
+            </div>
+            <a
+              href="/docs/"
+              class="text-signal font-semibold hover:underline inline-flex items-center gap-1 shrink-0"
+            >
+              <span>Diagnostics Guide</span>
+              <span aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Global Footer with Verbatim Non-Affiliation Statement -->
+    <Footer />
+  </body>
+</html>
