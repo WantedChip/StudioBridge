@@ -1,0 +1,37 @@
+{
+  "name": "flp_diff",
+  "title": "FLP Diff",
+  "description": "Compare two FL Studio project files (.flp) and return structured differences.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "file_a": {
+        "type": "string",
+        "description": "Path to the first project file (baseline)."
+      },
+      "file_b": {
+        "type": "string",
+        "description": "Path to the second project file (comparison)."
+      }
+    },
+    "required": ["file_a", "file_b"],
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "file_a": { "type": "string" },
+      "file_b": { "type": "string" },
+      "has_differences": { "type": "boolean" },
+      "diff": { "type": "object" },
+      "summary": { "type": "string" }
+    },
+    "required": [
+      "file_a",
+      "file_b",
+      "has_differences",
+      "diff",
+      "summary"
+    ]
+  }
+}

@@ -196,6 +196,7 @@ class StudioMcpServer:
         """Register built-in tool definitions for standard toolsets."""
         from studiobridge.mcp.tools.control import get_control_tools, get_raw_tools
         from studiobridge.mcp.tools.core import get_core_tools
+        from studiobridge.mcp.tools.flp import get_flp_tools
         from studiobridge.mcp.tools.inspect import get_inspect_tools
         from studiobridge.mcp.tools.notes import get_notes_tools
         from studiobridge.mcp.tools.render import get_render_tools
@@ -212,6 +213,8 @@ class StudioMcpServer:
         for tool in get_safety_tools(client=self.client, server=self):
             self.register_tool(tool)
         for tool in get_render_tools(client=self.client, server=self):
+            self.register_tool(tool)
+        for tool in get_flp_tools(client=self.client, server=self):
             self.register_tool(tool)
         for tool in get_raw_tools(client=self.client, server=self):
             self.register_tool(tool)

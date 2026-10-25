@@ -1,0 +1,54 @@
+{
+  "name": "flp_edit",
+  "title": "FLP Edit",
+  "description": "Apply a validated list of mutations to an offline FL Studio project, writing atomically to a new or existing file.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "file": {
+        "type": "string",
+        "description": "Path to the source FL Studio project file (.flp)."
+      },
+      "destination": {
+        "type": "string",
+        "description": "Target destination path for the edited project. If omitted, requires in_place: true."
+      },
+      "in_place": {
+        "type": "boolean",
+        "description": "Allow in-place overwrite with automatic timestamped backup (default: false)."
+      },
+      "mutations": {
+        "type": "array",
+        "items": { "type": "object" },
+        "description": "List of validated mutation operations (e.g. set_tempo, rename_channel, set_notes, add_marker)."
+      },
+      "force_unknown_version": {
+        "type": "boolean",
+        "description": "Bypass version protection for unknown or future FL Studio versions."
+      }
+    },
+    "required": ["file", "mutations"],
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "source": { "type": "string" },
+      "destination": { "type": "string" },
+      "mutations_applied": { "type": "integer" },
+      "records": {
+        "type": "array",
+        "items": { "type": "object" }
+      },
+      "is_valid": { "type": "boolean" },
+      "message": { "type": "string" }
+    },
+    "required": [
+      "source",
+      "destination",
+      "mutations_applied",
+      "is_valid",
+      "message"
+    ]
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "name": "flp_save_as",
+  "title": "FLP Save As",
+  "description": "Atomically save an FL Studio project (.flp) to a new destination path with structural invariant validation.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string",
+        "description": "Path to the source project file (.flp)."
+      },
+      "destination": {
+        "type": "string",
+        "description": "Target destination path for the saved file."
+      },
+      "force_unknown_version": {
+        "type": "boolean",
+        "description": "Bypass version protection for unknown or future FL Studio versions."
+      }
+    },
+    "required": ["source", "destination"],
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "source": { "type": "string" },
+      "destination": { "type": "string" },
+      "size_bytes": { "type": "integer" },
+      "version": { "type": "string" },
+      "is_valid": { "type": "boolean" },
+      "message": { "type": "string" }
+    },
+    "required": [
+      "source",
+      "destination",
+      "size_bytes",
+      "version",
+      "is_valid",
+      "message"
+    ]
+  }
+}

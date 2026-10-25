@@ -1,0 +1,46 @@
+{
+  "name": "flp_validate",
+  "title": "FLP Validate",
+  "description": "Execute structural invariant checks and static risk scoring on an FL Studio project file (.flp).",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "file": {
+        "type": "string",
+        "description": "Path to the FL Studio project file (.flp) to validate."
+      },
+      "test_fl_load": {
+        "type": "boolean",
+        "description": "Whether to run headless FL-load verification in real FL Studio (default: false)."
+      },
+      "timeout_s": {
+        "type": "number",
+        "description": "Timeout in seconds for headless FL-load verification (default: 30.0)."
+      }
+    },
+    "required": ["file"],
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "file": { "type": "string" },
+      "is_valid": { "type": "boolean" },
+      "is_safe_to_load": { "type": "boolean" },
+      "invariants": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "risk": { "type": "object" },
+      "fl_load": { "type": ["object", "null"] },
+      "live_verification": { "type": ["object", "null"] }
+    },
+    "required": [
+      "file",
+      "is_valid",
+      "is_safe_to_load",
+      "invariants",
+      "risk"
+    ]
+  }
+}

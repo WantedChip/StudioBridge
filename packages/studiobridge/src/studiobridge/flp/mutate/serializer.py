@@ -142,6 +142,7 @@ def serialize_project(
 
     # Build event mapping: index -> Event | None (None indicates dropped)
     event_map: dict[int, Event | None] = {}
+    extra_events_after: dict[int, list[Event]] = {}
     for i, ev in enumerate(orig_events):
         event_map[i] = ev
 
@@ -190,6 +191,12 @@ def serialize_project(
                     event_map[first_idx] = None  # Notes cleared
                 for drop_idx in note_events_for_pat[1:]:
                     event_map[drop_idx] = None
+            elif new_note_bytes and pat.source_events:
+                # Pattern previously had no note events; insert notes event after pattern header
+                last_pat_ev = pat.source_events[-1]
+                extra_events_after.setdefault(last_pat_ev, []).append(
+                    Event(id=226, raw=new_note_bytes)
+                )
 
             # Check pattern name update
             for ev_idx in pat.source_events:
@@ -232,6 +239,8 @@ def serialize_project(
         ev_item = event_map.get(i)
         if ev_item is not None:
             out_events.append(ev_item)
+        if i in extra_events_after:
+            out_events.extend(extra_events_after[i])
 
     # Handle newly added channels that do not exist in orig_events
     for ch in project.channels:

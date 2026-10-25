@@ -1,0 +1,57 @@
+{
+  "name": "flp_new_from_template",
+  "title": "FLP New From Template",
+  "description": "Generate a clean FL Studio project file (.flp) from an existing seed template.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "destination": {
+        "type": "string",
+        "description": "Target destination path for the new project file."
+      },
+      "template": {
+        "type": "string",
+        "description": "Template seed name (e.g. 'minimal', 'one_each_stock', 'audio_clip', 'sampler', 'layer', 'automation'). Default: 'minimal'."
+      },
+      "title": {
+        "type": "string",
+        "description": "Optional initial project title."
+      },
+      "author": {
+        "type": "string",
+        "description": "Optional initial project author."
+      },
+      "tempo": {
+        "type": "number",
+        "description": "Optional initial project tempo in BPM (e.g. 128.0)."
+      },
+      "ppq": {
+        "type": "integer",
+        "description": "Optional project PPQ resolution (default: 96)."
+      }
+    },
+    "required": ["destination"],
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "destination": { "type": "string" },
+      "template": { "type": "string" },
+      "size_bytes": { "type": "integer" },
+      "channel_count": { "type": "integer" },
+      "tempo": { "type": "number" },
+      "ppq": { "type": "integer" },
+      "message": { "type": "string" }
+    },
+    "required": [
+      "destination",
+      "template",
+      "size_bytes",
+      "channel_count",
+      "tempo",
+      "ppq",
+      "message"
+    ]
+  }
+}
