@@ -70,6 +70,18 @@ class ActuationConfig:
 
 
 @dataclass(slots=True)
+class RenderConfig:
+    """Headless render orchestration configuration [06_l0d §11, §13]."""
+
+    timeout_s: float = 900.0  # total render timeout in seconds
+    idle_timeout_s: float = 120.0  # idle timeout in seconds (no file growth)
+    timeout_multiplier: float = 1.5  # scaling factor on Windows ARM64 (Prism emulation)
+    default_format: str = "wav"
+    default_policy: str = "require_closed"
+    min_disk_free_multiplier: float = 2.0  # [RND-01]: disk space must be >= 2x estimated output
+
+
+@dataclass(slots=True)
 class StudioBridgeConfig:
     """Unified StudioBridge root configuration."""
 
@@ -77,6 +89,7 @@ class StudioBridgeConfig:
     broker: BrokerConfig = field(default_factory=BrokerConfig)
     safety: SafetyConfig = field(default_factory=SafetyConfig)
     actuation: ActuationConfig = field(default_factory=ActuationConfig)
+    render: RenderConfig = field(default_factory=RenderConfig)
     toolsets: list[str] = field(
         default_factory=lambda: [
             "core",
@@ -271,6 +284,16 @@ def config_from_dict(data: dict[str, Any]) -> StudioBridgeConfig:
         key_delay_ms=float(actuation_data.get("key_delay_ms", 15.0)),
     )
 
+    render_data = data.get("render", {})
+    render_cfg = RenderConfig(
+        timeout_s=float(render_data.get("timeout_s", 900.0)),
+        idle_timeout_s=float(render_data.get("idle_timeout_s", 120.0)),
+        timeout_multiplier=float(render_data.get("timeout_multiplier", 1.5)),
+        default_format=str(render_data.get("default_format", "wav")),
+        default_policy=str(render_data.get("default_policy", "require_closed")),
+        min_disk_free_multiplier=float(render_data.get("min_disk_free_multiplier", 2.0)),
+    )
+
     toolsets = data.get("toolsets", ["core", "inspect", "control", "notes", "safety", "render"])
     log_dir_raw = data.get("log_dir")
     fl_user_dir_raw = data.get("fl_user_dir")
@@ -281,6 +304,7 @@ def config_from_dict(data: dict[str, Any]) -> StudioBridgeConfig:
         broker=broker_cfg,
         safety=safety_cfg,
         actuation=actuation_cfg,
+        render=render_cfg,
         toolsets=list(toolsets) if isinstance(toolsets, list) else [],
         log_level=str(data.get("log_level", "INFO")),
         log_dir=Path(log_dir_raw) if log_dir_raw else None,
@@ -356,6 +380,14 @@ def save_config(config: StudioBridgeConfig, path: Path) -> None:
             f"allow_focus_steal = {str(config.actuation.allow_focus_steal).lower()}",
             f"user_idle_threshold_ms = {config.actuation.user_idle_threshold_ms}",
             f"key_delay_ms = {config.actuation.key_delay_ms}",
+            "",
+            "[render]",
+            f"timeout_s = {config.render.timeout_s}",
+            f"idle_timeout_s = {config.render.idle_timeout_s}",
+            f"timeout_multiplier = {config.render.timeout_multiplier}",
+            f'default_format = "{config.render.default_format}"',
+            f'default_policy = "{config.render.default_policy}"',
+            f"min_disk_free_multiplier = {config.render.min_disk_free_multiplier}",
         ]
     )
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")

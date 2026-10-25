@@ -295,6 +295,34 @@ ERROR_REGISTRY: dict[str, ErrorInfo] = {
         remedy="Check audio routing, master track volume, and render export settings.",
         docs_anchor="error-e-rnd-invalid",
     ),
+    "E_RND_DISK": ErrorInfo(
+        code="E_RND_DISK",
+        default_message=(
+            "Insufficient disk space on staging drive for render job "
+            "(requires >= 2x estimated output)."
+        ),
+        retryable=False,
+        remedy="Free disk space on staging volume or reduce render scope.",
+        docs_anchor="error-e-rnd-disk",
+    ),
+    "E_RND_BUSY": ErrorInfo(
+        code="E_RND_BUSY",
+        default_message=(
+            "Another render job is currently running (render concurrency limit is 1)."
+        ),
+        retryable=True,
+        remedy="Wait for the active render job to finish or cancel it before launching another.",
+        docs_anchor="error-e-rnd-busy",
+    ),
+    "E_RND_NO_INSTALL": ErrorInfo(
+        code="E_RND_NO_INSTALL",
+        default_message="FL Studio installation (FL64.exe) not found.",
+        retryable=False,
+        remedy=(
+            "Install FL Studio or configure SBRIDGE_FL_INSTALL_DIR to point to FL Studio directory."
+        ),
+        docs_anchor="error-e-rnd-no-install",
+    ),
     # E_ACT*: UI actuation and window guard errors
     "E_ACT_DISABLED": ErrorInfo(
         code="E_ACT_DISABLED",
@@ -920,6 +948,24 @@ class InvalidOutputError(RenderError):
     default_code: str = "E_RND_INVALID"
 
 
+class RenderDiskSpaceError(RenderError):
+    """Raised when available disk space is less than 2x estimated render output [RND-01]."""
+
+    default_code: str = "E_RND_DISK"
+
+
+class RenderConcurrencyError(RenderError):
+    """Raised when another render job is already active (max 1 concurrency)."""
+
+    default_code: str = "E_RND_BUSY"
+
+
+class FlInstallNotFoundError(RenderError):
+    """Raised when no compatible FL Studio installation could be located."""
+
+    default_code: str = "E_RND_NO_INSTALL"
+
+
 class ActuationError(StudioBridgeError):
     """Base exception for Win32 UI actuation and focus guard failures."""
 
@@ -961,3 +1007,6 @@ WindowNotFound = WindowNotFoundError
 FocusGuard = FocusGuardError
 ModalBlocked = ModalBlockedError
 UserInputActive = UserInputActiveError
+RenderDiskSpace = RenderDiskSpaceError
+RenderConcurrency = RenderConcurrencyError
+FlInstallNotFound = FlInstallNotFoundError
