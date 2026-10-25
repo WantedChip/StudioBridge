@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import os
 import sys
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Final
 
@@ -244,3 +245,105 @@ def find_fl_install_dirs() -> list[Path]:
             pass
 
     return sorted(found)
+
+
+def _is_subpath(target: Path, root: Path) -> bool:
+    """Check if target path resides within root path."""
+    try:
+        t_str = os.path.normcase(str(target.resolve()))
+        r_str = os.path.normcase(str(root.resolve()))
+        if t_str == r_str:
+            return True
+        if not r_str.endswith(("\\", "/")):
+            r_str = r_str + os.sep
+        return t_str.startswith(r_str)
+    except Exception:
+        return False
+
+
+def validate_safe_path(
+    path: Path | str,
+    allowed_roots: Sequence[Path | str] | None = None,
+    allow_unc: bool = False,
+) -> Path:
+    """Validate that path contains no traversal attacks and resolves within safe roots.
+
+    Per spec 10_l2_interfaces.md §2.8 and [MCP §2.8]:
+    - Rejects path traversal sequences (e.g. '..')
+    - Rejects unauthorized UNC network paths (e.g. '\\\\server\\share')
+    - Confirms path resolves within allowed safe roots (project dir, Documents,
+      FL Studio user data, local app data, system temp).
+
+    Raises:
+        SecurityError: If path contains traversal sequences or escapes allowed safe roots.
+    """
+    from studiobridge.core.errors import SecurityError
+
+    raw = str(path).strip()
+    if not raw:
+        raise SecurityError("Path cannot be empty", code="E_SECURITY")
+
+    # 1. Reject unauthorized UNC paths
+    if not allow_unc and (raw.startswith(("\\\\", "//")) or raw.startswith("\\\\?\\UNC\\")):
+        raise SecurityError(
+            f"Unauthorized UNC network path is forbidden: '{raw}'",
+            code="E_SECURITY",
+            remedy="Provide a local filesystem path within the project root or user Documents.",
+        )
+
+    # 2. Reject directory traversal sequences
+    parts = Path(raw).parts
+    if (
+        any(p == ".." for p in parts)
+        or "../" in raw
+        or "..\\" in raw
+        or raw.endswith(("/..", "\\..", ".."))
+    ):
+        raise SecurityError(
+            f"Path traversal sequence '..' is forbidden: '{raw}'",
+            code="E_SECURITY",
+            remedy="Specify a path without '..' parent directory references.",
+        )
+
+    # 3. Resolve path
+    try:
+        resolved = Path(raw).resolve()
+    except Exception as exc:
+        raise SecurityError(
+            f"Cannot resolve path '{raw}': {exc}",
+            code="E_SECURITY",
+        ) from exc
+
+    # 4. Determine allowed roots
+    if allowed_roots is not None:
+        roots = [Path(r).resolve() for r in allowed_roots]
+    else:
+        import tempfile
+
+        roots = [
+            Path.cwd().resolve(),
+            get_documents_dir().resolve(),
+            get_default_fl_user_data_dir().resolve(),
+            get_app_data_dir().resolve(),
+            get_jobs_dir().resolve(),
+            Path(tempfile.gettempdir()).resolve(),
+        ]
+        # Include configured allowlist environment paths if present
+        env_allowed = os.environ.get("SBRIDGE_ALLOWED_PATHS")
+        if env_allowed:
+            for item in env_allowed.replace(";", ",").split(","):
+                if item.strip():
+                    roots.append(Path(item.strip()).resolve())
+
+    # 5. Verify containment
+    if not any(_is_subpath(resolved, r) for r in roots):
+        raise SecurityError(
+            f"Path '{raw}' resolves outside allowed safe directories: '{resolved}'",
+            code="E_SECURITY",
+            remedy=(
+                "Ensure file is located within current project directory, user Documents, "
+                "or configured safe roots."
+            ),
+        )
+
+    return resolved

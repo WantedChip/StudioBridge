@@ -1,0 +1,30 @@
+{
+  "name": "notes_from_midi",
+  "title": "Notes From MIDI",
+  "description": "Convert a Standard MIDI File (.mid) into a structured note payload.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "path": {
+        "type": "string",
+        "description": "Path to standard MIDI file (.mid)."
+      },
+      "ppq": {
+        "type": "integer",
+        "description": "Target project PPQ for tick normalization (default: 96)."
+      }
+    },
+    "required": ["path"],
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "path": { "type": "string" },
+      "ppq": { "type": "integer" },
+      "count": { "type": "integer" },
+      "notes": { "type": "array", "items": { "type": "object" } }
+    },
+    "required": ["path", "ppq", "count", "notes"]
+  }
+}

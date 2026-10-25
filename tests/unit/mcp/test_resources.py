@@ -41,12 +41,13 @@ class TestResourceDefinitions:
         assert len(resources) == 4
 
     def test_default_resource_templates_catalog(self) -> None:
-        """Verify templates catalog returns API module and function templates."""
+        """Verify templates catalog returns API module, function, and render templates."""
         templates = get_default_resource_templates()
         uri_templates = [t.uri_template for t in templates]
         assert "studio://api/{module}" in uri_templates
         assert "studio://api/{module}/{function}" in uri_templates
-        assert len(templates) == 2
+        assert "studio://render/{job_id}" in uri_templates
+        assert len(templates) == 3
 
     def test_resource_definition_serialization(self) -> None:
         """Verify ResourceDefinition to_mcp_dict matches MCP specification."""

@@ -1,0 +1,59 @@
+{
+  "name": "render_start",
+  "title": "Render Start",
+  "description": "Initiate a background headless FL Studio project render job.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string",
+        "description": "Path to source FL Studio project file (.flp)."
+      },
+      "formats": {
+        "type": "array",
+        "items": { "type": "string", "enum": ["wav", "mp3", "flac", "ogg", "mid"] },
+        "description": "Output export formats (default: ['wav'])."
+      },
+      "out_dir": {
+        "type": "string",
+        "description": "Target directory for rendered audio files."
+      },
+      "instance_policy": {
+        "type": "string",
+        "enum": ["require_closed", "close_gracefully", "force_kill"],
+        "description": "Instance collision policy (default: 'require_closed')."
+      },
+      "timeout_s": {
+        "type": "number",
+        "description": "Total timeout in seconds (default: 900.0)."
+      },
+      "idle_timeout_s": {
+        "type": "number",
+        "description": "Idle timeout in seconds with no output growth (default: 120.0)."
+      },
+      "min_duration_s": {
+        "type": "number",
+        "description": "Minimum acceptable duration in seconds (default: 0.5)."
+      },
+      "max_silence_ratio": {
+        "type": "number",
+        "description": "Maximum allowed ratio of silence (default: 0.98)."
+      }
+    },
+    "required": ["source"],
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "job_id": { "type": "string" },
+      "state": { "type": "string" },
+      "source": { "type": "string" },
+      "formats": { "type": "array", "items": { "type": "string" } },
+      "out_dir": { "type": ["string", "null"] },
+      "created_at": { "type": "number" },
+      "task_handle": { "type": "object" }
+    },
+    "required": ["job_id", "state", "source", "formats"]
+  }
+}

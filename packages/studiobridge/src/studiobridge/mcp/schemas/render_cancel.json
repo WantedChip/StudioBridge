@@ -1,0 +1,25 @@
+{
+  "name": "render_cancel",
+  "title": "Render Cancel",
+  "description": "Terminate an active headless render subprocess and supervisor cleanly.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "job_id": {
+        "type": "string",
+        "description": "Unique render job ID to cancel."
+      }
+    },
+    "required": ["job_id"],
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "job_id": { "type": "string" },
+      "status": { "type": "string" },
+      "message": { "type": "string" }
+    },
+    "required": ["job_id", "status", "message"]
+  }
+}

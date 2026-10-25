@@ -5,6 +5,8 @@ from __future__ import annotations
 import sys
 from collections.abc import Sequence
 
+from studiobridge.cli.commands.notes import handle_notes
+from studiobridge.cli.commands.render import handle_render
 from studiobridge.cli.main import ExitCode, build_parser, cli_entry
 
 
@@ -20,4 +22,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     return code
 
 
-__all__ = ["ExitCode", "build_parser", "cli_entry", "main"]
+__all__ = [
+    "ExitCode",
+    "build_parser",
+    "cli_entry",
+    "handle_notes",
+    "handle_render",
+    "main",
+]

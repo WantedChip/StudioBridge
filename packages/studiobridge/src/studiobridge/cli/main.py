@@ -33,8 +33,10 @@ from studiobridge.cli.commands.inspect import (
 )
 from studiobridge.cli.commands.manifest import handle_manifest
 from studiobridge.cli.commands.mcp import handle_mcp
+from studiobridge.cli.commands.notes import handle_notes
 from studiobridge.cli.commands.ports import handle_ports
 from studiobridge.cli.commands.probe import handle_probe
+from studiobridge.cli.commands.render import handle_render
 from studiobridge.cli.commands.safety import (
     handle_batch,
     handle_call,
@@ -836,6 +838,163 @@ def build_parser() -> argparse.ArgumentParser:
             help="Emit output formatted as machine-readable JSON",
         )
     skill_p.set_defaults(handler=handle_skill, skill_action="info")
+
+    # 21. sbridge notes
+    notes_p = subparsers.add_parser("notes", help="Piano roll note operations and MIDI translation")
+    notes_sub = notes_p.add_subparsers(dest="notes_action", metavar="<apply|from-midi|read>")
+
+    n_apply_p = notes_sub.add_parser("apply", help="Apply note definitions to FL Studio piano roll")
+    n_apply_p.add_argument("file", help="Path to JSON notes file (.json) or MIDI file (.mid)")
+    n_apply_p.add_argument(
+        "--target", help="Target channel and pattern (e.g. 'channel:0,pattern:1')"
+    )
+    n_apply_p.add_argument(
+        "--channel", type=int, default=None, help="Target channel index (0-based)"
+    )
+    n_apply_p.add_argument(
+        "--pattern", type=int, default=None, help="Target pattern index (1-based)"
+    )
+    n_apply_p.add_argument(
+        "--mode",
+        choices=["append", "replace", "replace_all", "replace_range"],
+        default="append",
+        help="Apply mode (append|replace)",
+    )
+    n_apply_p.add_argument(
+        "--range", help="Tick range for replace_range mode (e.g. '0:384' or '0,384')"
+    )
+    n_apply_p.add_argument("--ppq", type=int, default=None, help="Project PPQ tick resolution")
+    n_apply_p.add_argument(
+        "--verify",
+        choices=["none", "oracle", "covert"],
+        default="none",
+        help="Verification method",
+    )
+    n_apply_p.add_argument(
+        "--fallback",
+        choices=["none", "step_grid", "midi"],
+        default="none",
+        help="Fallback actuation path",
+    )
+    n_apply_p.add_argument(
+        "--allow-focus-steal",
+        action="store_true",
+        default=None,
+        help="Allow focus steal if in background",
+    )
+    n_apply_p.add_argument(
+        "--force",
+        action="store_true",
+        default=False,
+        help="Override user-idle guard check",
+    )
+    n_apply_p.add_argument(
+        "--dry-run",
+        action="store_true",
+        default=False,
+        help="Simulate actuation without sending hotkey",
+    )
+    n_apply_p.set_defaults(handler=handle_notes, notes_action="apply")
+
+    n_midi_p = notes_sub.add_parser(
+        "from-midi", help="Convert MIDI file to structured note payload"
+    )
+    n_midi_p.add_argument("file", help="Path to standard MIDI file (.mid)")
+    n_midi_p.add_argument("--ppq", type=int, default=96, help="Target PPQ resolution")
+    n_midi_p.set_defaults(handler=handle_notes, notes_action="from-midi")
+
+    n_read_p = notes_sub.add_parser("read", help="Read notes from saved project file or MIDI file")
+    n_read_p.add_argument("file", help="Path to saved .flp or .mid file")
+    n_read_p.add_argument("--pattern", type=int, default=1, help="Pattern index")
+    n_read_p.add_argument("--channel", type=int, default=0, help="Channel index")
+    n_read_p.set_defaults(handler=handle_notes, notes_action="read")
+
+    for p in (notes_p, n_apply_p, n_midi_p, n_read_p):
+        p.add_argument(
+            "--json",
+            action="store_true",
+            default=False,
+            help="Emit output formatted as machine-readable JSON",
+        )
+    notes_p.set_defaults(handler=handle_notes)
+
+    # 22. sbridge render
+    render_p = subparsers.add_parser(
+        "render", help="Render FL Studio project headlessly or inspect jobs"
+    )
+    render_p.add_argument(
+        "project",
+        nargs="?",
+        default=None,
+        help="Path to FL Studio project (.flp) or action (status|cancel|analyze)",
+    )
+    render_p.add_argument(
+        "job_or_file",
+        nargs="?",
+        default=None,
+        help="Target job ID (for status/cancel) or audio file (for analyze)",
+    )
+    render_p.add_argument(
+        "--format",
+        default="wav",
+        help="Export format(s): wav, mp3, flac, ogg (comma-separated)",
+    )
+    render_p.add_argument(
+        "--out",
+        "--out-dir",
+        dest="out",
+        default=None,
+        help="Output destination directory",
+    )
+    render_p.add_argument(
+        "--policy",
+        choices=["require_closed", "close_gracefully", "force_kill"],
+        default="require_closed",
+        help="Instance collision policy",
+    )
+    render_p.add_argument(
+        "--timeout",
+        type=float,
+        default=900.0,
+        help="Total render timeout in seconds",
+    )
+    render_p.add_argument(
+        "--idle-timeout",
+        type=float,
+        default=120.0,
+        help="Idle timeout in seconds with no output growth",
+    )
+    render_p.add_argument(
+        "--watch",
+        action="store_true",
+        default=False,
+        help="Poll and watch render progress until complete",
+    )
+    render_p.add_argument(
+        "--min-duration",
+        type=float,
+        default=0.5,
+        help="Minimum duration in seconds (for analyze)",
+    )
+    render_p.add_argument(
+        "--max-silence",
+        type=float,
+        default=0.98,
+        help="Maximum allowed silence ratio (for analyze)",
+    )
+    render_p.add_argument(
+        "--allow-clipping",
+        action="store_true",
+        default=True,
+        help="Allow clipped samples without failing validation (for analyze)",
+    )
+    render_p.add_argument(
+        "--json",
+        action="store_true",
+        default=False,
+        help="Emit output formatted as machine-readable JSON",
+    )
+    render_p.set_defaults(handler=handle_render)
 
     return parser
 

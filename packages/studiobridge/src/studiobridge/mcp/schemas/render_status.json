@@ -1,0 +1,35 @@
+{
+  "name": "render_status",
+  "title": "Render Status",
+  "description": "Poll progress, completion state, output file paths, and metrics for a render job.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "job_id": {
+        "type": "string",
+        "description": "Unique render job ID."
+      }
+    },
+    "required": ["job_id"],
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "job_id": { "type": "string" },
+      "state": { "type": "string" },
+      "source": { "type": "string" },
+      "formats": { "type": "array", "items": { "type": "string" } },
+      "output_files": { "type": "array", "items": { "type": "string" } },
+      "sidecar_path": { "type": ["string", "null"] },
+      "error": { "type": ["string", "null"] },
+      "error_code": { "type": ["string", "null"] },
+      "exit_code": { "type": ["integer", "null"] },
+      "metrics": { "type": "object" },
+      "created_at": { "type": "number" },
+      "started_at": { "type": ["number", "null"] },
+      "completed_at": { "type": ["number", "null"] }
+    },
+    "required": ["job_id", "state", "output_files", "metrics"]
+  }
+}

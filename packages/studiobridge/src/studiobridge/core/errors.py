@@ -203,6 +203,16 @@ ERROR_REGISTRY: dict[str, ErrorInfo] = {
         remedy="Present confirmation prompt to user and retry with confirmation flag.",
         docs_anchor="error-e-confirm",
     ),
+    "E_SECURITY": ErrorInfo(
+        code="E_SECURITY",
+        default_message="Action refused due to security policy or path containment violation.",
+        retryable=False,
+        remedy=(
+            "Ensure file paths reside within allowed safe project roots "
+            "and contain no traversal sequences."
+        ),
+        docs_anchor="error-e-security",
+    ),
     # E_CONN*: Connection and broker errors
     "E_NOBROKER": ErrorInfo(
         code="E_NOBROKER",
@@ -601,6 +611,12 @@ class ArgumentError(StudioBridgeError):
     """Raised on argument type, value, or reference mismatch."""
 
     default_code: str = "E_ARGS"
+
+
+class SecurityError(ArgumentError):
+    """Raised when an action violates security constraints or path containment [MCP §2.8]."""
+
+    default_code: str = "E_SECURITY"
 
 
 class BadRefError(ArgumentError):
@@ -1010,3 +1026,4 @@ UserInputActive = UserInputActiveError
 RenderDiskSpace = RenderDiskSpaceError
 RenderConcurrency = RenderConcurrencyError
 FlInstallNotFound = FlInstallNotFoundError
+Security = SecurityError

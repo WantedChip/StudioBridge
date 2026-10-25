@@ -1,0 +1,39 @@
+{
+  "name": "render_analyze",
+  "title": "Render Analyze",
+  "description": "Run acoustic signal validation metrics and quality checks on a rendered audio file.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "path": {
+        "type": "string",
+        "description": "Path to audio file (.wav, .mp3, .flac, .ogg)."
+      },
+      "min_duration_s": {
+        "type": "number",
+        "description": "Minimum acceptable duration in seconds (default: 0.5)."
+      },
+      "max_silence_ratio": {
+        "type": "number",
+        "description": "Maximum allowed ratio of silence (default: 0.98)."
+      },
+      "allow_clipping": {
+        "type": "boolean",
+        "description": "Whether to allow clipped samples without failing validation (default: true)."
+      }
+    },
+    "required": ["path"],
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "path": { "type": "string" },
+      "is_valid": { "type": "boolean" },
+      "validation_status": { "type": "string" },
+      "error_message": { "type": ["string", "null"] },
+      "metrics": { "type": "object" }
+    },
+    "required": ["path", "is_valid", "validation_status", "metrics"]
+  }
+}

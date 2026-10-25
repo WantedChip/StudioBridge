@@ -1,0 +1,85 @@
+{
+  "name": "notes_apply",
+  "title": "Notes Apply",
+  "description": "Apply structured note arrays to the FL Studio piano roll with honest tier execution metadata.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "notes": {
+        "type": "array",
+        "description": "Array of note definitions (dicts with pos, length, key, velocity, or tuples).",
+        "items": { "type": ["object", "array"] }
+      },
+      "file": {
+        "type": "string",
+        "description": "Optional path to JSON or MIDI file containing notes."
+      },
+      "channel": {
+        "type": "integer",
+        "description": "Target channel index (0-based)."
+      },
+      "pattern": {
+        "type": "integer",
+        "description": "Target pattern index (1-based)."
+      },
+      "mode": {
+        "type": "string",
+        "enum": ["append", "replace_all", "replace_range"],
+        "description": "Note application mode (default: 'append')."
+      },
+      "range": {
+        "type": "array",
+        "items": { "type": "integer" },
+        "description": "Tick range [start_ticks, end_ticks] for 'replace_range' mode."
+      },
+      "ppq": {
+        "type": "integer",
+        "description": "Project pulses-per-quarter-note resolution (default: 96)."
+      },
+      "job_id": {
+        "type": "string",
+        "description": "Optional idempotency job ID."
+      },
+      "verify": {
+        "type": "string",
+        "enum": ["none", "oracle", "covert"],
+        "description": "Verification method (default: 'none')."
+      },
+      "fallback": {
+        "type": "string",
+        "enum": ["none", "step_grid", "midi"],
+        "description": "Fallback actuation path if piano roll actuation fails."
+      },
+      "allow_focus_steal": {
+        "type": "boolean",
+        "description": "Whether to bring FL Studio to foreground if in background."
+      },
+      "force": {
+        "type": "boolean",
+        "description": "Override user-idle guard check."
+      },
+      "dry_run": {
+        "type": "boolean",
+        "description": "Simulate note application without dispatching hotkey."
+      }
+    },
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "status": { "type": "string", "enum": ["applied", "pending", "failed"] },
+      "applied": { "type": ["boolean", "string"] },
+      "trigger": { "type": "string", "enum": ["T1", "T2", "T3", "step_grid", "midi_export"] },
+      "job_id": { "type": "string" },
+      "notes_count": { "type": "integer" },
+      "channel": { "type": ["integer", "null"] },
+      "pattern": { "type": ["integer", "null"] },
+      "verified": { "type": "string" },
+      "script_path": { "type": ["string", "null"] },
+      "instructions": { "type": "array", "items": { "type": "string" } },
+      "details": { "type": "object" }
+    },
+    "required": ["status", "applied", "trigger", "job_id", "notes_count", "verified"]
+  }
+}

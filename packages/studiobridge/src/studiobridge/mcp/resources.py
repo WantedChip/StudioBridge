@@ -23,6 +23,7 @@ from studiobridge.sdk.journal import MutationJournal
 # RFC 6570 URI template patterns
 API_FN_PATTERN = re.compile(r"^studio://api/([a-zA-Z0-9_]+)/([a-zA-Z0-9_]+)$")
 API_MOD_PATTERN = re.compile(r"^studio://api/([a-zA-Z0-9_]+)$")
+RENDER_JOB_PATTERN = re.compile(r"^studio://render/([a-zA-Z0-9_\-]+)$")
 
 
 @dataclass(frozen=True)
@@ -165,6 +166,15 @@ class ResourceProvider:
                 ),
                 mime_type="text/markdown",
             ),
+            ResourceTemplate(
+                uri_template="studio://render/{job_id}",
+                name="Render Job Progress and Metrics",
+                description=(
+                    "Streaming progress, completion state, and audio sidecar metrics "
+                    "for a render job."
+                ),
+                mime_type="application/json",
+            ),
         ]
 
     def read_resource(self, uri: str) -> ResourceContent:
@@ -196,6 +206,12 @@ class ResourceProvider:
         if mod_match:
             mod_name = mod_match.group(1)
             return self._read_api_module(clean_uri, mod_name)
+
+        # 4. Render job template: studio://render/{job_id}
+        render_match = RENDER_JOB_PATTERN.match(clean_uri)
+        if render_match:
+            job_id = render_match.group(1)
+            return self._read_render_job(clean_uri, job_id)
 
         raise ValueError(f"Resource URI not recognized: '{clean_uri}'")
 
@@ -509,6 +525,33 @@ class ResourceProvider:
             uri=uri,
             mime_type="text/markdown",
             text=card_md,
+        )
+
+    def _read_render_job(self, uri: str, job_id: str) -> ResourceContent:
+        """Generate studio://render/{job_id} JSON content."""
+        from studiobridge.mcp.tools.render import _lookup_job
+
+        data = _lookup_job(job_id)
+        if data is None:
+            raise ValueError(f"Render job '{job_id}' not found.")
+
+        payload = {
+            "uri": uri,
+            "job_id": data.get("job_id", job_id),
+            "state": data.get("state", "unknown"),
+            "source": data.get("source", ""),
+            "formats": data.get("formats", ["wav"]),
+            "output_files": data.get("output_files", []),
+            "sidecar_path": data.get("sidecar_path"),
+            "metrics": data.get("metrics", {}),
+            "error": data.get("error"),
+            "created_at": data.get("created_at"),
+            "completed_at": data.get("completed_at"),
+        }
+        return ResourceContent(
+            uri=uri,
+            mime_type="application/json",
+            text=json.dumps(payload, indent=2),
         )
 
 

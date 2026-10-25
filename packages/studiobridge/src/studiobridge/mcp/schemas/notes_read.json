@@ -1,0 +1,35 @@
+{
+  "name": "notes_read",
+  "title": "Notes Read",
+  "description": "Oracle-backed note reader returning patterns and notes from saved project state or MIDI files.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "flp_path": {
+        "type": "string",
+        "description": "Path to saved FL Studio project file (.flp) or MIDI file (.mid)."
+      },
+      "pattern": {
+        "type": "integer",
+        "description": "Pattern index to read notes from (default: 1)."
+      },
+      "channel": {
+        "type": "integer",
+        "description": "Channel index to read notes from (default: 0)."
+      }
+    },
+    "required": ["flp_path"],
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "flp_path": { "type": "string" },
+      "pattern": { "type": "integer" },
+      "channel": { "type": "integer" },
+      "count": { "type": "integer" },
+      "notes": { "type": "array", "items": { "type": "object" } }
+    },
+    "required": ["flp_path", "pattern", "channel", "count", "notes"]
+  }
+}

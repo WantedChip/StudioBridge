@@ -267,6 +267,24 @@ class McpHost:
                 return None
             return self._handle_prompts_get(req_id, params)
 
+        # 11. tasks/get
+        if method == "tasks/get":
+            if is_notification:
+                return None
+            return self._handle_tasks_get(req_id, params)
+
+        # 12. tasks/cancel
+        if method == "tasks/cancel":
+            if is_notification:
+                return None
+            return self._handle_tasks_cancel(req_id, params)
+
+        # 13. tasks/list
+        if method == "tasks/list":
+            if is_notification:
+                return None
+            return self._handle_tasks_list(req_id, params)
+
         # Unknown method
         if is_notification:
             return None
@@ -596,6 +614,126 @@ class McpHost:
                 message=f"Failed to get prompt '{name}': {exc}",
                 data={"code": "E_PROMPT", "name": name},
             )
+
+    def _handle_tasks_get(self, req_id: Any, params: dict[str, Any]) -> dict[str, Any]:
+        """Process 'tasks/get' request per MCP Tasks extension (2026-07-28)."""
+        if not isinstance(params, dict):
+            return self._make_error_frame(
+                req_id=req_id,
+                code=JsonRpcErrorCode.INVALID_PARAMS,
+                message="Invalid params: params must be an object",
+            )
+
+        task_id = params.get("taskId") or params.get("id") or params.get("job_id")
+        if not task_id or not isinstance(task_id, str):
+            return self._make_error_frame(
+                req_id=req_id,
+                code=JsonRpcErrorCode.INVALID_PARAMS,
+                message="Invalid params: 'taskId' is required and must be a string",
+            )
+
+        from studiobridge.mcp.tools.render import _lookup_job
+
+        data = _lookup_job(task_id)
+        if data is None:
+            return self._make_error_frame(
+                req_id=req_id,
+                code=JsonRpcErrorCode.INVALID_PARAMS,
+                message=f"Task '{task_id}' not found.",
+                data={"code": "E_BADREF", "taskId": task_id},
+            )
+
+        state_val = data.get("state", "running")
+        status_map = {
+            "done": "completed",
+            "failed": "failed",
+            "cancelled": "cancelled",
+        }
+        status_val = status_map.get(state_val, "running")
+
+        task_payload: dict[str, Any] = {
+            "id": task_id,
+            "status": status_val,
+            "state": state_val,
+            "output": data.get("output_files", []),
+            "metrics": data.get("metrics", {}),
+            "error": data.get("error"),
+            "created_at": data.get("created_at"),
+            "completed_at": data.get("completed_at"),
+        }
+        return {
+            "jsonrpc": "2.0",
+            "id": req_id,
+            "result": {"task": task_payload},
+        }
+
+    def _handle_tasks_cancel(self, req_id: Any, params: dict[str, Any]) -> dict[str, Any]:
+        """Process 'tasks/cancel' request per MCP Tasks extension (2026-07-28)."""
+        if not isinstance(params, dict):
+            return self._make_error_frame(
+                req_id=req_id,
+                code=JsonRpcErrorCode.INVALID_PARAMS,
+                message="Invalid params: params must be an object",
+            )
+
+        task_id = params.get("taskId") or params.get("id") or params.get("job_id")
+        if not task_id or not isinstance(task_id, str):
+            return self._make_error_frame(
+                req_id=req_id,
+                code=JsonRpcErrorCode.INVALID_PARAMS,
+                message="Invalid params: 'taskId' is required and must be a string",
+            )
+
+        from studiobridge.mcp.tools.render import RenderTools
+
+        try:
+            tools = RenderTools(server=self.server)
+            tools.render_cancel(task_id)
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"task": {"id": task_id, "status": "cancelled"}},
+            }
+        except Exception as exc:
+            return self._make_error_frame(
+                req_id=req_id,
+                code=JsonRpcErrorCode.INTERNAL_ERROR,
+                message=f"Failed to cancel task '{task_id}': {exc}",
+                data={"code": "E_TASK_CANCEL", "taskId": task_id},
+            )
+
+    def _handle_tasks_list(self, req_id: Any, params: dict[str, Any]) -> dict[str, Any]:
+        """Process 'tasks/list' request per MCP Tasks extension (2026-07-28)."""
+        from studiobridge.core.paths import get_jobs_dir
+        from studiobridge.mcp.tools.render import _lookup_job
+
+        tasks: list[dict[str, Any]] = []
+        jobs_dir = get_jobs_dir()
+        if jobs_dir.exists():
+            for child in sorted(jobs_dir.iterdir(), reverse=True):
+                if child.is_dir():
+                    data = _lookup_job(child.name)
+                    if data:
+                        state_val = data.get("state", "running")
+                        status_map = {
+                            "done": "completed",
+                            "failed": "failed",
+                            "cancelled": "cancelled",
+                        }
+                        tasks.append(
+                            {
+                                "id": child.name,
+                                "status": status_map.get(state_val, "running"),
+                                "state": state_val,
+                                "created_at": data.get("created_at"),
+                            }
+                        )
+
+        return {
+            "jsonrpc": "2.0",
+            "id": req_id,
+            "result": {"tasks": tasks},
+        }
 
     def _make_error_frame(
         self,

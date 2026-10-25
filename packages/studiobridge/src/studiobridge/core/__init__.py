@@ -44,6 +44,8 @@ from studiobridge.core.errors import (
     PreconditionError,
     ProtocolError,
     SafetyError,
+    Security,
+    SecurityError,
     StudioBridgeError,
     UnavailableError,
     VerificationError,
@@ -75,6 +77,7 @@ from studiobridge.core.paths import (
     get_journal_dir,
     get_logs_dir,
     get_secret_path,
+    validate_safe_path,
 )
 
 __all__ = [
@@ -118,6 +121,8 @@ __all__ = [
     "PreconditionError",
     "ProtocolError",
     "SafetyError",
+    "Security",
+    "SecurityError",
     "StudioBridgeError",
     "UnavailableError",
     "VerificationError",
@@ -147,4 +152,5 @@ __all__ = [
     "get_journal_dir",
     "get_logs_dir",
     "get_secret_path",
+    "validate_safe_path",
 ]
