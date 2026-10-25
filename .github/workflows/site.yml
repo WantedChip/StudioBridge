@@ -37,6 +37,9 @@ jobs:
       - name: Type check site
         run: npm run check
 
+      - name: Validate token contrast and font budget
+        run: npm run test:contrast
+
       - name: Build static site
         run: npm run build
 

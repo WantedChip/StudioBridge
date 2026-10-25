@@ -1,0 +1,223 @@
+/* =============================================================================
+   StudioBridge Design System Tokens — "Patchbay" Technical Catalogue
+   Specification: .agents/spec/18_landing_page_spec.md §7, §7.1, §7.1a (T-WEB-02)
+   ============================================================================= */
+
+/* -----------------------------------------------------------------------------
+   Typography: Self-Hosted WOFF2 Subsets (Latin)
+   Budget: ≤ 3 files, ≤ 100 KB total, font-display: swap
+   ----------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/bricolage-grotesque-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Inter Tight';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/inter-tight-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* -----------------------------------------------------------------------------
+   Design Tokens: Light "Paper" Default Palette (:root)
+   ----------------------------------------------------------------------------- */
+:root {
+  /* Canvas & Surfaces */
+  --bg: #F3F0E8;
+  --surface: #FBF9F4;
+
+  /* Typography / Ink */
+  --ink: #14130F;
+  --ink-muted: #55524A;
+
+  /* Hairlines & Interactive Boundaries */
+  --line: #CFC9BA;
+  --line-strong: #837E70;
+
+  /* Signal Orange Accent */
+  --signal: #E8461A;
+  --signal-text: #B8330F;
+
+  /* Semantic Feedback States */
+  --ok: #1D7A4A;
+  --warn: #8A5A00;
+  --err: #B3261E;
+
+  /* Font Families */
+  --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-sans: 'Inter Tight', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Strict Radii (0-2px industrial catalog) */
+  --radius-none: 0px;
+  --radius-sm: 1px;
+  --radius-md: 2px;
+
+  /* Standard color-scheme hint */
+  color-scheme: light dark;
+}
+
+/* -----------------------------------------------------------------------------
+   Dark "Rack" Palette: Overrides for forced dark mode & default system dark
+   [THM-02] Shared token definitions applied via media query and explicit attribute
+   ----------------------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F0F0D;
+    --surface: #181815;
+    --ink: #F1EEE6;
+    --ink-muted: #A9A497;
+    --line: #34332C;
+    --line-strong: #74726A;
+    --signal: #FF6A2B;
+    --signal-text: #FF6A2B;
+    --ok: #5BD08B;
+    --warn: #F2B84B;
+    --err: #FF7B72;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0F0F0D;
+  --surface: #181815;
+  --ink: #F1EEE6;
+  --ink-muted: #A9A497;
+  --line: #34332C;
+  --line-strong: #74726A;
+  --signal: #FF6A2B;
+  --signal-text: #FF6A2B;
+  --ok: #5BD08B;
+  --warn: #F2B84B;
+  --err: #FF7B72;
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --bg: #F3F0E8;
+  --surface: #FBF9F4;
+  --ink: #14130F;
+  --ink-muted: #55524A;
+  --line: #CFC9BA;
+  --line-strong: #837E70;
+  --signal: #E8461A;
+  --signal-text: #B8330F;
+  --ok: #1D7A4A;
+  --warn: #8A5A00;
+  --err: #B3261E;
+  color-scheme: light;
+}
+
+/* -----------------------------------------------------------------------------
+   High Contrast & Forced Colors Accessibility [THM-07]
+   ----------------------------------------------------------------------------- */
+@media (prefers-contrast: more) {
+  :root {
+    --line: var(--line-strong);
+    --ink-muted: var(--ink);
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Starlight Documentation Tokens Integration [THM-06]
+   Maps Starlight CSS properties directly to Patchbay tokens
+   ----------------------------------------------------------------------------- */
+:root {
+  --sl-color-bg: var(--bg);
+  --sl-color-bg-nav: var(--surface);
+  --sl-color-bg-sidebar: var(--surface);
+  --sl-color-hairline: var(--line);
+  --sl-color-text: var(--ink);
+  --sl-color-text-muted: var(--ink-muted);
+  --sl-color-accent: var(--signal);
+  --sl-color-accent-high: var(--signal-text);
+  --sl-font-system: var(--font-sans);
+  --sl-font-mono: var(--font-mono);
+}
+
+/* -----------------------------------------------------------------------------
+   Hardware Catalogue Utility Classes: Hairlines, Registration Marks & Numerals
+   ----------------------------------------------------------------------------- */
+.border-hairline {
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--line);
+}
+
+.border-hairline-t {
+  border-top: 1px solid var(--line);
+}
+
+.border-hairline-b {
+  border-bottom: 1px solid var(--line);
+}
+
+.border-hairline-l {
+  border-left: 1px solid var(--line);
+}
+
+.border-hairline-r {
+  border-right: 1px solid var(--line);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Registration marks (+) for catalog corners */
+.registration-mark {
+  position: relative;
+}
+
+.registration-mark::before {
+  content: "+";
+  position: absolute;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1;
+  color: var(--line-strong);
+  pointer-events: none;
+  user-select: none;
+}
+
+.registration-mark-tl::before {
+  top: -6px;
+  left: -6px;
+}
+
+.registration-mark-tr::before {
+  top: -6px;
+  right: -6px;
+}
+
+.registration-mark-bl::before {
+  bottom: -6px;
+  left: -6px;
+}
+
+.registration-mark-br::before {
+  bottom: -6px;
+  right: -6px;
+}
+
+/* Accessible 2px Focus Ring */
+.focus-ring:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}

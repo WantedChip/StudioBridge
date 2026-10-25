@@ -9,7 +9,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "typecheck": "astro check"
+    "typecheck": "astro check",
+    "test:contrast": "tsx scripts/check-contrast.ts"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.12",
@@ -25,6 +26,7 @@
   "devDependencies": {
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
+    "tsx": "^4.23.15",
     "typescript": "^5.7.3",
     "wrangler": "^4.152.0"
   }

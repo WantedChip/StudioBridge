@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { ThemeToggle } from '../components/ThemeToggle';
 ---
 
 <!doctype html>
@@ -8,41 +9,104 @@ import '../styles/global.css';
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Bridge coding agents to FL Studio with verified writes, reversibility, and local execution." />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#F3F0E8" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0F0F0D" media="(prefers-color-scheme: dark)" />
+
+    <!-- Self-hosted font preloads (display + text roman per §7.2) -->
+    <link rel="preload" href="/fonts/bricolage-grotesque-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="/fonts/inter-tight-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>StudioBridge — Agent Bridge for FL Studio</title>
+
+    <!-- Zero-flash blocking theme initialization script [THM-01] -->
+    <script is:inline>
+      (function () {
+        try {
+          var theme = localStorage.getItem('sb-theme');
+          if (theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+          } else if (theme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+          } else {
+            document.documentElement.removeAttribute('data-theme');
+          }
+        } catch (_) {}
+      })();
+    </script>
   </head>
-  <body class="min-h-screen bg-[#F3F0E8] text-[#181815] font-sans antialiased">
-    <header class="border-b border-[#181815]/10 px-6 py-4 flex items-center justify-between">
-      <div class="font-bold tracking-tight text-xl">StudioBridge</div>
-      <nav class="flex items-center gap-6 text-sm">
-        <a href="/docs" class="hover:underline">Documentation</a>
-        <a href="https://github.com/WantedChip/studiobridge" class="hover:underline" target="_blank" rel="noopener noreferrer">GitHub</a>
-      </nav>
-    </header>
-    <main class="max-w-4xl mx-auto px-6 py-20">
-      <div class="text-xs font-mono uppercase tracking-widest text-[#E8461A] mb-3">01 / SIGNAL PATH</div>
-      <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-6">
-        Patch your agent into your DAW.
-      </h1>
-      <p class="text-lg md:text-xl text-[#181815]/80 mb-8 max-w-2xl leading-relaxed">
-        Read, edit and render FL Studio projects from any coding agent — verified, reversible, local.
-      </p>
-      <div class="flex flex-wrap items-center gap-4">
-        <a
-          href="/docs"
-          class="inline-flex items-center px-5 py-2.5 bg-[#181815] text-[#F3F0E8] font-medium text-sm rounded hover:bg-[#181815]/90 transition"
-        >
-          Explore Docs &rarr;
-        </a>
-        <a
-          href="https://github.com/WantedChip/studiobridge"
-          class="inline-flex items-center px-5 py-2.5 border border-[#181815]/30 text-[#181815] font-medium text-sm rounded hover:bg-[#181815]/5 transition"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          View Source
+  <body class="min-h-screen bg-bg text-ink font-sans antialiased selection:bg-signal selection:text-white">
+    <header class="border-b border-line px-6 py-4 flex items-center justify-between bg-surface/80 backdrop-blur-xs sticky top-0 z-50">
+      <div class="flex items-center gap-6">
+        <a href="/" class="font-display font-bold tracking-tight text-xl text-ink hover:opacity-90 transition-opacity">
+          StudioBridge
         </a>
       </div>
+      <div class="flex items-center gap-6">
+        <nav class="hidden sm:flex items-center gap-6 text-sm font-sans">
+          <a href="/docs" class="text-ink-muted hover:text-ink transition-colors">Documentation</a>
+          <a href="https://github.com/WantedChip/studiobridge" class="text-ink-muted hover:text-ink transition-colors" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </nav>
+        <!-- Accessible 3-state segmented theme switcher [THM-03] -->
+        <ThemeToggle client:load />
+      </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-6 py-20">
+      <div class="registration-mark registration-mark-tl p-8 border border-line bg-surface rounded-[2px] mb-12 shadow-xs">
+        <div class="text-xs font-mono uppercase tracking-widest text-signal font-semibold mb-3">
+          01 / SIGNAL PATH
+        </div>
+        <h1 class="font-display text-4xl md:text-5xl font-extrabold tracking-tight text-ink mb-6">
+          Patch your agent into your DAW.
+        </h1>
+        <p class="font-sans text-lg md:text-xl text-ink-muted mb-8 max-w-2xl leading-relaxed">
+          Read, edit and render FL Studio projects from any coding agent — verified, reversible, local.
+        </p>
+        <div class="flex flex-wrap items-center gap-4">
+          <a
+            href="/docs"
+            class="inline-flex items-center px-5 py-2.5 bg-ink text-bg font-sans font-medium text-sm rounded-[2px] hover:opacity-90 transition focus-visible:outline-2 focus-visible:outline-ink focus-visible:outline-offset-2"
+          >
+            Explore Docs &rarr;
+          </a>
+          <a
+            href="https://github.com/WantedChip/studiobridge"
+            class="inline-flex items-center px-5 py-2.5 border border-line-strong text-ink font-sans font-medium text-sm rounded-[2px] hover:bg-bg transition focus-visible:outline-2 focus-visible:outline-ink focus-visible:outline-offset-2"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View Source
+          </a>
+        </div>
+      </div>
+
+      <!-- Technical Catalogue Specimen Section -->
+      <section class="border border-line rounded-[2px] p-6 bg-surface space-y-4">
+        <div class="flex items-center justify-between border-b border-line pb-3">
+          <span class="text-xs font-mono uppercase tracking-wider text-ink-muted">Token Inspection · WCAG 2.2 AA</span>
+          <span class="text-xs font-mono text-ok font-medium">VERIFIED</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono">
+          <div class="p-3 border border-line rounded-[1px] bg-bg">
+            <div class="text-ink-muted mb-1">--bg</div>
+            <div class="font-semibold text-ink">Canvas</div>
+          </div>
+          <div class="p-3 border border-line rounded-[1px] bg-surface">
+            <div class="text-ink-muted mb-1">--surface</div>
+            <div class="font-semibold text-ink">Elevated</div>
+          </div>
+          <div class="p-3 border border-line rounded-[1px] bg-bg">
+            <div class="text-ink-muted mb-1">--signal</div>
+            <div class="font-semibold text-signal-text">Accent</div>
+          </div>
+          <div class="p-3 border border-line rounded-[1px] bg-bg">
+            <div class="text-ink-muted mb-1">--line-strong</div>
+            <div class="font-semibold text-ink">Boundaries</div>
+          </div>
+        </div>
+      </section>
     </main>
   </body>
 </html>
