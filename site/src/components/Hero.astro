@@ -1,0 +1,97 @@
+---
+import CopyButton from './CopyButton';
+import SignalPath from './islands/SignalPath';
+---
+
+<section class="border-b border-line py-12 sm:py-20 px-4 sm:px-6 lg:px-8 bg-bg relative overflow-hidden" id="signal-path">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+      <!-- Left Column: Copy & Command Callouts -->
+      <div class="lg:col-span-5">
+        <!-- Section Kicker Badge -->
+        <div class="inline-flex items-center gap-2 px-2.5 py-1 border border-line rounded-[1px] bg-surface mb-6 font-mono text-[11px] text-ink-muted">
+          <span class="w-2 h-2 rounded-[1px] bg-signal inline-block" aria-hidden="true"></span>
+          <span class="font-semibold text-ink uppercase tracking-wider">01 / SIGNAL PATH</span>
+          <span class="text-line-strong select-none">|</span>
+          <span>WINDOWS x64 &amp; ARM64</span>
+        </div>
+
+        <!-- Hero Headline -->
+        <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-ink leading-[1.08] mb-6">
+          Patch your agent into your DAW.
+        </h1>
+
+        <!-- Subhead -->
+        <p class="font-sans text-lg sm:text-xl text-ink-muted leading-relaxed mb-8 max-w-xl">
+          Read, edit, and render FL Studio projects from any coding agent &mdash; verified, reversible, local.
+        </p>
+
+        <!-- Install Command Box with CopyButton Island -->
+        <div class="mb-8 max-w-xl">
+          <div class="border border-line bg-surface rounded-[2px] p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+            <div class="flex items-center gap-3 font-mono text-xs sm:text-sm text-ink overflow-x-auto">
+              <span class="text-signal select-none font-bold" aria-hidden="true">&gt;</span>
+              <span class="select-all font-semibold">uvx studiobridge setup</span>
+            </div>
+            <div class="shrink-0 flex items-center gap-2">
+              <span class="font-mono text-[10px] text-ok uppercase tracking-wider font-semibold px-2 py-1 bg-bg border border-line rounded-[1px] hidden xs:inline-block">
+                READY IN 1s
+              </span>
+              <CopyButton
+                client:load
+                text="uvx studiobridge setup"
+                label="COPY"
+                copiedLabel="COPIED"
+                ariaLabel="Copy install command: uvx studiobridge setup"
+              />
+            </div>
+          </div>
+
+          <!-- Status & Architecture Badges -->
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 mt-2.5 font-mono text-[11px] text-ink-muted">
+            <span class="inline-flex items-center gap-1.5 font-semibold text-ink">
+              <span class="w-1.5 h-1.5 rounded-full bg-ok" aria-hidden="true"></span>
+              MIT License
+            </span>
+            <span class="text-line-strong select-none">&bull;</span>
+            <span class="font-semibold text-ink">Windows ARM64 + x64</span>
+            <span class="text-line-strong select-none">&bull;</span>
+            <span>Zero Telemetry</span>
+            <span class="text-line-strong select-none">&bull;</span>
+            <span>Zero Kernel Drivers</span>
+          </div>
+        </div>
+
+        <!-- Action Links: "See it work" jump link pointing to #session-demo -->
+        <div class="flex flex-wrap items-center gap-4">
+          <a
+            href="#session-demo"
+            class="inline-flex items-center gap-2 px-5 py-2.5 bg-ink text-bg font-sans font-medium text-sm rounded-[2px] hover:opacity-90 transition-opacity focus-ring"
+          >
+            <span>See it work</span>
+            <span aria-hidden="true">&darr;</span>
+          </a>
+          <a
+            href="/docs/"
+            class="inline-flex items-center px-5 py-2.5 border border-line-strong text-ink font-sans font-medium text-sm rounded-[2px] hover:bg-surface transition-colors focus-ring"
+          >
+            Explore Documentation &rarr;
+          </a>
+          <a
+            href="https://github.com/WantedChip/studiobridge"
+            class="inline-flex items-center px-4 py-2.5 text-ink-muted hover:text-ink font-sans font-medium text-sm transition-colors focus-ring"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GitHub &rarr;
+          </a>
+        </div>
+      </div>
+
+      <!-- Right Column: Interactive Signal-Path SVG Island -->
+      <div class="lg:col-span-7">
+        <SignalPath client:visible />
+      </div>
+    </div>
+  </div>
+</section>

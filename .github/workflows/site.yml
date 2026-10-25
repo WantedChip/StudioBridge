@@ -46,6 +46,9 @@ jobs:
       - name: Validate static landing page structure (zero-JS)
         run: npm run test:html
 
+      - name: Validate hero section & signal-path island
+        run: npm run test:hero
+
       - name: Verify build artifacts
         run: |
           test -d dist

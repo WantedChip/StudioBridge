@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
 import SectionWorksWith from '../components/SectionWorksWith.astro';
 import SectionControlPlanes from '../components/SectionControlPlanes.astro';
 import SectionSafety from '../components/SectionSafety.astro';
@@ -52,120 +53,8 @@ import Footer from '../components/Footer.astro';
 
     <!-- Main Content Landed via Skip Link -->
     <main id="main-content">
-      <!-- 01 / SIGNAL PATH — Hero Section (Placeholder for Interactive SVG Island in v0.6.4) -->
-      <section class="border-b border-line py-16 sm:py-24 px-4 sm:px-6 lg:px-8 bg-bg relative overflow-hidden">
-        <div class="max-w-7xl mx-auto">
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            <!-- Left Column: Copy & Command Callouts -->
-            <div class="lg:col-span-7">
-              <div class="inline-flex items-center gap-2 px-2.5 py-1 border border-line rounded-[1px] bg-surface mb-6 font-mono text-[11px] text-ink-muted">
-                <span class="w-2 h-2 rounded-[1px] bg-signal inline-block" aria-hidden="true"></span>
-                <span class="font-semibold text-ink uppercase tracking-wider">01 / SIGNAL PATH</span>
-                <span class="text-line-strong">|</span>
-                <span>WINDOWS x64 &amp; ARM64</span>
-              </div>
-
-              <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-ink leading-[1.08] mb-6">
-                Patch your agent into your DAW.
-              </h1>
-
-              <p class="font-sans text-lg sm:text-xl text-ink-muted leading-relaxed mb-8 max-w-2xl">
-                Read, edit and render FL Studio projects from any coding agent &mdash; verified, reversible, local.
-              </p>
-
-              <!-- Install Command Box -->
-              <div class="mb-8 max-w-xl">
-                <div class="border border-line bg-surface rounded-[2px] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
-                  <div class="flex items-center gap-3 font-mono text-xs sm:text-sm text-ink overflow-x-auto">
-                    <span class="text-signal select-none">&gt;</span>
-                    <span class="select-all">uvx studiobridge hello</span>
-                  </div>
-                  <div class="shrink-0">
-                    <span class="font-mono text-[10px] text-ok uppercase tracking-wider font-semibold px-2 py-1 bg-bg border border-line rounded-[1px]">
-                      READY IN 1s
-                    </span>
-                  </div>
-                </div>
-                <div class="flex items-center gap-4 mt-2 font-mono text-[11px] text-ink-muted">
-                  <span>MIT LICENSE</span>
-                  <span>&bull;</span>
-                  <span>ZERO TELEMETRY</span>
-                  <span>&bull;</span>
-                  <span>ZERO KERNEL DRIVERS</span>
-                </div>
-              </div>
-
-              <!-- Action Links -->
-              <div class="flex flex-wrap items-center gap-4">
-                <a
-                  href="/docs/"
-                  class="inline-flex items-center px-5 py-2.5 bg-ink text-bg font-sans font-medium text-sm rounded-[2px] hover:opacity-90 transition-opacity focus-ring"
-                >
-                  Explore Documentation &rarr;
-                </a>
-                <a
-                  href="https://github.com/WantedChip/studiobridge"
-                  class="inline-flex items-center px-5 py-2.5 border border-line-strong text-ink font-sans font-medium text-sm rounded-[2px] hover:bg-surface transition-colors focus-ring"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  View Source on GitHub
-                </a>
-              </div>
-            </div>
-
-            <!-- Right Column: Signal Path Diagram Static Fallback / Specimen -->
-            <div class="lg:col-span-5">
-              <div class="registration-mark registration-mark-tl registration-mark-br border border-line bg-surface rounded-[2px] p-6 shadow-xs">
-                <div class="flex items-center justify-between border-b border-line pb-3 mb-4 font-mono text-[11px]">
-                  <span class="text-signal uppercase font-bold">SIGNAL TOPOLOGY</span>
-                  <span class="text-ink-muted">SYS-EX 53 42</span>
-                </div>
-
-                <!-- Abstract Signal Path Flow -->
-                <div class="space-y-3 font-mono text-xs">
-                  <div class="p-3 border border-line rounded-[1px] bg-bg flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                      <span class="w-2 h-2 rounded-full bg-signal" aria-hidden="true"></span>
-                      <span class="font-semibold text-ink">AGENT / CLIENT</span>
-                    </div>
-                    <span class="text-[10px] text-ink-muted">Claude, Cursor, CLI</span>
-                  </div>
-
-                  <div class="flex justify-center text-ink-muted font-mono text-xs select-none">
-                    &darr; Model Context Protocol (stdio/JSON-RPC)
-                  </div>
-
-                  <div class="p-3 border border-line rounded-[1px] bg-bg flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                      <span class="w-2 h-2 rounded-full bg-ok" aria-hidden="true"></span>
-                      <span class="font-semibold text-ink">STUDIOBRIDGE DAEMON</span>
-                    </div>
-                    <span class="text-[10px] text-ink-muted">Journal &amp; Safety</span>
-                  </div>
-
-                  <div class="flex justify-center text-ink-muted font-mono text-xs select-none">
-                    &darr; SysEx Frames [F0 7D 53 42 ...]
-                  </div>
-
-                  <div class="p-3 border border-line rounded-[1px] bg-bg flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                      <span class="w-2 h-2 rounded-full bg-line-strong" aria-hidden="true"></span>
-                      <span class="font-semibold text-ink">FL STUDIO ENGINE</span>
-                    </div>
-                    <span class="text-[10px] text-ink-muted">Host Controller Script</span>
-                  </div>
-                </div>
-
-                <div class="border-t border-line mt-4 pt-3 flex items-center justify-between font-mono text-[10px] text-ink-muted">
-                  <span>WIRE MAGIC: 0x53 0x42 (&quot;SB&quot;)</span>
-                  <span class="text-ok font-semibold">VERIFIED</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <!-- 01 / SIGNAL PATH — Hero Section with Interactive Signal-Path Island -->
+      <Hero />
 
       <!-- Section: Works With (Nominative Agent Chips) -->
       <SectionWorksWith />
