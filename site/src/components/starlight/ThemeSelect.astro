@@ -1,0 +1,111 @@
+---
+import Select from '@astrojs/starlight/components/Select.astro';
+---
+
+<starlight-theme-select>
+	<Select
+		icon="laptop"
+		label={Astro.locals.t('themeSelect.accessibleLabel')}
+		options={[
+			{ label: Astro.locals.t('themeSelect.dark'), selected: false, value: 'dark' },
+			{ label: Astro.locals.t('themeSelect.light'), selected: false, value: 'light' },
+			{ label: Astro.locals.t('themeSelect.auto'), selected: true, value: 'auto' },
+		]}
+		width="6.25em"
+	/>
+</starlight-theme-select>
+
+{/* Inlined to avoid FOUC. Uses global scope from ThemeProvider */}
+<script is:inline>
+	if (typeof window !== 'undefined' && window.StarlightThemeProvider) {
+		window.StarlightThemeProvider.updatePickers();
+	}
+</script>
+
+<script>
+	type Theme = 'auto' | 'dark' | 'light';
+
+	const storageKey = 'sb-theme';
+
+	const parseTheme = (theme: unknown): Theme =>
+		theme === 'auto' || theme === 'dark' || theme === 'light' || theme === 'system'
+			? theme === 'system' ? 'auto' : theme
+			: 'auto';
+
+	const loadTheme = (): Theme => {
+		if (typeof localStorage === 'undefined') return 'auto';
+		const val = localStorage.getItem(storageKey);
+		return val === 'dark' || val === 'light' ? val : 'auto';
+	};
+
+	function storeTheme(theme: Theme): void {
+		if (typeof localStorage !== 'undefined') {
+			const sbVal = theme === 'auto' ? 'system' : theme;
+			localStorage.setItem(storageKey, sbVal);
+			localStorage.setItem('starlight-theme', theme === 'auto' ? '' : theme);
+		}
+	}
+
+	function onThemeChange(theme: Theme): void {
+		if (window.StarlightThemeProvider) {
+			window.StarlightThemeProvider.updatePickers(theme === 'auto' ? 'system' : theme);
+		}
+		if (theme === 'dark') {
+			document.documentElement.setAttribute('data-theme', 'dark');
+		} else if (theme === 'light') {
+			document.documentElement.setAttribute('data-theme', 'light');
+		} else {
+			document.documentElement.removeAttribute('data-theme');
+		}
+		storeTheme(theme);
+		window.dispatchEvent(
+			new CustomEvent('sb-theme-change', { detail: { theme: theme === 'auto' ? 'system' : theme } })
+		);
+	}
+
+	// React to changes in system color scheme when auto/system is active
+	matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+		if (loadTheme() === 'auto') {
+			onThemeChange('auto');
+		}
+	});
+
+	// React to storage events from other tabs / landing page
+	window.addEventListener('storage', (e) => {
+		if (e.key === 'sb-theme') {
+			const newTheme = loadTheme();
+			if (window.StarlightThemeProvider) {
+				window.StarlightThemeProvider.updatePickers(newTheme === 'auto' ? 'system' : newTheme);
+			}
+			if (newTheme === 'dark') {
+				document.documentElement.setAttribute('data-theme', 'dark');
+			} else if (newTheme === 'light') {
+				document.documentElement.setAttribute('data-theme', 'light');
+			} else {
+				document.documentElement.removeAttribute('data-theme');
+			}
+		}
+	});
+
+	// React to internal sb-theme-change event
+	window.addEventListener('sb-theme-change', ((e: CustomEvent) => {
+		const val = e.detail?.theme;
+		const parsed = val === 'dark' || val === 'light' ? val : 'system';
+		if (window.StarlightThemeProvider) {
+			window.StarlightThemeProvider.updatePickers(parsed);
+		}
+	}) as EventListener);
+
+	class StarlightThemeSelect extends HTMLElement {
+		constructor() {
+			super();
+			onThemeChange(loadTheme());
+			this.querySelector('select')?.addEventListener('change', (e) => {
+				if (e.currentTarget instanceof HTMLSelectElement) {
+					onThemeChange(parseTheme(e.currentTarget.value));
+				}
+			});
+		}
+	}
+	customElements.define('starlight-theme-select', StarlightThemeSelect);
+</script>

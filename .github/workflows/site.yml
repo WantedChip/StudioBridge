@@ -58,6 +58,9 @@ jobs:
       - name: Validate capability matrix & compatibility page
         run: npm run test:compat
 
+      - name: Validate Starlight documentation & API reference
+        run: npm run test:docs
+
       - name: Verify build artifacts
         run: |
           test -d dist

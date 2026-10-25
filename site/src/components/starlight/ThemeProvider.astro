@@ -1,0 +1,43 @@
+---
+import { Icon } from '@astrojs/starlight/components';
+---
+
+{/* This is intentionally inlined to avoid FOUC. */}
+<script is:inline>
+	window.StarlightThemeProvider = (() => {
+		const storedTheme =
+			typeof localStorage !== 'undefined' && localStorage.getItem('sb-theme');
+		const theme = storedTheme || 'system';
+		if (theme === 'dark') {
+			document.documentElement.setAttribute('data-theme', 'dark');
+		} else if (theme === 'light') {
+			document.documentElement.setAttribute('data-theme', 'light');
+		} else {
+			document.documentElement.removeAttribute('data-theme');
+		}
+		return {
+			updatePickers(t) {
+				const active = t || (typeof localStorage !== 'undefined' ? localStorage.getItem('sb-theme') : null) || 'system';
+				const pickerValue = active === 'system' ? 'auto' : active;
+				document.querySelectorAll('starlight-theme-select').forEach((picker) => {
+					const select = picker.querySelector('select');
+					if (select) select.value = pickerValue;
+					const tmpl = document.querySelector('#theme-icons');
+					const newIcon = tmpl && tmpl.content.querySelector('.' + pickerValue);
+					if (newIcon) {
+						const oldIcon = picker.querySelector('svg.label-icon');
+						if (oldIcon) {
+							oldIcon.replaceChildren(...newIcon.cloneNode(true).childNodes);
+						}
+					}
+				});
+			},
+		};
+	})();
+</script>
+
+<template id="theme-icons">
+	<Icon name="sun" class="light" />
+	<Icon name="moon" class="dark" />
+	<Icon name="laptop" class="auto" />
+</template>

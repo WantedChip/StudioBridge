@@ -1,7 +1,7 @@
 {
   "meta": {
     "schemaVersion": "1.0.0",
-    "generatedAt": "2026-10-25T18:52:39.467Z",
+    "generatedAt": "2026-10-25T19:12:30.859Z",
     "specVersion": "18 §5, §6.2",
     "description": "Authentic compatibility and capability matrix derived from real hardware test runs on Machine A and Machine B.",
     "testedEnvironments": {
