@@ -1,0 +1,157 @@
+---
+const INTERLOCKS = [
+  {
+    number: '01',
+    code: 'SEC-INIT',
+    title: 'Read-Only Default Mode',
+    badge: 'ZERO WRITE LEAKAGE',
+    description: 'Every session begins in strict read-only observation mode. State querying, mixer inspection, and pattern reading execute with zero mutation privileges.',
+    rule: 'session.mode = ReadOnly',
+    details: 'Agents cannot alter faders, tweak parameters, or save files until explicit write access is granted. Rogue agent loops cannot corrupt open projects.',
+  },
+  {
+    number: '02',
+    code: 'SEC-VERIFY',
+    title: 'Read-Back Verification',
+    badge: 'TOLERANCE COMPARISON',
+    description: 'StudioBridge refuses blind write acknowledgments. Every parameter set command reads back the live state from FL Studio to confirm the exact value was applied.',
+    rule: '|actual - expected| <= tolerance',
+    details: 'Mutations are committed to an append-only journal with sequential Journal IDs, microsecond timestamps, before/after values, and caller identities.',
+  },
+  {
+    number: '03',
+    code: 'SEC-TARGET',
+    title: 'Protected Target Gates',
+    badge: 'CONFIRMATION BARRIER',
+    description: 'Master mixer tracks, monitor buses, and critical arrangement sections are registered as protected targets requiring high-privilege confirmation.',
+    rule: 'require_confirmation(target)',
+    details: 'Destructive mutations (channel deletions, route resets, file overwrites) trigger interactive confirmation gates in MCP and CLI clients.',
+  },
+];
+
+const GUARANTEE_LEVELS = [
+  {
+    level: 'G0',
+    title: 'Observation Guarantee',
+    scope: 'Inspection & Diagnostics',
+    description: '100% non-destructive. Zero memory or disk mutation. Safe for autonomous code analyzers and background agent inspectors.',
+    indicator: 'ok',
+  },
+  {
+    level: 'G1',
+    title: 'In-Session Checkpoint',
+    scope: 'Live MIDI/SysEx RPC',
+    description: 'In-memory state snapshot created prior to any batch mutation. Single-command rollback() restores prior parameters instantly.',
+    indicator: 'ok',
+  },
+  {
+    level: 'G2',
+    title: 'Atomic Disk Backup',
+    scope: 'Offline .flp Operations',
+    description: 'Automatic timestamped backup (.bak-YYYYMMDDHHMMSS) written to disk before modifying. Output committed via atomic fsync replace.',
+    indicator: 'ok',
+  },
+];
+---
+
+<section class="border-b border-line py-16 px-4 sm:px-6 lg:px-8 bg-surface/40">
+  <div class="max-w-7xl mx-auto">
+    <!-- Section Header -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10 pb-6 border-b border-line">
+      <div>
+        <div class="font-mono text-xs uppercase tracking-widest text-signal font-semibold mb-2">
+          05 / INTERLOCKS
+        </div>
+        <h2 class="font-display text-3xl sm:text-4xl font-extrabold tracking-tight text-ink">
+          Reversible by default.
+        </h2>
+      </div>
+      <p class="font-sans text-sm sm:text-base text-ink-muted max-w-xl leading-relaxed">
+        Writing code with AI requires safety interlocks that guarantee project preservation. StudioBridge enforces read-only session starts, read-back verification, and multi-tier rollback guarantees.
+      </p>
+    </div>
+
+    <!-- Interlocks Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      {INTERLOCKS.map((item) => (
+        <div class="border border-line bg-surface rounded-[2px] p-6 flex flex-col justify-between shadow-xs">
+          <div>
+            <div class="flex items-center justify-between border-b border-line pb-3 mb-4">
+              <span class="font-mono text-xs text-signal font-bold">
+                INTERLOCK {item.number}
+              </span>
+              <span class="font-mono text-[10px] uppercase tracking-wider text-ink-muted">
+                {item.code}
+              </span>
+            </div>
+            <div class="font-mono text-[10px] uppercase tracking-wider text-ok font-semibold mb-1">
+              {item.badge}
+            </div>
+            <h3 class="font-display text-xl font-bold text-ink mb-3">
+              {item.title}
+            </h3>
+            <p class="font-sans text-xs text-ink-muted leading-relaxed mb-4">
+              {item.description}
+            </p>
+            <p class="font-sans text-xs text-ink leading-relaxed mb-4">
+              {item.details}
+            </p>
+          </div>
+          <div class="border-t border-line pt-3 mt-2">
+            <span class="font-mono text-[10px] text-ink-muted uppercase block mb-1">INVARIANT CONSTRAINT</span>
+            <code class="font-mono text-[11px] text-ink bg-bg px-2 py-1 border border-line rounded-[1px] block text-center">
+              {item.rule}
+            </code>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Rollback Guarantees Table / Tier Panel -->
+    <div class="border border-line bg-surface rounded-[2px] p-6 shadow-xs">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-line pb-4 mb-6">
+        <div>
+          <span class="font-mono text-xs uppercase tracking-widest text-signal font-semibold">
+            REVERSIBILITY MATRIX
+          </span>
+          <h3 class="font-display text-xl font-bold text-ink mt-0.5">
+            Three-Tier Rollback Guarantee Levels
+          </h3>
+        </div>
+        <span class="font-mono text-xs text-ink-muted">
+          SPECIFICATION // 09 §6
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {GUARANTEE_LEVELS.map((g) => (
+          <div class="border border-line bg-bg p-5 rounded-[2px] flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="font-mono text-lg font-bold text-ink px-2 py-0.5 border border-line-strong rounded-[1px] bg-surface">
+                  {g.level}
+                </span>
+                <span class="font-mono text-[10px] text-ok uppercase tracking-wider font-semibold">
+                  VERIFIED
+                </span>
+              </div>
+              <h4 class="font-display text-base font-bold text-ink mb-1">
+                {g.title}
+              </h4>
+              <div class="font-mono text-[11px] text-signal mb-2">
+                {g.scope}
+              </div>
+              <p class="font-sans text-xs text-ink-muted leading-relaxed">
+                {g.description}
+              </p>
+            </div>
+            <div class="border-t border-line pt-3 mt-4 flex items-center justify-between font-mono text-[10px] text-ink-muted">
+              <span>ROLLBACK STATUS</span>
+              <span class="text-ok font-semibold">DETERMINISTIC</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,60 @@
+---
+const AGENTS = [
+  { name: 'Claude Code', type: 'CLI & Terminal' },
+  { name: 'Claude Desktop', type: 'Desktop MCP' },
+  { name: 'Codex', type: 'Coding Agent' },
+  { name: 'Cursor', type: 'Editor MCP' },
+  { name: 'opencode', type: 'Open Agent' },
+  { name: 'Antigravity', type: 'Agent Platform' },
+  { name: 'Gemini CLI', type: 'Terminal Tool' },
+  { name: 'VS Code', type: 'Extension Host' },
+  { name: 'Windsurf', type: 'Agentic IDE' },
+  { name: 'Zed', type: 'Native Editor' },
+  { name: 'any MCP client', type: 'Standard Protocol' },
+  { name: 'plain CLI', type: 'PowerShell / cmd' },
+];
+---
+
+<section class="border-b border-line py-12 px-4 sm:px-6 lg:px-8 bg-surface/30">
+  <div class="max-w-7xl mx-auto">
+    <!-- Section Sub-Header / Patchbay Tag -->
+    <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 mb-6">
+      <div>
+        <div class="font-mono text-[11px] uppercase tracking-widest text-signal font-semibold mb-1">
+          PATCHBAY INTERFACES · NOMINATIVE SPECIFICATION
+        </div>
+        <h2 class="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">
+          Works with your agent.
+        </h2>
+      </div>
+      <p class="font-sans text-sm text-ink-muted max-w-md">
+        Plug into your DAW via standard Model Context Protocol (MCP) or direct command line. Zero proprietary kernel MIDI drivers.
+      </p>
+    </div>
+
+    <!-- Typographic Chips Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
+      {AGENTS.map((agent) => (
+        <div class="group border border-line bg-surface rounded-[2px] p-3 flex flex-col justify-between hover:border-line-strong hover:bg-bg transition-colors">
+          <div class="flex items-center justify-between gap-1 mb-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-line-strong group-hover:bg-signal transition-colors" aria-hidden="true"></span>
+            <span class="font-mono text-[10px] text-ink-muted tabular-nums uppercase">PORT OK</span>
+          </div>
+          <div>
+            <div class="font-mono font-medium text-xs sm:text-sm text-ink leading-tight">
+              {agent.name}
+            </div>
+            <div class="font-mono text-[10px] text-ink-muted mt-0.5">
+              {agent.type}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div class="mt-4 font-mono text-[11px] text-ink-muted flex items-center justify-between">
+      <span>* Brand and product names are referenced nominatively for compatibility identification.</span>
+      <span class="hidden sm:inline-block tabular-nums">12 / 12 TARGETS VERIFIED</span>
+    </div>
+  </div>
+</section>

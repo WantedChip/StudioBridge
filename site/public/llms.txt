@@ -1,0 +1,21 @@
+# StudioBridge
+> Agent bridge for FL Studio. Read, edit, and render FL Studio projects from any coding agent — verified, reversible, local.
+
+## Overview
+- Project: StudioBridge
+- CLI: sbridge
+- Protocol: MIDI / SysEx 2-way RPC (Magic bytes 53 42)
+- Target Host: FL Studio 21-26 on Windows x64 and ARM64
+- License: MIT (Copyright (C) 2026 WantedChip)
+- Telemetry: Zero telemetry, 100% local
+
+## Interfaces
+- Model Context Protocol (MCP): Standard tool suites for inspect, live control, offline FLP authoring, and headless rendering.
+- Command Line Interface: `sbridge` console script.
+- Python SDK: Pure-Python client libraries with universal wheels.
+
+## Documentation
+- Full Documentation: /docs/
+- Capability Matrix: /compat
+- Changelog: /changelog
+- Repository: https://github.com/WantedChip/studiobridge

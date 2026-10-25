@@ -1,0 +1,77 @@
+---
+const FAQS = [
+  {
+    index: '09.1',
+    question: 'Will StudioBridge ever overwrite or corrupt my FL Studio project files?',
+    answer: 'No. StudioBridge operates under a strict "Verified, Reversible Writes" philosophy. By default, sessions start in read-only observation mode. When mutating .flp projects offline, StudioBridge validates structural invariants on an isolated temporary file, creates an automatic timestamped backup (.bak-YYYYMMDDHHMMSS) on disk, and commits changes via atomic file replacement. It never auto-saves or overwrites your project files implicitly.',
+  },
+  {
+    index: '09.2',
+    question: 'Does StudioBridge collect telemetry or send data over the internet?',
+    answer: 'Zero telemetry. StudioBridge makes zero outbound network calls, contains no tracking pixels, creates no user accounts, and phones home to nowhere. All operations execute 100% locally on your machine between your coding agent and your local FL Studio installation.',
+  },
+  {
+    index: '09.3',
+    question: 'Which FL Studio versions are supported?',
+    answer: 'StudioBridge supports FL Studio 21, 24, 25, and 26 on Windows. Because Image-Line periodically updates internal data structures, StudioBridge negotiates a capability matrix upon connecting and explicitly reports capability states (available, degraded, or unavailable) with technical reasons for each host build.',
+  },
+  {
+    index: '09.4',
+    question: 'Does StudioBridge support Windows on ARM64 (e.g. Snapdragon X)?',
+    answer: 'Yes. StudioBridge is engineered with zero native C-extension dependencies on Windows. The core daemon, CLI, MCP server, and ctypes WinMM bindings run natively on ARM64 Python runtimes. While FL Studio itself runs under Microsoft Prism emulation on ARM64 devices, StudioBridge\'s watchdog timers and render supervisors automatically scale deadlines to ensure reliable operation.',
+  },
+  {
+    index: '09.5',
+    question: 'What is the relationship between StudioBridge and Image-Line?',
+    answer: 'StudioBridge is an independent open-source project created by WantedChip. FL Studio is a registered trademark of Image-Line Software NV. StudioBridge is not affiliated with, endorsed by, or sponsored by Image-Line. All brand names are referenced nominatively for compatibility identification only.',
+  },
+  {
+    index: '09.6',
+    question: 'How does StudioBridge protect against prompt injection from project files?',
+    answer: 'When an agent inspects an FL Studio project, all user-authored strings (project comments, channel names, pattern labels, marker text) are filtered and tagged with "untrusted": true metadata before delivery to the LLM context. This ensures coding agents distinguish between developer instructions and arbitrary audio project data.',
+  },
+];
+---
+
+<section class="border-b border-line py-16 px-4 sm:px-6 lg:px-8 bg-bg">
+  <div class="max-w-4xl mx-auto">
+    <!-- Section Header -->
+    <div class="mb-10 pb-6 border-b border-line">
+      <div class="font-mono text-xs uppercase tracking-widest text-signal font-semibold mb-2">
+        09 / FAQ
+      </div>
+      <h2 class="font-display text-3xl sm:text-4xl font-extrabold tracking-tight text-ink mb-3">
+        Frequently Asked Questions
+      </h2>
+      <p class="font-sans text-sm sm:text-base text-ink-muted leading-relaxed">
+        Key details on safety, file preservation, host compatibility, and privacy. Every accordion is accessible via keyboard and operates with zero JavaScript.
+      </p>
+    </div>
+
+    <!-- Semantic Accessible Accordion List -->
+    <div class="space-y-3">
+      {FAQS.map((faq) => (
+        <details class="group border border-line bg-surface rounded-[2px] transition-colors open:bg-surface">
+          <summary class="flex items-center justify-between p-4 sm:p-5 cursor-pointer font-sans font-semibold text-sm sm:text-base text-ink select-none hover:bg-bg transition-colors focus-ring rounded-[1px]">
+            <div class="flex items-baseline gap-3 text-left pr-4">
+              <span class="font-mono text-xs text-signal font-bold tabular-nums shrink-0">
+                {faq.index}
+              </span>
+              <span>{faq.question}</span>
+            </div>
+            <div class="w-5 h-5 flex items-center justify-center shrink-0 text-ink-muted group-hover:text-ink transition-transform duration-200 group-open:rotate-180">
+              <svg class="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                <path d="M4 6l4 4 4-4" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+          </summary>
+          <div class="px-4 sm:px-5 pb-5 pt-1 text-xs sm:text-sm text-ink-muted leading-relaxed font-sans border-t border-line/50">
+            <p class="mt-2 text-ink-muted leading-relaxed">
+              {faq.answer}
+            </p>
+          </div>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>

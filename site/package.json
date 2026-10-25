@@ -10,7 +10,8 @@
     "preview": "astro preview",
     "check": "astro check",
     "typecheck": "astro check",
-    "test:contrast": "tsx scripts/check-contrast.ts"
+    "test:contrast": "tsx scripts/check-contrast.ts",
+    "test:html": "tsx scripts/check-landing-html.ts"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.12",

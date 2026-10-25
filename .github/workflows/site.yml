@@ -43,6 +43,9 @@ jobs:
       - name: Build static site
         run: npm run build
 
+      - name: Validate static landing page structure (zero-JS)
+        run: npm run test:html
+
       - name: Verify build artifacts
         run: |
           test -d dist

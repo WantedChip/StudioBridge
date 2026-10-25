@@ -1,0 +1,99 @@
+---
+const HIGHLIGHTS = [
+  {
+    title: 'Permissive MIT License',
+    badge: 'COPYRIGHT (C) 2026 WANTEDCHIP',
+    description: 'Completely free for commercial productions, proprietary game audio pipelines, and studio infrastructure. Zero viral copyleft clauses.',
+    link: 'https://github.com/WantedChip/studiobridge/blob/main/LICENSE',
+    linkLabel: 'Read LICENSE',
+  },
+  {
+    title: 'Clean-Room Provenance',
+    badge: 'ZERO GPL CONTAMINATION',
+    description: 'Authored entirely from clean-room documentation and live hardware experiments. Strictly free from GPL code, reverse-engineered headers, or decompiler dumps.',
+    link: '/docs/',
+    linkLabel: 'Review Provenance',
+  },
+  {
+    title: 'Prompt-Injection Defense',
+    badge: 'SEC-05 SANITIZED CONTEXT',
+    description: 'External project titles, markers, and comments are tagged as untrusted metadata to defend LLMs against prompt injection attacks hidden in DAW files.',
+    link: 'https://github.com/WantedChip/studiobridge/blob/main/SECURITY.md',
+    linkLabel: 'Security Policy',
+  },
+  {
+    title: 'Architecture & Roadmap',
+    badge: 'TRANSPARENT ENGINEERING',
+    description: 'Follow our structured roadmap from v0.1 wire protocols to v1.0 native production release. Inspect test coverage and architectural decision records.',
+    link: '/changelog',
+    linkLabel: 'View Roadmap',
+  },
+];
+---
+
+<section class="border-b border-line py-16 px-4 sm:px-6 lg:px-8 bg-surface/30">
+  <div class="max-w-7xl mx-auto">
+    <!-- Section Header -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10 pb-6 border-b border-line">
+      <div>
+        <div class="font-mono text-xs uppercase tracking-widest text-signal font-semibold mb-2">
+          08 / SOURCE
+        </div>
+        <h2 class="font-display text-3xl sm:text-4xl font-extrabold tracking-tight text-ink">
+          Open, clean, and 100% local.
+        </h2>
+      </div>
+      <p class="font-sans text-sm sm:text-base text-ink-muted max-w-xl leading-relaxed">
+        StudioBridge is an open-source project built for transparency. No telemetry, no cloud accounts, no network phone-home calls. Your music and your code never leave your machine.
+      </p>
+    </div>
+
+    <!-- 4 Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      {HIGHLIGHTS.map((item) => (
+        <div class="border border-line bg-surface rounded-[2px] p-6 flex flex-col justify-between shadow-xs">
+          <div>
+            <div class="font-mono text-[10px] uppercase tracking-wider text-signal font-semibold mb-2">
+              {item.badge}
+            </div>
+            <h3 class="font-display text-lg font-bold text-ink mb-3">
+              {item.title}
+            </h3>
+            <p class="font-sans text-xs text-ink-muted leading-relaxed mb-6">
+              {item.description}
+            </p>
+          </div>
+          <div class="border-t border-line pt-3">
+            <a
+              href={item.link}
+              class="font-mono text-xs text-ink hover:text-signal transition-colors inline-flex items-center gap-1.5 focus-ring rounded-[1px]"
+              target={item.link.startsWith('http') ? '_blank' : '_self'}
+              rel={item.link.startsWith('http') ? 'noopener noreferrer' : ''}
+            >
+              <span>{item.linkLabel}</span>
+              <span aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Repository Action Bar -->
+    <div class="border border-line bg-surface p-6 rounded-[2px] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <div class="font-mono text-xs text-ink-muted uppercase">OFFICIAL GITHUB REPOSITORY</div>
+        <div class="font-mono text-sm sm:text-base text-ink font-semibold">github.com/WantedChip/studiobridge</div>
+      </div>
+      <div class="flex items-center gap-3">
+        <a
+          href="https://github.com/WantedChip/studiobridge"
+          class="inline-flex items-center px-4 py-2 bg-ink text-bg font-sans font-medium text-xs sm:text-sm rounded-[2px] hover:opacity-90 transition-opacity focus-ring"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          View on GitHub &rarr;
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

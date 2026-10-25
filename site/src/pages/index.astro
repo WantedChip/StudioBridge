@@ -1,6 +1,13 @@
 ---
 import '../styles/global.css';
-import { ThemeToggle } from '../components/ThemeToggle';
+import Header from '../components/Header.astro';
+import SectionWorksWith from '../components/SectionWorksWith.astro';
+import SectionControlPlanes from '../components/SectionControlPlanes.astro';
+import SectionSafety from '../components/SectionSafety.astro';
+import SectionLimits from '../components/SectionLimits.astro';
+import SectionOpenSource from '../components/SectionOpenSource.astro';
+import SectionFaq from '../components/SectionFaq.astro';
+import Footer from '../components/Footer.astro';
 ---
 
 <!doctype html>
@@ -8,7 +15,10 @@ import { ThemeToggle } from '../components/ThemeToggle';
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Bridge coding agents to FL Studio with verified writes, reversibility, and local execution." />
+    <meta
+      name="description"
+      content="Read, edit and render FL Studio projects from any coding agent — verified, reversible, local. Standard MCP server and CLI for Windows."
+    />
     <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#F3F0E8" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0F0F0D" media="(prefers-color-scheme: dark)" />
@@ -37,76 +47,146 @@ import { ThemeToggle } from '../components/ThemeToggle';
     </script>
   </head>
   <body class="min-h-screen bg-bg text-ink font-sans antialiased selection:bg-signal selection:text-white">
-    <header class="border-b border-line px-6 py-4 flex items-center justify-between bg-surface/80 backdrop-blur-xs sticky top-0 z-50">
-      <div class="flex items-center gap-6">
-        <a href="/" class="font-display font-bold tracking-tight text-xl text-ink hover:opacity-90 transition-opacity">
-          StudioBridge
-        </a>
-      </div>
-      <div class="flex items-center gap-6">
-        <nav class="hidden sm:flex items-center gap-6 text-sm font-sans">
-          <a href="/docs" class="text-ink-muted hover:text-ink transition-colors">Documentation</a>
-          <a href="https://github.com/WantedChip/studiobridge" class="text-ink-muted hover:text-ink transition-colors" target="_blank" rel="noopener noreferrer">GitHub</a>
-        </nav>
-        <!-- Accessible 3-state segmented theme switcher [THM-03] -->
-        <ThemeToggle client:load />
-      </div>
-    </header>
+    <!-- Sticky Navigation Header with Skip-Link -->
+    <Header />
 
-    <main class="max-w-4xl mx-auto px-6 py-20">
-      <div class="registration-mark registration-mark-tl p-8 border border-line bg-surface rounded-[2px] mb-12 shadow-xs">
-        <div class="text-xs font-mono uppercase tracking-widest text-signal font-semibold mb-3">
-          01 / SIGNAL PATH
-        </div>
-        <h1 class="font-display text-4xl md:text-5xl font-extrabold tracking-tight text-ink mb-6">
-          Patch your agent into your DAW.
-        </h1>
-        <p class="font-sans text-lg md:text-xl text-ink-muted mb-8 max-w-2xl leading-relaxed">
-          Read, edit and render FL Studio projects from any coding agent — verified, reversible, local.
-        </p>
-        <div class="flex flex-wrap items-center gap-4">
-          <a
-            href="/docs"
-            class="inline-flex items-center px-5 py-2.5 bg-ink text-bg font-sans font-medium text-sm rounded-[2px] hover:opacity-90 transition focus-visible:outline-2 focus-visible:outline-ink focus-visible:outline-offset-2"
-          >
-            Explore Docs &rarr;
-          </a>
-          <a
-            href="https://github.com/WantedChip/studiobridge"
-            class="inline-flex items-center px-5 py-2.5 border border-line-strong text-ink font-sans font-medium text-sm rounded-[2px] hover:bg-bg transition focus-visible:outline-2 focus-visible:outline-ink focus-visible:outline-offset-2"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            View Source
-          </a>
-        </div>
-      </div>
+    <!-- Main Content Landed via Skip Link -->
+    <main id="main-content">
+      <!-- 01 / SIGNAL PATH — Hero Section (Placeholder for Interactive SVG Island in v0.6.4) -->
+      <section class="border-b border-line py-16 sm:py-24 px-4 sm:px-6 lg:px-8 bg-bg relative overflow-hidden">
+        <div class="max-w-7xl mx-auto">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            <!-- Left Column: Copy & Command Callouts -->
+            <div class="lg:col-span-7">
+              <div class="inline-flex items-center gap-2 px-2.5 py-1 border border-line rounded-[1px] bg-surface mb-6 font-mono text-[11px] text-ink-muted">
+                <span class="w-2 h-2 rounded-[1px] bg-signal inline-block" aria-hidden="true"></span>
+                <span class="font-semibold text-ink uppercase tracking-wider">01 / SIGNAL PATH</span>
+                <span class="text-line-strong">|</span>
+                <span>WINDOWS x64 &amp; ARM64</span>
+              </div>
 
-      <!-- Technical Catalogue Specimen Section -->
-      <section class="border border-line rounded-[2px] p-6 bg-surface space-y-4">
-        <div class="flex items-center justify-between border-b border-line pb-3">
-          <span class="text-xs font-mono uppercase tracking-wider text-ink-muted">Token Inspection · WCAG 2.2 AA</span>
-          <span class="text-xs font-mono text-ok font-medium">VERIFIED</span>
-        </div>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono">
-          <div class="p-3 border border-line rounded-[1px] bg-bg">
-            <div class="text-ink-muted mb-1">--bg</div>
-            <div class="font-semibold text-ink">Canvas</div>
-          </div>
-          <div class="p-3 border border-line rounded-[1px] bg-surface">
-            <div class="text-ink-muted mb-1">--surface</div>
-            <div class="font-semibold text-ink">Elevated</div>
-          </div>
-          <div class="p-3 border border-line rounded-[1px] bg-bg">
-            <div class="text-ink-muted mb-1">--signal</div>
-            <div class="font-semibold text-signal-text">Accent</div>
-          </div>
-          <div class="p-3 border border-line rounded-[1px] bg-bg">
-            <div class="text-ink-muted mb-1">--line-strong</div>
-            <div class="font-semibold text-ink">Boundaries</div>
+              <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-ink leading-[1.08] mb-6">
+                Patch your agent into your DAW.
+              </h1>
+
+              <p class="font-sans text-lg sm:text-xl text-ink-muted leading-relaxed mb-8 max-w-2xl">
+                Read, edit and render FL Studio projects from any coding agent &mdash; verified, reversible, local.
+              </p>
+
+              <!-- Install Command Box -->
+              <div class="mb-8 max-w-xl">
+                <div class="border border-line bg-surface rounded-[2px] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                  <div class="flex items-center gap-3 font-mono text-xs sm:text-sm text-ink overflow-x-auto">
+                    <span class="text-signal select-none">&gt;</span>
+                    <span class="select-all">uvx studiobridge hello</span>
+                  </div>
+                  <div class="shrink-0">
+                    <span class="font-mono text-[10px] text-ok uppercase tracking-wider font-semibold px-2 py-1 bg-bg border border-line rounded-[1px]">
+                      READY IN 1s
+                    </span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-4 mt-2 font-mono text-[11px] text-ink-muted">
+                  <span>MIT LICENSE</span>
+                  <span>&bull;</span>
+                  <span>ZERO TELEMETRY</span>
+                  <span>&bull;</span>
+                  <span>ZERO KERNEL DRIVERS</span>
+                </div>
+              </div>
+
+              <!-- Action Links -->
+              <div class="flex flex-wrap items-center gap-4">
+                <a
+                  href="/docs/"
+                  class="inline-flex items-center px-5 py-2.5 bg-ink text-bg font-sans font-medium text-sm rounded-[2px] hover:opacity-90 transition-opacity focus-ring"
+                >
+                  Explore Documentation &rarr;
+                </a>
+                <a
+                  href="https://github.com/WantedChip/studiobridge"
+                  class="inline-flex items-center px-5 py-2.5 border border-line-strong text-ink font-sans font-medium text-sm rounded-[2px] hover:bg-surface transition-colors focus-ring"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View Source on GitHub
+                </a>
+              </div>
+            </div>
+
+            <!-- Right Column: Signal Path Diagram Static Fallback / Specimen -->
+            <div class="lg:col-span-5">
+              <div class="registration-mark registration-mark-tl registration-mark-br border border-line bg-surface rounded-[2px] p-6 shadow-xs">
+                <div class="flex items-center justify-between border-b border-line pb-3 mb-4 font-mono text-[11px]">
+                  <span class="text-signal uppercase font-bold">SIGNAL TOPOLOGY</span>
+                  <span class="text-ink-muted">SYS-EX 53 42</span>
+                </div>
+
+                <!-- Abstract Signal Path Flow -->
+                <div class="space-y-3 font-mono text-xs">
+                  <div class="p-3 border border-line rounded-[1px] bg-bg flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="w-2 h-2 rounded-full bg-signal" aria-hidden="true"></span>
+                      <span class="font-semibold text-ink">AGENT / CLIENT</span>
+                    </div>
+                    <span class="text-[10px] text-ink-muted">Claude, Cursor, CLI</span>
+                  </div>
+
+                  <div class="flex justify-center text-ink-muted font-mono text-xs select-none">
+                    &darr; Model Context Protocol (stdio/JSON-RPC)
+                  </div>
+
+                  <div class="p-3 border border-line rounded-[1px] bg-bg flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="w-2 h-2 rounded-full bg-ok" aria-hidden="true"></span>
+                      <span class="font-semibold text-ink">STUDIOBRIDGE DAEMON</span>
+                    </div>
+                    <span class="text-[10px] text-ink-muted">Journal &amp; Safety</span>
+                  </div>
+
+                  <div class="flex justify-center text-ink-muted font-mono text-xs select-none">
+                    &darr; SysEx Frames [F0 7D 53 42 ...]
+                  </div>
+
+                  <div class="p-3 border border-line rounded-[1px] bg-bg flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="w-2 h-2 rounded-full bg-line-strong" aria-hidden="true"></span>
+                      <span class="font-semibold text-ink">FL STUDIO ENGINE</span>
+                    </div>
+                    <span class="text-[10px] text-ink-muted">Host Controller Script</span>
+                  </div>
+                </div>
+
+                <div class="border-t border-line mt-4 pt-3 flex items-center justify-between font-mono text-[10px] text-ink-muted">
+                  <span>WIRE MAGIC: 0x53 0x42 (&quot;SB&quot;)</span>
+                  <span class="text-ok font-semibold">VERIFIED</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
+
+      <!-- Section: Works With (Nominative Agent Chips) -->
+      <SectionWorksWith />
+
+      <!-- Section: 03 / CONTROL SURFACES (Four Channel Strips) -->
+      <SectionControlPlanes />
+
+      <!-- Section: 05 / INTERLOCKS (Safety Architecture) -->
+      <SectionSafety />
+
+      <!-- Section: 07 / LIMITS (Honest Boundaries) -->
+      <SectionLimits />
+
+      <!-- Section: 08 / SOURCE (Open Source, License, Security) -->
+      <SectionOpenSource />
+
+      <!-- Section: 09 / FAQ (Semantic Accessible Accordions) -->
+      <SectionFaq />
     </main>
+
+    <!-- Global Footer with Verbatim Non-Affiliation Disclaimer -->
+    <Footer />
   </body>
 </html>

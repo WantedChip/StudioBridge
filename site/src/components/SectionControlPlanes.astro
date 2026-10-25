@@ -1,0 +1,210 @@
+---
+const PLANES = [
+  {
+    index: '03.1',
+    channel: 'CH 01 // LIVE RPC',
+    title: 'Live MIDI/SysEx RPC',
+    protocol: 'MIDI / SysEx 2-Way Protocol',
+    status: 'ONLINE · FL SCRIPT ENGINE',
+    statusType: 'ok',
+    description: 'Bidirectional MIDI/SysEx RPC communicating directly with FL Studio\'s controller script engine with sub-10ms round-trip latency.',
+    capabilities: [
+      'Mixer fader volume, stereo pan, mute, and solo controls',
+      'Transport playback, recording, loop toggling, and tempo shifts',
+      'Channel rack parameters and live pattern note triggering',
+      'Verified read-back comparison against expected tolerances',
+    ],
+    constraints: [
+      'Requires FL Studio running with StudioBridge device script active',
+      'Confined to standard Python 3.9 controller API sandbox',
+      'Universal pure ctypes WinMM backend (zero native C-extensions)',
+    ],
+    snippetLabel: 'MCP TOOL CALL',
+    snippet: `// MCP tool: live_mixer_set
+{
+  "track": 1,
+  "parameter": "volume",
+  "value": 0.8,
+  "tolerance": 0.01
+}`,
+  },
+  {
+    index: '03.2',
+    channel: 'CH 02 // OFFLINE FLP',
+    title: 'Direct Binary .flp Codec',
+    protocol: 'Clean-Room Binary Parser',
+    status: 'STANDALONE · 100% CLEAN-ROOM',
+    statusType: 'ok',
+    description: '100% clean-room binary parser and serializer for .flp projects. Read, diff, mutate, and generate project files directly on disk.',
+    capabilities: [
+      'Lossless byte-identical round-tripping for FLhd and FLdt chunks',
+      'Pattern note generation, mixer routing, and timeline markers',
+      'Stock seed template instantiation without opaque synthesis',
+      'Post-mutation structural invariant validation before writing',
+    ],
+    constraints: [
+      'Operates completely standalone without launching FL Studio',
+      'Opaque third-party VST plugin chunks preserved verbatim',
+      'Atomic temp-file replace with automatic timestamped backup',
+    ],
+    snippetLabel: 'CLI COMMAND',
+    snippet: `# CLI: edit project on disk
+sbridge flp edit track.flp \\
+  --tempo 128 \\
+  --pattern "Lead" \\
+  --notes lead_notes.json`,
+  },
+  {
+    index: '03.3',
+    channel: 'CH 03 // HEADLESS RENDER',
+    title: 'Headless Render Supervisor',
+    protocol: 'Win32 Job Supervisor',
+    status: 'HEADLESS · JOB OBJECTS',
+    statusType: 'ok',
+    description: 'Headless export preflight, process supervision, freeze watchdog detection, and automated multi-format audio generation.',
+    capabilities: [
+      'Automated export to WAV (16/24/32-bit), MP3, FLAC, OGG, MIDI',
+      'Isolated temporary staging directories eliminate write corruption',
+      'Audio header analysis, duration verification, and sidecar JSON',
+      'Watchdog freeze and modal dialog detection with automatic kill',
+    ],
+    constraints: [
+      'Requires FL Studio installed on the host machine',
+      'Win32 Job Objects guarantee zero orphaned child processes',
+      'Watchdog timeout deadlines scale for ARM64 Prism emulation',
+    ],
+    snippetLabel: 'CLI COMMAND',
+    snippet: `# CLI: headless bounce
+sbridge render export track.flp \\
+  --format wav \\
+  --bitdepth 24 \\
+  --out dist/preview.wav`,
+  },
+  {
+    index: '03.4',
+    channel: 'CH 04 // UI ACTUATION',
+    title: 'Win32 Piano-Roll Actuation',
+    protocol: 'Focus-Guarded UI Scripting',
+    status: 'FOREGROUND · PYTHON HARNESS',
+    statusType: 'warn',
+    description: 'Focus-guarded UI actuation executing native FL Studio Python Piano Roll scripts for intricate musical articulation and chord voicings.',
+    capabilities: [
+      'Automated Piano Roll score generation and execution',
+      'Win32 foreground window lock verification and focus guards',
+      'Micro-timings, velocity curves, chord voicing automation',
+      'Idempotent score generation with oracle test verification',
+    ],
+    constraints: [
+      'Requires active Windows desktop session and focused FL window',
+      'User input temporarily guarded during score execution',
+      'Generates script files placed in FL Piano Roll Script directory',
+    ],
+    snippetLabel: 'CLI COMMAND',
+    snippet: `# CLI: apply generative score
+sbridge actuation apply-score \\
+  --pattern 1 \\
+  --score chords.pyscript`,
+  },
+];
+---
+
+<section class="border-b border-line py-16 px-4 sm:px-6 lg:px-8 bg-bg">
+  <div class="max-w-7xl mx-auto">
+    <!-- Section Header -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10 pb-6 border-b border-line">
+      <div>
+        <div class="font-mono text-xs uppercase tracking-widest text-signal font-semibold mb-2">
+          03 / CONTROL SURFACES
+        </div>
+        <h2 class="font-display text-3xl sm:text-4xl font-extrabold tracking-tight text-ink">
+          One bridge, every control surface.
+        </h2>
+      </div>
+      <p class="font-sans text-sm sm:text-base text-ink-muted max-w-xl leading-relaxed">
+        StudioBridge exposes four distinct control planes designed for deterministic studio automation. Choose between live bidirectional RPC, offline binary project authoring, headless audio rendering, or UI piano-roll scripting.
+      </p>
+    </div>
+
+    <!-- 4 Channel Strips Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {PLANES.map((plane) => (
+        <article class="registration-mark registration-mark-tl border border-line bg-surface rounded-[2px] p-5 flex flex-col justify-between shadow-xs hover:border-line-strong transition-colors">
+          <div>
+            <!-- Channel Strip Header -->
+            <div class="flex items-center justify-between border-b border-line pb-3 mb-4">
+              <span class="font-mono text-xs font-semibold text-ink uppercase tracking-wider">
+                {plane.channel}
+              </span>
+              <span class="font-mono text-[11px] text-ink-muted tabular-nums">
+                {plane.index}
+              </span>
+            </div>
+
+            <!-- Status Indicator -->
+            <div class="flex items-center gap-2 mb-3">
+              <span
+                class={`w-2 h-2 rounded-[1px] ${
+                  plane.statusType === 'ok' ? 'bg-ok' : 'bg-warn'
+                }`}
+                aria-hidden="true"
+              ></span>
+              <span class="font-mono text-[10px] uppercase tracking-wider text-ink-muted">
+                {plane.status}
+              </span>
+            </div>
+
+            <h3 class="font-display text-xl font-bold text-ink mb-1">
+              {plane.title}
+            </h3>
+            <div class="font-mono text-[11px] text-signal font-medium mb-3">
+              {plane.protocol}
+            </div>
+
+            <p class="font-sans text-xs text-ink-muted leading-relaxed mb-5">
+              {plane.description}
+            </p>
+
+            <!-- Capabilities -->
+            <div class="mb-4">
+              <div class="font-mono text-[10px] uppercase tracking-wider text-ink-muted font-semibold mb-2">
+                Capabilities
+              </div>
+              <ul class="space-y-1.5 text-xs font-sans text-ink">
+                {plane.capabilities.map((cap) => (
+                  <li class="flex items-start gap-2">
+                    <span class="text-ok font-mono font-bold leading-tight" aria-hidden="true">+</span>
+                    <span>{cap}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <!-- Constraints -->
+            <div class="mb-5">
+              <div class="font-mono text-[10px] uppercase tracking-wider text-ink-muted font-semibold mb-2">
+                Boundaries
+              </div>
+              <ul class="space-y-1.5 text-xs font-sans text-ink-muted">
+                {plane.constraints.map((con) => (
+                  <li class="flex items-start gap-2">
+                    <span class="text-ink-muted font-mono leading-tight" aria-hidden="true">&ndash;</span>
+                    <span>{con}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <!-- Code Snippet -->
+          <div class="border-t border-line pt-4 mt-2">
+            <div class="flex items-center justify-between text-[10px] font-mono text-ink-muted mb-1.5">
+              <span>{plane.snippetLabel}</span>
+              <span>VERIFIED</span>
+            </div>
+            <pre class="bg-bg p-3 border border-line rounded-[1px] text-[11px] font-mono text-ink overflow-x-auto leading-tight selection:bg-signal selection:text-white"><code>{plane.snippet}</code></pre>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

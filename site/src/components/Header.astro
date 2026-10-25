@@ -1,0 +1,70 @@
+---
+import { ThemeToggle } from './ThemeToggle';
+---
+
+<header class="border-b border-line bg-surface/90 backdrop-blur-xs sticky top-0 z-50">
+  <!-- Accessible skip-link as first element -->
+  <a
+    href="#main-content"
+    class="sr-only focus:not-sr-only focus:absolute focus:top-2.5 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:bg-ink focus:text-bg focus:font-mono focus:text-xs focus:rounded-[2px] focus:outline-2 focus:outline-signal"
+  >
+    Skip to main content
+  </a>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+    <!-- Wordmark & Protocol Brand -->
+    <div class="flex items-center gap-4">
+      <a
+        href="/"
+        class="flex items-center gap-2.5 font-display font-bold tracking-tight text-xl text-ink hover:opacity-90 transition-opacity focus-ring rounded-[1px]"
+        aria-label="StudioBridge Home"
+      >
+        <span class="w-2 h-2 rounded-[1px] bg-signal inline-block" aria-hidden="true"></span>
+        <span>StudioBridge</span>
+      </a>
+      <span class="hidden md:inline-block font-mono text-[10px] uppercase tracking-wider text-ink-muted border-l border-line pl-3">
+        DAW Control Protocol
+      </span>
+    </div>
+
+    <!-- Navigation & Theme Switcher -->
+    <div class="flex items-center gap-4 sm:gap-6">
+      <nav class="flex items-center gap-3 sm:gap-5 text-sm font-sans" aria-label="Primary Navigation">
+        <a
+          href="/docs/"
+          class="text-ink-muted hover:text-ink transition-colors focus-ring rounded-[1px] px-1 py-0.5"
+        >
+          Docs
+        </a>
+        <a
+          href="/compat"
+          class="text-ink-muted hover:text-ink transition-colors focus-ring rounded-[1px] px-1 py-0.5"
+        >
+          Compat
+        </a>
+        <a
+          href="/changelog"
+          class="text-ink-muted hover:text-ink transition-colors focus-ring rounded-[1px] px-1 py-0.5"
+        >
+          Changelog
+        </a>
+        <a
+          href="https://github.com/WantedChip/studiobridge"
+          class="text-ink-muted hover:text-ink transition-colors focus-ring rounded-[1px] px-1 py-0.5 inline-flex items-center gap-1"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span>GitHub</span>
+          <svg class="w-3 h-3 text-ink-muted" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path d="M3.5 1.5h7v7M10.5 1.5l-9 9" />
+          </svg>
+        </a>
+      </nav>
+
+      <!-- Integrated 3-State Accessible Theme Switcher [THM-03] -->
+      <div class="border-l border-line pl-3 sm:pl-4">
+        <ThemeToggle client:load />
+      </div>
+    </div>
+  </div>
+</header>

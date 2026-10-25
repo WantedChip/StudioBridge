@@ -1,0 +1,122 @@
+---
+const LIMITS = [
+  {
+    index: '07.1',
+    capabilityId: 'CAP_PLUGIN_INSTANTIATE',
+    status: 'UNAVAILABLE',
+    statusType: 'err',
+    title: 'Third-Party Plugin Instantiation',
+    description: 'StudioBridge cannot instantiate arbitrary third-party VST, VST3, or CLAP plugins programmatically without host UI interaction.',
+    reason: 'FL Studio\'s controller API exposes no scriptable endpoint to load arbitrary DLL/VST binaries into channel racks or mixer inserts.',
+    workaround: 'Use seed template instantiation (sbridge flp template add) to import pre-configured plugin wrappers, or build projects from template .flp files containing your preferred instruments.',
+  },
+  {
+    index: '07.2',
+    capabilityId: 'CAP_HOST_NATIVE_ARM64',
+    status: 'EMULATED HOST',
+    statusType: 'warn',
+    title: 'FL Studio Windows ARM64 Emulation',
+    description: 'StudioBridge runs natively on Windows ARM64; however, FL Studio itself executes under Microsoft Prism x64 emulation on ARM64 devices.',
+    reason: 'Image-Line has not yet published a native Windows ARM64 compiled binary for FL Studio.',
+    workaround: 'StudioBridge\'s ctypes WinMM bindings and CLI run 100% natively on ARM64. Render watchdog deadlines automatically scale to accommodate Prism emulation overhead.',
+  },
+  {
+    index: '07.3',
+    capabilityId: 'CAP_FLP_PLAYLIST_WRITE',
+    status: 'EXPERIMENTAL',
+    statusType: 'warn',
+    title: 'Playlist Clip Creation in FL 26.x',
+    description: 'Synthesizing brand-new audio clips and pattern timeline clips via offline binary .flp authoring is experimental in FL Studio 26.',
+    reason: 'FL Studio 26 introduced evolving 88-byte chunk structures with variable-length container headers that differ from FL 21–25.',
+    workaround: 'Modifying existing playlist items, pattern notes, markers, and channel parameters is 100% verified. Full generation of new timeline clips is gated behind an experimental flag.',
+  },
+  {
+    index: '07.4',
+    capabilityId: 'CAP_ZERO_KERNEL_DRIVERS',
+    status: 'BY DESIGN',
+    statusType: 'ok',
+    title: 'Zero Proprietary Kernel Drivers',
+    description: 'StudioBridge strictly refuses to bundle, distribute, or require proprietary kernel-mode virtual MIDI drivers (loopMIDI, virtualMIDI).',
+    reason: 'Closed-source kernel drivers introduce system instability, driver signature problems, and potential Blue Screen of Death (BSOD) risks.',
+    workaround: 'Primary MIDI routing uses native Windows MIDI Services (WMS) loopback endpoints or physical loopback jacks, maintaining zero native C-extension dependencies.',
+  },
+];
+---
+
+<section class="border-b border-line py-16 px-4 sm:px-6 lg:px-8 bg-bg">
+  <div class="max-w-7xl mx-auto">
+    <!-- Section Header -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10 pb-6 border-b border-line">
+      <div>
+        <div class="font-mono text-xs uppercase tracking-widest text-signal font-semibold mb-2">
+          07 / LIMITS
+        </div>
+        <h2 class="font-display text-3xl sm:text-4xl font-extrabold tracking-tight text-ink">
+          It tells you the truth.
+        </h2>
+      </div>
+      <p class="font-sans text-sm sm:text-base text-ink-muted max-w-xl leading-relaxed">
+        Engineering honesty is our primary differentiator. We document every technical boundary and host limitation explicitly so you never hit silent failures or surprise walls.
+      </p>
+    </div>
+
+    <!-- Limits Technical Catalogue Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {LIMITS.map((limit) => (
+        <article class="border border-line bg-surface rounded-[2px] p-6 flex flex-col justify-between shadow-xs">
+          <div>
+            <div class="flex items-center justify-between border-b border-line pb-3 mb-4">
+              <span class="font-mono text-xs text-ink-muted tabular-nums">
+                {limit.index}
+              </span>
+              <div class="flex items-center gap-2">
+                <span
+                  class={`w-2 h-2 rounded-[1px] ${
+                    limit.statusType === 'ok'
+                      ? 'bg-ok'
+                      : limit.statusType === 'warn'
+                        ? 'bg-warn'
+                        : 'bg-err'
+                  }`}
+                  aria-hidden="true"
+                ></span>
+                <span class="font-mono text-[10px] uppercase tracking-wider font-semibold text-ink">
+                  {limit.status}
+                </span>
+              </div>
+            </div>
+
+            <div class="font-mono text-[11px] text-signal font-medium mb-1">
+              {limit.capabilityId}
+            </div>
+            <h3 class="font-display text-lg sm:text-xl font-bold text-ink mb-3">
+              {limit.title}
+            </h3>
+
+            <p class="font-sans text-xs text-ink leading-relaxed mb-4">
+              {limit.description}
+            </p>
+
+            <div class="mb-4 bg-bg p-3 border border-line rounded-[1px]">
+              <span class="font-mono text-[10px] uppercase tracking-wider text-ink-muted font-semibold block mb-1">
+                Technical Root Cause
+              </span>
+              <p class="font-sans text-xs text-ink-muted leading-relaxed">
+                {limit.reason}
+              </p>
+            </div>
+          </div>
+
+          <div class="border-t border-line pt-3 mt-2">
+            <span class="font-mono text-[10px] uppercase tracking-wider text-ok font-semibold block mb-1">
+              Engineered Workaround
+            </span>
+            <p class="font-sans text-xs text-ink-muted leading-relaxed">
+              {limit.workaround}
+            </p>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
