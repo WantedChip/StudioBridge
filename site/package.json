@@ -23,7 +23,11 @@
     "test:demo": "tsx ../tests/web/test_console_demo.spec.ts",
     "test:compat": "tsx ../tests/web/test_capability_matrix.spec.ts",
     "test:docs": "tsx ../tests/web/test_docs.spec.ts",
-    "test:metadata": "tsx ../tests/web/test_metadata.spec.ts"
+    "test:metadata": "tsx ../tests/web/test_metadata.spec.ts",
+    "test:a11y": "tsx tests/accessibility.spec.ts",
+    "test:visual": "tsx tests/visual_regression.spec.ts",
+    "test:perf": "tsx tests/performance.spec.ts",
+    "test:audit": "tsx tests/accessibility.spec.ts && tsx tests/visual_regression.spec.ts && tsx tests/performance.spec.ts"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.12",

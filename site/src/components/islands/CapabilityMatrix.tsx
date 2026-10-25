@@ -296,7 +296,7 @@ export default function CapabilityMatrix(): React.JSX.Element {
         </div>
 
         {/* Dynamic Capability Table */}
-        <div className="border border-line bg-surface rounded-[2px] overflow-hidden shadow-xs">
+        <div className="border border-line bg-surface rounded-[2px] overflow-x-auto shadow-xs">
           <table className="w-full text-left border-collapse" aria-label="FL Studio Capability Matrix">
             <thead>
               <tr className="border-b border-line bg-bg font-mono text-[11px] uppercase tracking-wider text-ink-muted">

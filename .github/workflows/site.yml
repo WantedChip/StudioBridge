@@ -64,6 +64,15 @@ jobs:
       - name: Validate SEO, GEO, OpenGraph & metadata
         run: npm run test:metadata
 
+      - name: Validate accessibility (WCAG 2.2 AA)
+        run: npm run test:a11y
+
+      - name: Validate visual regression & responsive viewports
+        run: npm run test:visual
+
+      - name: Validate performance budgets & Lighthouse thresholds
+        run: npm run test:perf
+
       - name: Verify build artifacts
         run: |
           test -d dist

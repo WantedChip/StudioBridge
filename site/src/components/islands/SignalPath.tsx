@@ -495,9 +495,9 @@ export default function SignalPath(): React.JSX.Element {
             <div>
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-[1px] bg-signal" aria-hidden="true"></span>
-                <h3 className="font-mono text-xs font-bold text-ink uppercase tracking-wider">
+                <h2 className="font-mono text-xs font-bold text-ink uppercase tracking-wider">
                   {selectedNode.name} &mdash; {selectedNode.role}
-                </h3>
+                </h2>
               </div>
               <p className="font-sans text-xs text-ink-muted mt-0.5">
                 {selectedNode.summary}

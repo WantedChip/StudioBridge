@@ -15,6 +15,24 @@ export default defineConfig({
     starlight({
       title: 'StudioBridge Docs',
       customCss: ['./src/styles/tokens.css', './src/styles/global.css'],
+      head: [
+        {
+          tag: 'meta',
+          attrs: {
+            name: 'theme-color',
+            content: '#F3F0E8',
+            media: '(prefers-color-scheme: light)',
+          },
+        },
+        {
+          tag: 'meta',
+          attrs: {
+            name: 'theme-color',
+            content: '#0F0F0D',
+            media: '(prefers-color-scheme: dark)',
+          },
+        },
+      ],
       components: {
         ThemeProvider: './src/components/starlight/ThemeProvider.astro',
         ThemeSelect: './src/components/starlight/ThemeSelect.astro',
