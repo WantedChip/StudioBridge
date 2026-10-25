@@ -1,0 +1,4 @@
+/documentation    /docs/    301
+/documentation/*  /docs/:splat  301
+/github           https://github.com/WantedChip/studiobridge  302
+/repo             https://github.com/WantedChip/studiobridge  302
