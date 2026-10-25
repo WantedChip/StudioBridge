@@ -24,6 +24,7 @@ from studiobridge.cli.commands.control import (
 )
 from studiobridge.cli.commands.diag import handle_diag
 from studiobridge.cli.commands.doctor import handle_doctor
+from studiobridge.cli.commands.flp import handle_flp
 from studiobridge.cli.commands.hello import handle_hello
 from studiobridge.cli.commands.inspect import (
     handle_channels,
@@ -995,6 +996,40 @@ def build_parser() -> argparse.ArgumentParser:
         help="Emit output formatted as machine-readable JSON",
     )
     render_p.set_defaults(handler=handle_render)
+
+    # 23. sbridge flp
+    flp_p = subparsers.add_parser(
+        "flp", help="Offline FL Studio project file (.flp) inspection, diffing, and validation"
+    )
+    flp_sub = flp_p.add_subparsers(dest="flp_action", metavar="<inspect|diff|roundtrip>")
+
+    flp_inspect_p = flp_sub.add_parser(
+        "inspect", help="Inspect .flp project structure, metadata, and tracks"
+    )
+    flp_inspect_p.add_argument("file", help="Path to FL Studio project file (.flp)")
+    flp_inspect_p.set_defaults(handler=handle_flp, flp_action="inspect")
+
+    flp_diff_p = flp_sub.add_parser(
+        "diff", help="Semantic diff between two FL Studio project files"
+    )
+    flp_diff_p.add_argument("file_a", help="Path to first .flp file")
+    flp_diff_p.add_argument("file_b", help="Path to second .flp file")
+    flp_diff_p.set_defaults(handler=handle_flp, flp_action="diff")
+
+    flp_roundtrip_p = flp_sub.add_parser(
+        "roundtrip", help="Verify lossless byte-identical re-serialization"
+    )
+    flp_roundtrip_p.add_argument("file", help="Path to FL Studio project file (.flp)")
+    flp_roundtrip_p.set_defaults(handler=handle_flp, flp_action="roundtrip")
+
+    for p in (flp_p, flp_inspect_p, flp_diff_p, flp_roundtrip_p):
+        p.add_argument(
+            "--json",
+            action="store_true",
+            default=False,
+            help="Emit output formatted as machine-readable JSON",
+        )
+    flp_p.set_defaults(handler=handle_flp)
 
     return parser
 
