@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import contextlib
 import ctypes
-import json
 import shutil
 import subprocess
 import sys
@@ -26,6 +25,7 @@ from studiobridge.core.config import StudioBridgeConfig, load_config
 from studiobridge.core.errors import (
     BlockingDialogError,
     FlRunningError,
+    InvalidOutputError,
     RenderError,
     RenderTimeoutError,
 )
@@ -33,6 +33,8 @@ from studiobridge.core.paths import get_jobs_dir
 from studiobridge.render.discover import FlDiscovery, FlInstall
 from studiobridge.render.job import JobState, RenderJob, RenderJobLock
 from studiobridge.render.policy import InstancePolicyEnforcer
+from studiobridge.render.sidecar import build_sidecar_dict, write_sidecar
+from studiobridge.render.validate import AudioValidator
 
 # Windows Job Object Win32 Constants & Structures
 JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE: int = 0x2000
@@ -195,6 +197,7 @@ class RenderRunner:
         discovery: FlDiscovery | None = None,
         window_mgr: WindowManager | None = None,
         policy_enforcer: InstancePolicyEnforcer | None = None,
+        validator: AudioValidator | None = None,
         popen_factory: Callable[..., Any] | None = None,
         poll_interval_s: float = 0.5,
     ) -> None:
@@ -202,6 +205,7 @@ class RenderRunner:
         self.discovery = discovery or FlDiscovery()
         self.window_mgr = window_mgr or WindowManager()
         self.policy_enforcer = policy_enforcer or InstancePolicyEnforcer(self.window_mgr)
+        self.validator = validator or AudioValidator()
         self.popen_factory = popen_factory or subprocess.Popen
         self.poll_interval_s = poll_interval_s
 
@@ -378,7 +382,12 @@ class RenderRunner:
 
             # --- 5. Collection ---
             job.state = JobState.COLLECTING
-            self._collect_outputs(job, fl_install)
+            self._collect_outputs(job)
+
+            # --- 6. Validation & Sidecar Emission ---
+            job.state = JobState.VALIDATING
+            self._validate_and_emit_sidecars(job, fl_install)
+
             job.state = JobState.DONE
             job.completed_at = time.time()
             return job
@@ -432,8 +441,8 @@ class RenderRunner:
             pass
         return total
 
-    def _collect_outputs(self, job: RenderJob, fl_install: FlInstall) -> None:
-        """Move generated audio files to out_dir and write sidecar metadata."""
+    def _collect_outputs(self, job: RenderJob) -> None:
+        """Move generated audio files from staged directory to out_dir."""
         out_dir = job.out_dir or (get_jobs_dir() / job.job_id / "out")
         out_dir.mkdir(parents=True, exist_ok=True)
         job.out_dir = out_dir
@@ -450,29 +459,84 @@ class RenderRunner:
 
         job.output_files = collected
 
-        # Write sidecar metadata JSON [06_l0d §12]
+    def _validate_and_emit_sidecars(self, job: RenderJob, fl_install: FlInstall) -> None:
+        """Validate rendered outputs against ValidationSpec and write sidecar metadata [RND-05]."""
+        out_dir = job.out_dir or (get_jobs_dir() / job.job_id / "out")
+        out_dir.mkdir(parents=True, exist_ok=True)
+        job.out_dir = out_dir
+
         fl_build_str = (
             f"{fl_install.major}.{fl_install.minor}.{fl_install.build}.{fl_install.revision}"
         )
-        sidecar_data = {
-            "job_id": job.job_id,
-            "fl_version": fl_install.version_str,
-            "fl_build": fl_build_str,
-            "fl_architecture": fl_install.architecture,
-            "is_emulated": fl_install.is_emulated,
-            "source": str(job.source),
-            "source_hash": job.source_hash,
-            "source_size_bytes": job.source_size_bytes,
-            "formats": job.formats,
-            "output_files": [f.name for f in collected],
-            "duration_s": (job.completed_at or time.time()) - (job.started_at or time.time()),
-            "created_at": job.created_at,
-            "completed_at": time.time(),
-            "settings_warning": (
-                "Export settings were inherited from the last FL Studio interactive session."
-            ),
-        }
 
-        sidecar_path = out_dir / f"{job.source.stem}.render.json"
-        sidecar_path.write_text(json.dumps(sidecar_data, indent=2), encoding="utf-8")
+        validation_status = "unvalidated"
+        last_metrics = None
+
+        for item in job.output_files:
+            suffix = item.suffix.lower()
+            if suffix in (".wav", ".mp3", ".flac", ".ogg", ".oga"):
+                if job.validate is not None:
+                    res = self.validator.validate_file(item, spec=job.validate)
+                    job.metrics.update(res.metrics.to_dict())
+                    last_metrics = res.metrics
+                    if not res.is_valid:
+                        job.state = JobState.FAILED
+                        job.error_code = "E_RND_INVALID"
+                        job.error = (
+                            f"Audio validation failed for '{item.name}': {res.error_message}"
+                        )
+                        # Emit sidecar with failed status before raising
+                        fail_data = build_sidecar_dict(
+                            job_id=job.job_id,
+                            source=str(job.source),
+                            source_hash=job.source_hash,
+                            source_size_bytes=job.source_size_bytes,
+                            fl_version=fl_install.version_str,
+                            fl_build=fl_build_str,
+                            fl_architecture=fl_install.architecture,
+                            is_emulated=fl_install.is_emulated,
+                            duration_s=res.metrics.duration_s,
+                            formats=job.formats,
+                            output_files=[f.name for f in job.output_files],
+                            validation_status="failed",
+                            metrics=res.metrics,
+                            created_at=job.created_at,
+                            completed_at=time.time(),
+                            extra={"error": job.error, "error_code": job.error_code},
+                        )
+                        write_sidecar(out_dir / f"{job.source.stem}.render.json", fail_data)
+                        raise InvalidOutputError(job.error, code="E_RND_INVALID")
+                    validation_status = "passed"
+                else:
+                    m = self.validator.inspect(item)
+                    job.metrics.update(m.to_dict())
+                    last_metrics = m
+
+        duration_s = float(
+            job.metrics.get(
+                "duration_s",
+                (job.completed_at or time.time()) - (job.started_at or time.time()),
+            )
+        )
+
+        sidecar_data = build_sidecar_dict(
+            job_id=job.job_id,
+            source=str(job.source),
+            source_hash=job.source_hash,
+            source_size_bytes=job.source_size_bytes,
+            fl_version=fl_install.version_str,
+            fl_build=fl_build_str,
+            fl_architecture=fl_install.architecture,
+            is_emulated=fl_install.is_emulated,
+            duration_s=duration_s,
+            formats=job.formats,
+            output_files=[f.name for f in job.output_files],
+            validation_status=validation_status,
+            metrics=last_metrics,
+            created_at=job.created_at,
+            completed_at=time.time(),
+            extra={"metrics": job.metrics},
+        )
+
+        sidecar_path = write_sidecar(out_dir / f"{job.source.stem}.render.json", sidecar_data)
         job.sidecar_path = sidecar_path

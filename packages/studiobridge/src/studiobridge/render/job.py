@@ -30,6 +30,7 @@ from studiobridge.core.errors import (
 )
 from studiobridge.core.paths import get_jobs_dir
 from studiobridge.render.discover import FlInstall
+from studiobridge.render.validate import ValidationSpec
 
 
 class JobState(str, Enum):
@@ -201,6 +202,7 @@ class RenderJob:
     timeout_multiplier: float = 1.0
     estimated_output_bytes: int = 50_000_000
     min_disk_free_multiplier: float = 2.0
+    validate: ValidationSpec | None = None
     state: JobState = JobState.CREATED
     staged_flp: Path | None = None
     staged_dir: Path | None = None
@@ -336,6 +338,7 @@ class RenderJob:
             "timeout_s": self.timeout_s,
             "idle_timeout_s": self.idle_timeout_s,
             "timeout_multiplier": self.timeout_multiplier,
+            "validate": self.validate.to_dict() if self.validate is not None else None,
             "created_at": self.created_at,
             "started_at": self.started_at,
             "completed_at": self.completed_at,
