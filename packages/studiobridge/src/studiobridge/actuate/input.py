@@ -14,7 +14,7 @@ import hashlib
 import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from studiobridge.actuate.guards import ActuationGuards
 from studiobridge.actuate.win32 import FLWindowInfo, WindowManager
@@ -23,7 +23,9 @@ from studiobridge.core.errors import (
     ActuationDisabledError,
     WindowNotFoundError,
 )
-from studiobridge.sdk.journal import MutationJournal
+
+if TYPE_CHECKING:
+    from studiobridge.sdk.journal import MutationJournal
 
 # SendInput Constants
 INPUT_KEYBOARD = 1

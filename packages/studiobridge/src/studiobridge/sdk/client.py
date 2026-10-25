@@ -29,6 +29,7 @@ from studiobridge.sdk.capabilities import check_operation_capability
 from studiobridge.sdk.channels import AsyncChannels, SyncChannels
 from studiobridge.sdk.events import AsyncEventManager, SyncEventManager
 from studiobridge.sdk.mixer import AsyncMixer, SyncMixer
+from studiobridge.sdk.notes import AsyncNotes, SyncNotes
 from studiobridge.sdk.patterns import AsyncPatterns, SyncPatterns
 from studiobridge.sdk.playlist import AsyncPlaylist, SyncPlaylist
 from studiobridge.sdk.plugins import AsyncPlugins, SyncPlugins
@@ -184,6 +185,7 @@ class AsyncStudio:
         self.mixer: AsyncMixer = AsyncMixer(session)
         self.channels: AsyncChannels = AsyncChannels(session)
         self.patterns: AsyncPatterns = AsyncPatterns(session)
+        self.notes: AsyncNotes = AsyncNotes(session)
         self.plugins: AsyncPlugins = AsyncPlugins(session)
         self.project: AsyncProject = AsyncProject(session)
         self.playlist: AsyncPlaylist = AsyncPlaylist(session)
@@ -325,6 +327,7 @@ class Studio:
         self.patterns: SyncPatterns = SyncPatterns(
             portal, async_studio.patterns, session=async_studio.session
         )
+        self.notes: SyncNotes = SyncNotes(portal, async_studio.notes, session=async_studio.session)
         self.plugins: SyncPlugins = SyncPlugins(
             portal, async_studio.plugins, session=async_studio.session
         )

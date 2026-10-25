@@ -125,6 +125,14 @@ def apply(form=None):
     status_marker.time = marker_time
     score.addMarker(status_marker)
 
+    # 6. Experimental covert status channel: attempt to rename active pattern
+    try:
+        import patterns
+        current_pat = patterns.patternNumber()
+        patterns.setPatternName(current_pat, "JOB:OK:" + str(len(NOTES)))
+    except Exception:
+        pass
+
 
 def applyScore(score=None):
     return apply(score)

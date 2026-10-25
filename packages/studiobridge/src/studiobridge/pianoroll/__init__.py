@@ -1,9 +1,29 @@
-"""Piano roll script generator, templates, and note application orchestration."""
+"""Piano roll script generator, templates, MIDI fallback, and note application orchestration."""
 
 from studiobridge.pianoroll.generator import (
     PyscriptGenerator,
     generate_pyscript,
     generate_pyscript_jobs,
+)
+from studiobridge.pianoroll.midi import (
+    decode_vlq,
+    encode_midi_bytes,
+    encode_vlq,
+    read_midi_notes,
+    write_midi_file,
+)
+from studiobridge.pianoroll.oracle import (
+    FPT_SAVE_NEW,
+    MockNoteOracleParser,
+    NoteOracleParser,
+    OracleReport,
+    OracleVerifier,
+)
+from studiobridge.pianoroll.orchestrator import (
+    DEFAULT_SCRIPT_NAME,
+    WID_PIANO_ROLL,
+    NoteApplyOrchestrator,
+    NoteApplyResult,
 )
 from studiobridge.pianoroll.templates import (
     DEFAULT_DEVICE_NAME,
@@ -35,14 +55,26 @@ __all__ = [
     "DEFAULT_BEATS_PER_BAR",
     "DEFAULT_DEVICE_NAME",
     "DEFAULT_PPQ",
+    "DEFAULT_SCRIPT_NAME",
+    "FPT_SAVE_NEW",
     "MAX_PAYLOAD_BYTES",
     "NOTE_NAMES",
     "SUBDIVISION_BEAT_RATIOS",
     "VALID_APPLY_MODES",
+    "WID_PIANO_ROLL",
     "ApplyMode",
+    "MockNoteOracleParser",
     "Note",
+    "NoteApplyOrchestrator",
+    "NoteApplyResult",
+    "NoteOracleParser",
+    "OracleReport",
+    "OracleVerifier",
     "PyscriptGenerator",
     "PyscriptJob",
+    "decode_vlq",
+    "encode_midi_bytes",
+    "encode_vlq",
     "format_notes_literal",
     "generate_pyscript",
     "generate_pyscript_jobs",
@@ -53,7 +85,9 @@ __all__ = [
     "normalize_release",
     "normalize_velocity",
     "note_name_to_midi",
+    "read_midi_notes",
     "render_apply_script",
     "subdivision_to_ticks",
     "ticks_to_subdivision",
+    "write_midi_file",
 ]

@@ -64,6 +64,10 @@ from studiobridge.sdk.mixer import (
     AsyncMixer,
     SyncMixer,
 )
+from studiobridge.sdk.notes import (
+    AsyncNotes,
+    SyncNotes,
+)
 from studiobridge.sdk.patterns import (
     AsyncPatterns,
     SyncPatterns,
@@ -171,6 +175,7 @@ __all__ = [
     "AsyncEventManager",
     "AsyncEventSubscription",
     "AsyncMixer",
+    "AsyncNotes",
     "AsyncPatterns",
     "AsyncPlaylist",
     "AsyncPlugins",
@@ -239,6 +244,7 @@ __all__ = [
     "SyncEventManager",
     "SyncEventSubscription",
     "SyncMixer",
+    "SyncNotes",
     "SyncPatterns",
     "SyncPlaylist",
     "SyncPlugins",
