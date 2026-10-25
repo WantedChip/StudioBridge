@@ -302,6 +302,20 @@ class ProjectMutator:
     # 3. Channel-Level Mutation Operators
     # =========================================================================
 
+    def add_channel_from_template(
+        self,
+        kind: str,
+        params: dict[str, Any] | None = None,
+        **kwargs: Any,
+    ) -> ProjectMutator:
+        """Add a channel to the project from a template fragment [FLP-30, FLP-40]."""
+        from studiobridge.flp.templates.instantiator import instantiate_channel
+
+        combined_params = dict(params or {})
+        combined_params.update(kwargs)
+        instantiate_channel(self.project, kind, combined_params)
+        return self
+
     def rename_channel(self, channel_index: int, name: str) -> ProjectMutator:
         """Rename channel rack generator [FLP-30]."""
         ch = self.project.channel(channel_index)

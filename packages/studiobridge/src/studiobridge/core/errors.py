@@ -764,6 +764,12 @@ class UnavailableError(CapabilityError):
     default_code: str = "E_UNAVAILABLE"
 
 
+class TemplateFragmentUnavailableError(UnavailableError):
+    """Raised when a requested template fragment is not in the library [FLP-40]."""
+
+    default_code: str = "E_UNAVAILABLE"
+
+
 class DegradedError(CapabilityError):
     """Raised when a capability is running in degraded mode with reduced functionality."""
 
@@ -778,6 +784,7 @@ class ExperimentalDisabledError(UnavailableError):
 
 # Aliases per spec 09_l1_sdk.md §10
 Unavailable = UnavailableError
+TemplateFragmentUnavailable = TemplateFragmentUnavailableError
 Degraded = DegradedError
 ExperimentalDisabled = ExperimentalDisabledError
 

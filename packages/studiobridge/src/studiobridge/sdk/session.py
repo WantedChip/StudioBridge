@@ -18,6 +18,8 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 
+import anyio
+
 from studiobridge._version import __version__
 from studiobridge.broker.client import BrokerClient, ensure_broker
 from studiobridge.broker.embedded import EmbeddedBroker
@@ -582,25 +584,36 @@ class Session:
         )
 
         try:
-            if self.backend == "embedded":
-                assert self._broker is not None
-                res = await self._broker.device_call(
-                    op,
-                    call_args,
-                    opts=opts,
-                    client_id=self.client_id,
-                    priority=priority,
-                    timeout=timeout,
-                )
-            else:
-                assert self._client is not None
-                res = await self._client.device_call(
-                    op,
-                    call_args,
-                    opts=opts,
-                    priority=priority,
-                    timeout=timeout,
-                )
+            max_retries = 3
+            res: Any = None
+            for attempt in range(max_retries):
+                try:
+                    if self.backend == "embedded":
+                        assert self._broker is not None
+                        res = await self._broker.device_call(
+                            op,
+                            call_args,
+                            opts=opts,
+                            client_id=self.client_id,
+                            priority=priority,
+                            timeout=timeout,
+                        )
+                    else:
+                        assert self._client is not None
+                        res = await self._client.device_call(
+                            op,
+                            call_args,
+                            opts=opts,
+                            priority=priority,
+                            timeout=timeout,
+                        )
+                    break
+                except BrokerError as be:
+                    if be.retryable and be.code == "E_BUSY" and attempt < max_retries - 1:
+                        retry_ms = be.details.get("retry_ms", 10) if be.details else 10
+                        await anyio.sleep(max(0.005, retry_ms / 1000.0))
+                        continue
+                    raise
 
             duration_ms = round((time.monotonic() - t0) * 1000, 3)
             self.stats_accumulator.record_call(op, duration_ms, success=True)

@@ -268,3 +268,70 @@ def test_cli_flp_edit_file_not_found(capsys: pytest.CaptureFixture[str]) -> None
     """sbridge flp edit on missing file returns exit code 1."""
     code = cli_entry(["flp", "edit", "non_existent.flp", "--tempo", "130"])
     assert code == 1
+
+
+def test_cli_flp_new_entry(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """sbridge flp new generates functional .flp project via cli_entry (# req: FLP-40)."""
+    out_file = tmp_path / "created.flp"
+    code = cli_entry(
+        [
+            "flp",
+            "new",
+            str(out_file),
+            "--template",
+            "sampler",
+            "--title",
+            "Generated Beat",
+            "--tempo",
+            "138",
+            "--json",
+        ]
+    )
+    assert code == 0
+    assert out_file.is_file()
+
+    captured = capsys.readouterr()
+    data = json.loads(captured.out)
+    assert data["status"] == "ok"
+    assert data["template"] == "sampler"
+    assert data["title"] == "Generated Beat"
+    assert data["tempo"] == 138.0
+
+
+def test_cli_flp_template_list_entry(capsys: pytest.CaptureFixture[str]) -> None:
+    """sbridge flp template list prints templates via cli_entry (# req: FLP-40)."""
+    code = cli_entry(["flp", "template", "list", "--json"])
+    assert code == 0
+
+    captured = capsys.readouterr()
+    data = json.loads(captured.out)
+    assert data["status"] == "ok"
+    assert any(t["name"] == "minimal" for t in data["templates"])
+    assert any(f["name"] == "3x Osc" for f in data["fragments"])
+
+
+def test_cli_flp_template_add_entry(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """sbridge flp template add extracts fragment via cli_entry (# req: FLP-40)."""
+    flp_path = _create_test_flp(tmp_path / "source.flp")
+    code = cli_entry(
+        [
+            "flp",
+            "template",
+            "add",
+            str(flp_path),
+            "--select",
+            "channel:0",
+            "--name",
+            "Kick Fragment",
+            "--author",
+            "Drum Programmer",
+            "--json",
+        ]
+    )
+    assert code == 0
+
+    captured = capsys.readouterr()
+    data = json.loads(captured.out)
+    assert data["status"] == "ok"
+    assert data["fragment"]["name"] == "Kick Fragment"
+    assert data["fragment"]["provenance"]["author"] == "Drum Programmer"

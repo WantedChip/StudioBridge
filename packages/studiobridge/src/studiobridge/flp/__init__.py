@@ -10,6 +10,8 @@ from studiobridge.core.errors import (
     FlpVersionUnsupportedError,
     FlpWriteRisk,
     FlpWriteRiskError,
+    TemplateFragmentUnavailable,
+    TemplateFragmentUnavailableError,
 )
 from studiobridge.flp.atomic import atomic_save
 from studiobridge.flp.codec import (
@@ -68,6 +70,18 @@ from studiobridge.flp.schema import (
     resolve_profile_from_events,
     resolve_profile_from_file,
 )
+from studiobridge.flp.templates import (
+    Fragment,
+    FragmentProvenance,
+    TemplateLibrary,
+    get_seed_path,
+    get_seeds_dir,
+    instantiate,
+    instantiate_channel,
+    instantiate_project,
+    list_seed_templates,
+    verify_seed_integrity,
+)
 from studiobridge.flp.validate import (
     check_invariants,
     validate_invariants,
@@ -91,6 +105,8 @@ __all__ = [
     "FlpVersionUnsupportedError",
     "FlpWriteRisk",
     "FlpWriteRiskError",
+    "Fragment",
+    "FragmentProvenance",
     "HeaderChunk",
     "LenEnc",
     "Marker",
@@ -110,6 +126,9 @@ __all__ = [
     "ResolutionResult",
     "Slot",
     "StructLayouts",
+    "TemplateFragmentUnavailable",
+    "TemplateFragmentUnavailableError",
+    "TemplateLibrary",
     "TrackDataRecord",
     "UnmodeledEvent",
     "VersionProfile",
@@ -125,7 +144,13 @@ __all__ = [
     "encode_text",
     "encode_varint",
     "get_profile",
+    "get_seed_path",
+    "get_seeds_dir",
+    "instantiate",
+    "instantiate_channel",
+    "instantiate_project",
     "list_profiles",
+    "list_seed_templates",
     "parse",
     "resolve_profile",
     "resolve_profile_from_events",
@@ -133,4 +158,5 @@ __all__ = [
     "serialize",
     "serialize_project",
     "validate_invariants",
+    "verify_seed_integrity",
 ]

@@ -183,6 +183,14 @@ class Project:
                     consumed_indices.add(i)
                     current_channel.name = decode_text(ev.raw, encoding=text_encoding)
                     current_channel.source_events.append(i)
+                    if current_channel.channel_type == "sampler":
+                        n_lower = current_channel.name.lower()
+                        if "audio clip" in n_lower or n_lower == "audioclip":
+                            current_channel.channel_type = "audio_clip"
+                        elif "layer" in n_lower:
+                            current_channel.channel_type = "layer"
+                        elif "automation" in n_lower:
+                            current_channel.channel_type = "automation"
                 elif current_pattern is not None:
                     consumed_indices.add(i)
                     current_pattern.name = decode_text(ev.raw, encoding=text_encoding)
@@ -465,3 +473,30 @@ class Project:
             force_unknown_version=force_unknown_version,
             make_backup=make_backup,
         )
+
+    @classmethod
+    def new(
+        cls,
+        template: str = "minimal",
+        params: dict[str, Any] | None = None,
+        **kwargs: Any,
+    ) -> Project:
+        """Instantiate a fresh Project from a seed template [FLP-40]."""
+        from studiobridge.flp.templates.instantiator import instantiate_project
+
+        combined_params = dict(params or {})
+        combined_params.update(kwargs)
+        return instantiate_project(template, combined_params)
+
+    def add_channel_from_template(
+        self,
+        kind: str,
+        params: dict[str, Any] | None = None,
+        **kwargs: Any,
+    ) -> Channel:
+        """Add a channel to this project from a template fragment [FLP-40]."""
+        from studiobridge.flp.templates.instantiator import instantiate_channel
+
+        combined_params = dict(params or {})
+        combined_params.update(kwargs)
+        return instantiate_channel(self, kind, combined_params)

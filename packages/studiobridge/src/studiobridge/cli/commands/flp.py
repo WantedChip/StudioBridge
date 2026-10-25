@@ -22,7 +22,7 @@ from studiobridge.flp.validate.invariants import check_invariants
 
 
 def handle_flp(args: argparse.Namespace) -> int:
-    """Dispatch FLP subcommands (inspect, diff, roundtrip, edit)."""
+    """Dispatch FLP subcommands (inspect, diff, roundtrip, edit, new, template)."""
     action = getattr(args, "flp_action", None)
     if action == "inspect":
         return _handle_inspect(args)
@@ -32,6 +32,10 @@ def handle_flp(args: argparse.Namespace) -> int:
         return _handle_roundtrip(args)
     if action == "edit":
         return _handle_edit(args)
+    if action in ("new", "template"):
+        from studiobridge.cli.commands.flp_template import handle_flp_template
+
+        return handle_flp_template(args)
 
     print(f"Unknown flp action: {action}", file=sys.stderr)
     return 2

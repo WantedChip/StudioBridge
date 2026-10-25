@@ -1001,7 +1001,9 @@ def build_parser() -> argparse.ArgumentParser:
     flp_p = subparsers.add_parser(
         "flp", help="Offline FL Studio project file (.flp) inspection, diffing, and validation"
     )
-    flp_sub = flp_p.add_subparsers(dest="flp_action", metavar="<inspect|diff|roundtrip|edit>")
+    flp_sub = flp_p.add_subparsers(
+        dest="flp_action", metavar="<inspect|diff|roundtrip|edit|new|template>"
+    )
 
     flp_inspect_p = flp_sub.add_parser(
         "inspect", help="Inspect .flp project structure, metadata, and tracks"
@@ -1114,7 +1116,61 @@ def build_parser() -> argparse.ArgumentParser:
     )
     flp_edit_p.set_defaults(handler=handle_flp, flp_action="edit")
 
-    for p in (flp_p, flp_inspect_p, flp_diff_p, flp_roundtrip_p, flp_edit_p):
+    flp_new_p = flp_sub.add_parser(
+        "new", help="Instantiate a fresh valid project file from a template"
+    )
+    flp_new_p.add_argument("output", help="Destination output .flp file path")
+    flp_new_p.add_argument(
+        "--template",
+        "-t",
+        default="minimal",
+        help="Template name (default: minimal)",
+    )
+    flp_new_p.add_argument("--title", help="Set project title")
+    flp_new_p.add_argument("--author", help="Set project author")
+    flp_new_p.add_argument("--comments", help="Set project comments")
+    flp_new_p.add_argument("--tempo", type=float, help="Set project tempo in BPM")
+    flp_new_p.add_argument(
+        "--force",
+        action="store_true",
+        default=False,
+        help="Overwrite output file if it exists",
+    )
+    flp_new_p.set_defaults(handler=handle_flp, flp_action="new", flp_template_action="new")
+
+    flp_template_p = flp_sub.add_parser(
+        "template", help="Manage and inspect FLP seed templates and fragments"
+    )
+    flp_tpl_sub = flp_template_p.add_subparsers(dest="flp_template_action", metavar="<list|add>")
+
+    flp_tpl_list_p = flp_tpl_sub.add_parser(
+        "list", help="List available seed templates and stock fragments"
+    )
+    flp_tpl_list_p.set_defaults(
+        handler=handle_flp, flp_action="template", flp_template_action="list"
+    )
+
+    flp_tpl_add_p = flp_tpl_sub.add_parser(
+        "add", help="Extract and record a fragment from an FLP project"
+    )
+    flp_tpl_add_p.add_argument("file", help="Path to source FL Studio project (.flp)")
+    flp_tpl_add_p.add_argument("--select", required=True, help="Fragment selector (e.g. channel:3)")
+    flp_tpl_add_p.add_argument("--name", help="Custom fragment name")
+    flp_tpl_add_p.add_argument("--kind", help="Fragment kind (sampler, plugin, audio_clip, layer)")
+    flp_tpl_add_p.add_argument("--author", help="Provenance author name")
+    flp_tpl_add_p.set_defaults(handler=handle_flp, flp_action="template", flp_template_action="add")
+
+    for p in (
+        flp_p,
+        flp_inspect_p,
+        flp_diff_p,
+        flp_roundtrip_p,
+        flp_edit_p,
+        flp_new_p,
+        flp_template_p,
+        flp_tpl_list_p,
+        flp_tpl_add_p,
+    ):
         p.add_argument(
             "--json",
             action="store_true",

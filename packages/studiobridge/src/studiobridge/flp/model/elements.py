@@ -122,6 +122,7 @@ class Channel:
     step_bits: list[int] = field(default_factory=list)
     plugin: Plugin | None = None
     source_events: list[int] = field(default_factory=list)
+    _fragment_events: list[Event] = field(default_factory=list, repr=False, compare=False)
 
     @property
     def mixer_track(self) -> int:

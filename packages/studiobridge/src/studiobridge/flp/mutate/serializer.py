@@ -151,11 +151,11 @@ def serialize_project(
             event_map[i] = Event(id=68, raw=struct.pack("<H", int(project.tempo)))
         elif ev.id == 156 and ("tempo" in touched_meta or mutator is None):
             event_map[i] = Event(id=156, raw=struct.pack("<I", int(project.fine_tempo * 1000)))
-        elif ev.id == 201 and "title" in touched_meta:
+        elif ev.id == 201 and ("title" in touched_meta or mutator is None):
             event_map[i] = Event(id=201, raw=encode_text(project.title, encoding=encoding))
-        elif ev.id in (203, 212) and "author" in touched_meta:
+        elif ev.id in (203, 212) and ("author" in touched_meta or mutator is None):
             event_map[i] = Event(id=ev.id, raw=encode_text(project.author, encoding=encoding))
-        elif ev.id == 202 and "comments" in touched_meta:
+        elif ev.id == 202 and ("comments" in touched_meta or mutator is None):
             event_map[i] = Event(id=202, raw=encode_text(project.comments, encoding=encoding))
 
     # 2. Channel updates (only touched channels)
@@ -232,6 +232,18 @@ def serialize_project(
         ev_item = event_map.get(i)
         if ev_item is not None:
             out_events.append(ev_item)
+
+    # Handle newly added channels that do not exist in orig_events
+    for ch in project.channels:
+        if not ch.source_events or all(ev_idx >= len(orig_events) for ev_idx in ch.source_events):
+            if getattr(ch, "_fragment_events", None):
+                out_events.extend(ch._fragment_events)
+            else:
+                out_events.append(Event(id=64, raw=struct.pack("<H", ch.index)))
+                out_events.append(Event(id=200, raw=encode_text(ch.name, encoding=encoding)))
+                if ch.plugin is not None:
+                    out_events.append(Event(id=213, raw=ch.plugin.data))
+                out_events.append(Event(id=215, raw=b"\x00" * 32))
 
     # Handle newly added patterns that do not exist in source_events
     for pat in project.patterns:
