@@ -116,6 +116,7 @@ APPROVED_EXCEPTIONS: Final[tuple[str, ...]] = (
     "tools/tokens.py",
     "tools/rename.py",
     "tests/unit/tools/test_rename.py",
+    "docs/flp/PROVENANCE.md",
     ".agents/",
 )
 

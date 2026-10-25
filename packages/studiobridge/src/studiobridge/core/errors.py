@@ -917,9 +917,39 @@ class OfflineError(StudioBridgeError):
 
 
 class FlpParseError(OfflineError):
-    """Raised when binary FLP parser fails."""
+    """Raised when binary FLP parser fails [FLP-02]."""
 
     default_code: str = "E_FLP_PARSE"
+
+    def __init__(
+        self,
+        message: str | None = None,
+        *,
+        code: str = "E_FLP_PARSE",
+        offset: int | None = None,
+        details: dict[str, Any] | None = None,
+        retryable: bool = False,
+        remedy: str | None = None,
+        docs_anchor: str | None = None,
+    ) -> None:
+        det = dict(details) if details else {}
+        self.offset: int | None = offset if offset is not None else det.get("offset")
+        if self.offset is not None and "offset" not in det:
+            det["offset"] = self.offset
+        super().__init__(
+            message=message,
+            code=code,
+            details=det,
+            retryable=retryable,
+            remedy=remedy,
+            docs_anchor=docs_anchor,
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        data = super().to_dict()
+        if self.offset is not None:
+            data["offset"] = self.offset
+        return data
 
 
 class FlpVersionUnsupportedError(OfflineError):
