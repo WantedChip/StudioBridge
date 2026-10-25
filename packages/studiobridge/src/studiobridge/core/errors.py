@@ -397,6 +397,15 @@ class ProtocolError(StudioBridgeError):
     default_code: str = "E_PROTO"
 
 
+class PayloadTooLargeError(StudioBridgeError):
+    """Raised when note payload or frame size exceeds allowed limit."""
+
+    default_code: str = "E_TOOBIG"
+
+
+PayloadTooLarge = PayloadTooLargeError
+
+
 class PortError(StudioBridgeError):
     """Raised on MIDI port open, discovery, or OS-level port configuration failures."""
 
