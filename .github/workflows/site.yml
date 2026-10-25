@@ -52,6 +52,9 @@ jobs:
       - name: Validate agent installation tabs island
         run: npm run test:install
 
+      - name: Validate console demo island & session playback
+        run: npm run test:demo
+
       - name: Verify build artifacts
         run: |
           test -d dist

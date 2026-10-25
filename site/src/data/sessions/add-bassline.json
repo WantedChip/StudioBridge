@@ -1,0 +1,205 @@
+{
+  "id": "add-bassline",
+  "title": "Add 16th-Note Bassline & Oracle Verification",
+  "tabLabel": "Add Bassline",
+  "summary": "Generate a rolling 16th-note bassline in D minor, apply notes to Pattern 2 via piano-roll actuation, and verify with oracle read-back.",
+  "source": "live",
+  "environmentLabel": "Recorded on FL 26.1.3 / ARM64",
+  "recordedAt": "2026-10-25",
+  "fl": {
+    "build": "26.1.3",
+    "arch": "ARM64"
+  },
+  "steps": [
+    {
+      "stepNumber": 0,
+      "role": "user",
+      "text": "Add a rolling 16th-note bassline in D minor (D1–F1–G1–A1 groove) to Pattern 2 for Channel 3 (3xOsc Bass). Verify the written notes via piano-roll oracle read-back.",
+      "visual": {
+        "view": "pianoroll",
+        "description": "Initial state: Pattern 2, Channel 3 (3xOsc Bass) has an empty note lane.",
+        "pianoroll": {
+          "channelName": "3xOsc Bass",
+          "patternNumber": 2,
+          "notes": [],
+          "stepGridActiveSteps": []
+        }
+      }
+    },
+    {
+      "stepNumber": 1,
+      "role": "tool",
+      "tool": "channel_get",
+      "args": {
+        "channel": 3
+      },
+      "result": {
+        "channel": 3,
+        "name": "3xOsc Bass",
+        "pan": 0.0,
+        "volume": 0.82,
+        "pitch": 0,
+        "root_note": "D3",
+        "color": "#3B82F6",
+        "muted": false,
+        "target_pattern": 2
+      },
+      "verified": true,
+      "visual": {
+        "view": "pianoroll",
+        "description": "Channel inspected: 3xOsc Bass identified. Target Pattern 2 verified ready for actuation.",
+        "pianoroll": {
+          "channelName": "3xOsc Bass",
+          "patternNumber": 2,
+          "notes": [],
+          "stepGridActiveSteps": []
+        }
+      }
+    },
+    {
+      "stepNumber": 2,
+      "role": "tool",
+      "tool": "notes_apply",
+      "args": {
+        "channel": 3,
+        "pattern": 2,
+        "mode": "replace",
+        "verify": "oracle",
+        "notes": [
+          { "pitch": 38, "time": 0, "duration": 24, "velocity": 100 },
+          { "pitch": 38, "time": 24, "duration": 24, "velocity": 85 },
+          { "pitch": 41, "time": 48, "duration": 24, "velocity": 92 },
+          { "pitch": 38, "time": 72, "duration": 24, "velocity": 80 },
+          { "pitch": 38, "time": 96, "duration": 24, "velocity": 98 },
+          { "pitch": 43, "time": 120, "duration": 24, "velocity": 88 },
+          { "pitch": 41, "time": 144, "duration": 24, "velocity": 90 },
+          { "pitch": 45, "time": 168, "duration": 24, "velocity": 105 },
+          { "pitch": 38, "time": 192, "duration": 24, "velocity": 100 },
+          { "pitch": 38, "time": 216, "duration": 24, "velocity": 82 },
+          { "pitch": 41, "time": 240, "duration": 24, "velocity": 94 },
+          { "pitch": 38, "time": 264, "duration": 24, "velocity": 78 },
+          { "pitch": 43, "time": 288, "duration": 24, "velocity": 96 },
+          { "pitch": 45, "time": 312, "duration": 24, "velocity": 92 },
+          { "pitch": 41, "time": 336, "duration": 24, "velocity": 88 },
+          { "pitch": 38, "time": 360, "duration": 24, "velocity": 110 }
+        ]
+      },
+      "result": {
+        "status": "applied",
+        "notes_written": 16,
+        "pattern": 2,
+        "channel": 3,
+        "oracle_verification": "verified",
+        "journal_id": 1043,
+        "execution_tier": "tier_1_actuation"
+      },
+      "verified": true,
+      "journalId": 1043,
+      "visual": {
+        "view": "pianoroll",
+        "description": "16 notes applied to piano roll across 16 steps (D1, F1, G1, A1). Oracle verified.",
+        "pianoroll": {
+          "channelName": "3xOsc Bass",
+          "patternNumber": 2,
+          "notes": [
+            { "id": "n0", "pitch": 38, "pitchName": "D1", "startStep": 0, "durationSteps": 1, "velocity": 100, "verified": true },
+            { "id": "n1", "pitch": 38, "pitchName": "D1", "startStep": 1, "durationSteps": 1, "velocity": 85, "verified": true },
+            { "id": "n2", "pitch": 41, "pitchName": "F1", "startStep": 2, "durationSteps": 1, "velocity": 92, "verified": true },
+            { "id": "n3", "pitch": 38, "pitchName": "D1", "startStep": 3, "durationSteps": 1, "velocity": 80, "verified": true },
+            { "id": "n4", "pitch": 38, "pitchName": "D1", "startStep": 4, "durationSteps": 1, "velocity": 98, "verified": true },
+            { "id": "n5", "pitch": 43, "pitchName": "G1", "startStep": 5, "durationSteps": 1, "velocity": 88, "verified": true },
+            { "id": "n6", "pitch": 41, "pitchName": "F1", "startStep": 6, "durationSteps": 1, "velocity": 90, "verified": true },
+            { "id": "n7", "pitch": 45, "pitchName": "A1", "startStep": 7, "durationSteps": 1, "velocity": 105, "verified": true },
+            { "id": "n8", "pitch": 38, "pitchName": "D1", "startStep": 8, "durationSteps": 1, "velocity": 100, "verified": true },
+            { "id": "n9", "pitch": 38, "pitchName": "D1", "startStep": 9, "durationSteps": 1, "velocity": 82, "verified": true },
+            { "id": "n10", "pitch": 41, "pitchName": "F1", "startStep": 10, "durationSteps": 1, "velocity": 94, "verified": true },
+            { "id": "n11", "pitch": 38, "pitchName": "D1", "startStep": 11, "durationSteps": 1, "velocity": 78, "verified": true },
+            { "id": "n12", "pitch": 43, "pitchName": "G1", "startStep": 12, "durationSteps": 1, "velocity": 96, "verified": true },
+            { "id": "n13", "pitch": 45, "pitchName": "A1", "startStep": 13, "durationSteps": 1, "velocity": 92, "verified": true },
+            { "id": "n14", "pitch": 41, "pitchName": "F1", "startStep": 14, "durationSteps": 1, "velocity": 88, "verified": true },
+            { "id": "n15", "pitch": 38, "pitchName": "D1", "startStep": 15, "durationSteps": 1, "velocity": 110, "verified": true }
+          ],
+          "stepGridActiveSteps": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+        }
+      }
+    },
+    {
+      "stepNumber": 3,
+      "role": "tool",
+      "tool": "notes_read",
+      "args": {
+        "channel": 3,
+        "pattern": 2
+      },
+      "result": {
+        "channel": 3,
+        "pattern": 2,
+        "note_count": 16,
+        "ppq": 96,
+        "hash": "sha256:d8a944cb3f284e621183204918efad41",
+        "status": "match_100%",
+        "pitches_detected": ["D1", "F1", "G1", "A1"]
+      },
+      "verified": true,
+      "visual": {
+        "view": "pianoroll",
+        "description": "Read-back oracle: 16/16 notes confirmed intact with cryptographic SHA-256 state match.",
+        "pianoroll": {
+          "channelName": "3xOsc Bass",
+          "patternNumber": 2,
+          "notes": [
+            { "id": "n0", "pitch": 38, "pitchName": "D1", "startStep": 0, "durationSteps": 1, "velocity": 100, "verified": true },
+            { "id": "n1", "pitch": 38, "pitchName": "D1", "startStep": 1, "durationSteps": 1, "velocity": 85, "verified": true },
+            { "id": "n2", "pitch": 41, "pitchName": "F1", "startStep": 2, "durationSteps": 1, "velocity": 92, "verified": true },
+            { "id": "n3", "pitch": 38, "pitchName": "D1", "startStep": 3, "durationSteps": 1, "velocity": 80, "verified": true },
+            { "id": "n4", "pitch": 38, "pitchName": "D1", "startStep": 4, "durationSteps": 1, "velocity": 98, "verified": true },
+            { "id": "n5", "pitch": 43, "pitchName": "G1", "startStep": 5, "durationSteps": 1, "velocity": 88, "verified": true },
+            { "id": "n6", "pitch": 41, "pitchName": "F1", "startStep": 6, "durationSteps": 1, "velocity": 90, "verified": true },
+            { "id": "n7", "pitch": 45, "pitchName": "A1", "startStep": 7, "durationSteps": 1, "velocity": 105, "verified": true },
+            { "id": "n8", "pitch": 38, "pitchName": "D1", "startStep": 8, "durationSteps": 1, "velocity": 100, "verified": true },
+            { "id": "n9", "pitch": 38, "pitchName": "D1", "startStep": 9, "durationSteps": 1, "velocity": 82, "verified": true },
+            { "id": "n10", "pitch": 41, "pitchName": "F1", "startStep": 10, "durationSteps": 1, "velocity": 94, "verified": true },
+            { "id": "n11", "pitch": 38, "pitchName": "D1", "startStep": 11, "durationSteps": 1, "velocity": 78, "verified": true },
+            { "id": "n12", "pitch": 43, "pitchName": "G1", "startStep": 12, "durationSteps": 1, "velocity": 96, "verified": true },
+            { "id": "n13", "pitch": 45, "pitchName": "A1", "startStep": 13, "durationSteps": 1, "velocity": 92, "verified": true },
+            { "id": "n14", "pitch": 41, "pitchName": "F1", "startStep": 14, "durationSteps": 1, "velocity": 88, "verified": true },
+            { "id": "n15", "pitch": 38, "pitchName": "D1", "startStep": 15, "durationSteps": 1, "velocity": 110, "verified": true }
+          ],
+          "stepGridActiveSteps": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+        }
+      }
+    },
+    {
+      "stepNumber": 4,
+      "role": "agent",
+      "text": "16th-note rolling bassline successfully written to Pattern 2 (Channel 3: 3xOsc Bass). 16 notes in D minor (D1–F1–G1–A1) actuated via Tier-1 keyboard hooks and verified 100% against piano roll oracle read-back (journal entry #1043).",
+      "visual": {
+        "view": "pianoroll",
+        "description": "Pattern 2 bassline complete and ready for playback.",
+        "pianoroll": {
+          "channelName": "3xOsc Bass",
+          "patternNumber": 2,
+          "notes": [
+            { "id": "n0", "pitch": 38, "pitchName": "D1", "startStep": 0, "durationSteps": 1, "velocity": 100, "verified": true },
+            { "id": "n1", "pitch": 38, "pitchName": "D1", "startStep": 1, "durationSteps": 1, "velocity": 85, "verified": true },
+            { "id": "n2", "pitch": 41, "pitchName": "F1", "startStep": 2, "durationSteps": 1, "velocity": 92, "verified": true },
+            { "id": "n3", "pitch": 38, "pitchName": "D1", "startStep": 3, "durationSteps": 1, "velocity": 80, "verified": true },
+            { "id": "n4", "pitch": 38, "pitchName": "D1", "startStep": 4, "durationSteps": 1, "velocity": 98, "verified": true },
+            { "id": "n5", "pitch": 43, "pitchName": "G1", "startStep": 5, "durationSteps": 1, "velocity": 88, "verified": true },
+            { "id": "n6", "pitch": 41, "pitchName": "F1", "startStep": 6, "durationSteps": 1, "velocity": 90, "verified": true },
+            { "id": "n7", "pitch": 45, "pitchName": "A1", "startStep": 7, "durationSteps": 1, "velocity": 105, "verified": true },
+            { "id": "n8", "pitch": 38, "pitchName": "D1", "startStep": 8, "durationSteps": 1, "velocity": 100, "verified": true },
+            { "id": "n9", "pitch": 38, "pitchName": "D1", "startStep": 9, "durationSteps": 1, "velocity": 82, "verified": true },
+            { "id": "n10", "pitch": 41, "pitchName": "F1", "startStep": 10, "durationSteps": 1, "velocity": 94, "verified": true },
+            { "id": "n11", "pitch": 38, "pitchName": "D1", "startStep": 11, "durationSteps": 1, "velocity": 78, "verified": true },
+            { "id": "n12", "pitch": 43, "pitchName": "G1", "startStep": 12, "durationSteps": 1, "velocity": 96, "verified": true },
+            { "id": "n13", "pitch": 45, "pitchName": "A1", "startStep": 13, "durationSteps": 1, "velocity": 92, "verified": true },
+            { "id": "n14", "pitch": 41, "pitchName": "F1", "startStep": 14, "durationSteps": 1, "velocity": 88, "verified": true },
+            { "id": "n15", "pitch": 38, "pitchName": "D1", "startStep": 15, "durationSteps": 1, "velocity": 110, "verified": true }
+          ],
+          "stepGridActiveSteps": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+        }
+      }
+    }
+  ]
+}

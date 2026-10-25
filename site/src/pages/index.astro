@@ -3,6 +3,7 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Hero from '../components/Hero.astro';
 import SectionWorksWith from '../components/SectionWorksWith.astro';
+import ConsoleDemo from '../components/islands/ConsoleDemo.tsx';
 import SectionControlPlanes from '../components/SectionControlPlanes.astro';
 import SectionSafety from '../components/SectionSafety.astro';
 import InstallTabs from '../components/islands/InstallTabs.tsx';
@@ -59,6 +60,9 @@ import Footer from '../components/Footer.astro';
 
       <!-- Section: Works With (Nominative Agent Chips) -->
       <SectionWorksWith />
+
+      <!-- Section: 02 / TRY A SESSION (Interactive Console Demo Island) -->
+      <ConsoleDemo client:visible />
 
       <!-- Section: 03 / CONTROL SURFACES (Four Channel Strips) -->
       <SectionControlPlanes />

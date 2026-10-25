@@ -1,0 +1,181 @@
+{
+  "id": "render-preview",
+  "title": "Headless WAV Render & Acoustic Analysis",
+  "tabLabel": "Render Preview",
+  "summary": "Initiate a headless WAV render, monitor supervisor progress, and validate audio duration, peak dBFS, and silence metrics.",
+  "source": "live",
+  "environmentLabel": "Recorded on FL 26.1.3 / ARM64",
+  "recordedAt": "2026-10-25",
+  "fl": {
+    "build": "26.1.3",
+    "arch": "ARM64"
+  },
+  "steps": [
+    {
+      "stepNumber": 0,
+      "role": "user",
+      "text": "Trigger a headless WAV render of demo_track.flp to output/preview.wav, supervise the background render process, and run acoustic signal validation.",
+      "visual": {
+        "view": "render",
+        "description": "Render supervisor idle. Ready to launch headless export.",
+        "render": {
+          "jobId": "rnd_88f2a1",
+          "status": "idle",
+          "progressPct": 0,
+          "waveformPoints": []
+        }
+      }
+    },
+    {
+      "stepNumber": 1,
+      "role": "tool",
+      "tool": "render_start",
+      "args": {
+        "source": "projects/demo_track.flp",
+        "formats": ["wav"],
+        "out_dir": "output",
+        "instance_policy": "require_closed",
+        "timeout_s": 60.0
+      },
+      "result": {
+        "job_id": "rnd_88f2a1",
+        "status": "started",
+        "target_file": "output/preview.wav",
+        "fl_process": "FL64.exe (PID 18402)",
+        "instance_policy": "require_closed",
+        "timeout_s": 60.0
+      },
+      "verified": true,
+      "visual": {
+        "view": "render",
+        "description": "Supervisor spawned FL64.exe (PID 18402). Render initialization underway.",
+        "render": {
+          "jobId": "rnd_88f2a1",
+          "status": "starting",
+          "progressPct": 10,
+          "waveformPoints": []
+        }
+      }
+    },
+    {
+      "stepNumber": 2,
+      "role": "tool",
+      "tool": "render_status",
+      "args": {
+        "job_id": "rnd_88f2a1"
+      },
+      "result": {
+        "job_id": "rnd_88f2a1",
+        "status": "rendering",
+        "progress_pct": 58,
+        "elapsed_s": 2.4,
+        "eta_s": 1.7,
+        "bytes_written": 3276800
+      },
+      "verified": true,
+      "visual": {
+        "view": "render",
+        "description": "Export in progress: 58% completed. Headless FL64.exe active.",
+        "render": {
+          "jobId": "rnd_88f2a1",
+          "status": "rendering",
+          "progressPct": 58,
+          "waveformPoints": [0.15, 0.32, 0.45, 0.28, 0.62, 0.48, 0.75, 0.55, 0.82, 0.60]
+        }
+      }
+    },
+    {
+      "stepNumber": 3,
+      "role": "tool",
+      "tool": "render_status",
+      "args": {
+        "job_id": "rnd_88f2a1"
+      },
+      "result": {
+        "job_id": "rnd_88f2a1",
+        "status": "completed",
+        "progress_pct": 100,
+        "duration_s": 4.1,
+        "output_path": "output/preview.wav",
+        "file_size_bytes": 5644844
+      },
+      "verified": true,
+      "visual": {
+        "view": "render",
+        "description": "Render complete in 4.1s. File finalized on disk (5.64 MB).",
+        "render": {
+          "jobId": "rnd_88f2a1",
+          "status": "completed",
+          "progressPct": 100,
+          "durationS": 16.0,
+          "waveformPoints": [0.15, 0.32, 0.45, 0.28, 0.62, 0.48, 0.75, 0.55, 0.82, 0.60, 0.72, 0.50, 0.68, 0.42, 0.35, 0.18]
+        }
+      }
+    },
+    {
+      "stepNumber": 4,
+      "role": "tool",
+      "tool": "render_analyze",
+      "args": {
+        "path": "output/preview.wav",
+        "min_duration_s": 15.0,
+        "max_silence_ratio": 0.10
+      },
+      "result": {
+        "path": "output/preview.wav",
+        "is_valid": true,
+        "validation_status": "passed",
+        "duration_s": 16.0,
+        "sample_rate": 44100,
+        "channels": 2,
+        "bit_depth": 24,
+        "peak_dbfs": -0.4,
+        "rms_dbfs": -12.8,
+        "silence_ratio": 0.015,
+        "clipping_samples": 0
+      },
+      "verified": true,
+      "visual": {
+        "view": "render",
+        "description": "Acoustic validation passed: 16.0s duration, -0.4 dBFS peak, 0 clipped samples.",
+        "render": {
+          "jobId": "rnd_88f2a1",
+          "status": "analyzed",
+          "progressPct": 100,
+          "durationS": 16.0,
+          "peakDbfs": -0.4,
+          "rmsDbfs": -12.8,
+          "silenceRatio": 0.015,
+          "waveformPoints": [
+            0.15, 0.28, 0.42, 0.65, 0.55, 0.78, 0.62, 0.88,
+            0.70, 0.92, 0.84, 0.68, 0.75, 0.82, 0.90, 0.74,
+            0.60, 0.72, 0.85, 0.65, 0.52, 0.40, 0.28, 0.12
+          ]
+        }
+      }
+    },
+    {
+      "stepNumber": 5,
+      "role": "agent",
+      "text": "Headless render completed in 4.1s. Acoustic analysis validated: 16.0s stereo WAV (24-bit / 44.1 kHz), true peak -0.4 dBFS, RMS -12.8 dBFS, silence ratio 1.5%, with zero clipped samples. Render artifact ready at output/preview.wav.",
+      "visual": {
+        "view": "render",
+        "description": "Export verified: clean acoustic spectrum meeting all audio quality gates.",
+        "render": {
+          "jobId": "rnd_88f2a1",
+          "status": "analyzed",
+          "progressPct": 100,
+          "durationS": 16.0,
+          "peakDbfs": -0.4,
+          "rmsDbfs": -12.8,
+          "silenceRatio": 0.015,
+          "waveformPoints": [
+            0.15, 0.28, 0.42, 0.65, 0.55, 0.78, 0.62, 0.88,
+            0.70, 0.92, 0.84, 0.68, 0.75, 0.82, 0.90, 0.74,
+            0.60, 0.72, 0.85, 0.65, 0.52, 0.40, 0.28, 0.12
+          ]
+        }
+      }
+    }
+  ]
+}

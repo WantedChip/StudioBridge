@@ -25,6 +25,9 @@ const checks = [
   { name: 'Works With: Claude Code', test: html.includes('Claude Code') },
   { name: 'Works With: any MCP client', test: html.includes('any MCP client') },
   { name: 'Works With: plain CLI', test: html.includes('plain CLI') },
+  { name: 'Section 02 / TRY A SESSION', test: html.includes('02 / TRY A SESSION') },
+  { name: 'Console Demo: Session Balance Drums', test: html.includes('Balance Drums') },
+  { name: 'Console Demo: Section anchor #session-demo', test: html.includes('id="session-demo"') },
   { name: 'Section 03 / CONTROL SURFACES', test: html.includes('03 / CONTROL SURFACES') },
   { name: 'Channel CH 01 // LIVE RPC', test: html.includes('CH 01 // LIVE RPC') },
   { name: 'Channel CH 02 // OFFLINE FLP', test: html.includes('CH 02 // OFFLINE FLP') },
@@ -59,7 +62,7 @@ const checks = [
   { name: 'FAQ answers trademark non-affiliation', test: faqIncludes('What is the relationship between StudioBridge and Image-Line?') },
   { name: 'Verbatim prominent non-affiliation statement in footer (18 §11)', test: html.includes('StudioBridge is an independent open-source project. FL Studio is a trademark of Image-Line. Not affiliated with or endorsed by Image-Line.') },
   { name: 'Footer links to llms.txt', test: html.includes('href="/llms.txt"') },
-  { name: 'Numbered technical catalogue styling across sections', test: html.includes('01 /') && html.includes('03 /') && html.includes('05 /') && html.includes('06 /') && html.includes('07 /') && html.includes('08 /') && html.includes('09 /') },
+  { name: 'Numbered technical catalogue styling across sections', test: html.includes('01 /') && html.includes('02 /') && html.includes('03 /') && html.includes('05 /') && html.includes('06 /') && html.includes('07 /') && html.includes('08 /') && html.includes('09 /') },
 ];
 
 function faqIncludes(str: string): boolean {

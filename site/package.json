@@ -15,7 +15,8 @@
     "test:contrast": "tsx scripts/check-contrast.ts",
     "test:html": "tsx scripts/check-landing-html.ts",
     "test:hero": "tsx ../tests/web/test_hero.spec.ts",
-    "test:install": "tsx ../tests/web/test_install_tabs.spec.ts"
+    "test:install": "tsx ../tests/web/test_install_tabs.spec.ts",
+    "test:demo": "tsx ../tests/web/test_console_demo.spec.ts"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.12",
