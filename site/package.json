@@ -6,13 +6,16 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build",
+    "prebuild": "tsx scripts/gen-agents.ts",
+    "build": "tsx scripts/gen-agents.ts && astro build",
     "preview": "astro preview",
     "check": "astro check",
     "typecheck": "astro check",
+    "gen:agents": "tsx scripts/gen-agents.ts",
     "test:contrast": "tsx scripts/check-contrast.ts",
     "test:html": "tsx scripts/check-landing-html.ts",
-    "test:hero": "tsx ../tests/web/test_hero.spec.ts"
+    "test:hero": "tsx ../tests/web/test_hero.spec.ts",
+    "test:install": "tsx ../tests/web/test_install_tabs.spec.ts"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.12",

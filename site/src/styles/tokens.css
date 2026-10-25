@@ -221,3 +221,28 @@
   outline: 2px solid var(--ink);
   outline-offset: 2px;
 }
+
+/* -----------------------------------------------------------------------------
+   Shiki Dual-Theme Code Block Tokens (Paper & Rack Adaptations)
+   Specification: .agents/spec/18_landing_page_spec.md §7.1a [THM-05]
+   ----------------------------------------------------------------------------- */
+.shiki {
+  background-color: var(--surface) !important;
+  color: var(--ink) !important;
+  font-family: var(--font-mono);
+}
+
+.shiki span {
+  color: var(--shiki-light);
+}
+
+:root[data-theme="dark"] .shiki span {
+  color: var(--shiki-dark) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .shiki span {
+    color: var(--shiki-dark) !important;
+  }
+}
+

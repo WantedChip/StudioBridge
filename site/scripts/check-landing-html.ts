@@ -35,6 +35,12 @@ const checks = [
   { name: 'Interlock: Read-Back Verification', test: html.includes('Read-Back Verification') },
   { name: 'Interlock: Protected Target Gates', test: html.includes('Protected Target Gates') },
   { name: 'Rollback guarantee levels G0, G1, G2', test: html.includes('G0') && html.includes('G1') && html.includes('G2') },
+  { name: 'Section 06 / PATCH IN', test: html.includes('06 / PATCH IN') },
+  { name: 'Install: Setup Virtual MIDI Loopback (Step 1)', test: html.includes('Setup Virtual MIDI Loopback') },
+  { name: 'Install: Configure Agent MCP Server (Step 2)', test: html.includes('Configure Agent MCP Server') },
+  { name: 'Install: Verify with Doctor (Step 3)', test: html.includes('Verify Wire') && html.includes('Doctor') },
+  { name: 'Install: Accessible tablist and tabs', test: html.includes('role="tablist"') && html.includes('role="tab"') && html.includes('role="tabpanel"') },
+  { name: 'Install: Doctor sample output present', test: html.includes('SYS-01') && html.includes('WMS-01') && html.includes('PORT-01') && html.includes('DEV-01') },
   { name: 'Section 07 / LIMITS', test: html.includes('07 / LIMITS') },
   { name: 'Limits: Plugin Instantiation (CAP_PLUGIN_INSTANTIATE)', test: html.includes('CAP_PLUGIN_INSTANTIATE') },
   { name: 'Limits: Windows ARM64 Host Emulation (CAP_HOST_NATIVE_ARM64)', test: html.includes('CAP_HOST_NATIVE_ARM64') },
@@ -53,7 +59,7 @@ const checks = [
   { name: 'FAQ answers trademark non-affiliation', test: faqIncludes('What is the relationship between StudioBridge and Image-Line?') },
   { name: 'Verbatim prominent non-affiliation statement in footer (18 §11)', test: html.includes('StudioBridge is an independent open-source project. FL Studio is a trademark of Image-Line. Not affiliated with or endorsed by Image-Line.') },
   { name: 'Footer links to llms.txt', test: html.includes('href="/llms.txt"') },
-  { name: 'Numbered technical catalogue styling across sections', test: html.includes('01 /') && html.includes('03 /') && html.includes('05 /') && html.includes('07 /') && html.includes('08 /') && html.includes('09 /') },
+  { name: 'Numbered technical catalogue styling across sections', test: html.includes('01 /') && html.includes('03 /') && html.includes('05 /') && html.includes('06 /') && html.includes('07 /') && html.includes('08 /') && html.includes('09 /') },
 ];
 
 function faqIncludes(str: string): boolean {

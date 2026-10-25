@@ -5,6 +5,7 @@ import Hero from '../components/Hero.astro';
 import SectionWorksWith from '../components/SectionWorksWith.astro';
 import SectionControlPlanes from '../components/SectionControlPlanes.astro';
 import SectionSafety from '../components/SectionSafety.astro';
+import InstallTabs from '../components/islands/InstallTabs.tsx';
 import SectionLimits from '../components/SectionLimits.astro';
 import SectionOpenSource from '../components/SectionOpenSource.astro';
 import SectionFaq from '../components/SectionFaq.astro';
@@ -64,6 +65,9 @@ import Footer from '../components/Footer.astro';
 
       <!-- Section: 05 / INTERLOCKS (Safety Architecture) -->
       <SectionSafety />
+
+      <!-- Section: 06 / PATCH IN (Dynamic Agent Installation Tabs Island) -->
+      <InstallTabs client:visible />
 
       <!-- Section: 07 / LIMITS (Honest Boundaries) -->
       <SectionLimits />

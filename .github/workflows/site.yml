@@ -49,6 +49,9 @@ jobs:
       - name: Validate hero section & signal-path island
         run: npm run test:hero
 
+      - name: Validate agent installation tabs island
+        run: npm run test:install
+
       - name: Verify build artifacts
         run: |
           test -d dist
