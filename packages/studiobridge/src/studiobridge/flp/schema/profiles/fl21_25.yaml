@@ -1,0 +1,116 @@
+# FL Studio 21-25 Profile Specification [FLP-10, FLP-11]
+# Layout derived from statistical corpus analysis cross-referenced with permissive sources.
+# See docs/flp/PROVENANCE.md for clean-room derivation notes.
+
+id: "fl21_25"
+name: "FL Studio 21-25 Profile"
+
+fl_version_range:
+  min_version: "21.0.0"
+  max_version: "25.99.99"
+
+struct_layouts:
+  playlist_item_size: 80
+  track_data_size: 66
+  event_ids:
+    version_string: 199
+    plugin_data: 213
+    channel_params: 215
+    playlist_items: 224
+    track_data: 238
+    event_172: 172
+  playlist_item_offsets:
+    start_time: 0
+    length: 4
+    track_index: 8
+    pattern_index: 12
+    flags: 16
+
+event_meanings:
+  199:
+    name: "version_string"
+    category: "metadata"
+    kind: "variable"
+    type: "string"
+    description: "FL Studio engine version string"
+  213:
+    name: "plugin_data"
+    category: "plugin"
+    kind: "variable"
+    type: "blob"
+    description: "Plugin wrapper state blob"
+  215:
+    name: "channel_params"
+    category: "channel"
+    kind: "variable"
+    type: "blob"
+    description: "Channel synthesis and mixing parameters"
+  224:
+    name: "playlist_items"
+    category: "playlist"
+    kind: "variable"
+    type: "records"
+    record_size: 80
+    description: "Timeline playlist item clip/pattern placement chunks"
+  238:
+    name: "track_data"
+    category: "mixer"
+    kind: "variable"
+    type: "record"
+    record_size: 66
+    description: "Mixer insert track parameter blob (61 in FL 21, 66 in FL 24/25)"
+  172:
+    name: "fl25_small_event"
+    category: "quirk"
+    kind: "dword"
+    type: "dword_quirk"
+    payload_effective_size: 3
+    description: "3-byte event quirk first observed in FL 25.2.3"
+  68:
+    name: "main_tempo"
+    category: "transport"
+    kind: "word"
+    type: "uint16"
+    description: "Project main tempo in BPM"
+  156:
+    name: "fine_tempo"
+    category: "transport"
+    kind: "dword"
+    type: "uint32"
+    description: "Fine tempo fraction"
+  201:
+    name: "project_title"
+    category: "metadata"
+    kind: "variable"
+    type: "string"
+    description: "Project title"
+
+text_encoding:
+  default_encoding: "utf-16-le"
+  fallback_encoding: "latin1"
+  null_terminated: true
+
+known_quirks:
+  playlist_item_size_80: "FL Studio 21-25 uses 80-byte playlist item records."
+  track_data_size_61_66: "FL Studio 21 uses 61-byte track data, FL 24/25 uses 66-byte track data."
+  event_172_three_byte: "FL Studio 25.2.3+ introduces event 172 with 3-byte payload."
+  lossy_plugin_data_save: "Plugin data (213) and channel params (215) must preserve original raw bytes to avoid truncation."
+
+expectations:
+  synthetic_fl21:
+    fl_version: "21.0.3"
+    tempo: 130.0
+    channel_count: 4
+    playlist_item_count: 3
+    playlist_item_record_size: 80
+    track_data_size: 61
+    project_title: "StudioBridge Demo FL21"
+  synthetic_fl25:
+    fl_version: "25.2.3"
+    tempo: 128.0
+    channel_count: 4
+    playlist_item_count: 2
+    playlist_item_record_size: 80
+    track_data_size: 66
+    has_event_172: true
+    project_title: "StudioBridge Demo FL25"

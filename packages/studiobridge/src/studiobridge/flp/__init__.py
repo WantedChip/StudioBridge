@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
-from studiobridge.core.errors import FlpParseError
+from studiobridge.core.errors import (
+    FlpInvariantViolationError,
+    FlpParseError,
+    FlpVersionUnsupportedError,
+)
 from studiobridge.flp.codec import (
     Chunk,
     Event,
@@ -18,20 +22,60 @@ from studiobridge.flp.codec import (
     parse,
     serialize,
 )
+from studiobridge.flp.schema import (
+    EventMeaning,
+    PlaylistItemRecord,
+    ProfileResolver,
+    ResolutionResult,
+    StructLayouts,
+    TrackDataRecord,
+    VersionProfile,
+    decode_playlist_items,
+    decode_text,
+    decode_track_data,
+    decode_version_string,
+    detect_encoding,
+    encode_text,
+    get_profile,
+    list_profiles,
+    resolve_profile,
+    resolve_profile_from_events,
+    resolve_profile_from_file,
+)
 
 __all__ = [
     "Chunk",
     "Event",
     "EventChunk",
     "EventKind",
+    "EventMeaning",
     "FlpFile",
     "FlpHeader",
+    "FlpInvariantViolationError",
     "FlpParseError",
+    "FlpVersionUnsupportedError",
     "HeaderChunk",
     "LenEnc",
+    "PlaylistItemRecord",
+    "ProfileResolver",
     "RawChunk",
+    "ResolutionResult",
+    "StructLayouts",
+    "TrackDataRecord",
+    "VersionProfile",
+    "decode_playlist_items",
+    "decode_text",
+    "decode_track_data",
     "decode_varint",
+    "decode_version_string",
+    "detect_encoding",
+    "encode_text",
     "encode_varint",
+    "get_profile",
+    "list_profiles",
     "parse",
+    "resolve_profile",
+    "resolve_profile_from_events",
+    "resolve_profile_from_file",
     "serialize",
 ]
