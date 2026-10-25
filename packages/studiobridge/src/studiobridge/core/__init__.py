@@ -24,6 +24,7 @@ from studiobridge.core.capabilities import (
     create_default_registry,
 )
 from studiobridge.core.config import (
+    ActuationConfig,
     BrokerConfig,
     PortConfig,
     SafetyConfig,
@@ -97,6 +98,7 @@ __all__ = [
     "CapabilityState",
     "create_default_registry",
     # Config
+    "ActuationConfig",
     "BrokerConfig",
     "PortConfig",
     "SafetyConfig",

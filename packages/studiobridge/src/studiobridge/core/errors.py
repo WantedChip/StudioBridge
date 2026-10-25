@@ -295,6 +295,51 @@ ERROR_REGISTRY: dict[str, ErrorInfo] = {
         remedy="Check audio routing, master track volume, and render export settings.",
         docs_anchor="error-e-rnd-invalid",
     ),
+    # E_ACT*: UI actuation and window guard errors
+    "E_ACT_DISABLED": ErrorInfo(
+        code="E_ACT_DISABLED",
+        default_message="UI actuation is disabled by policy.",
+        retryable=False,
+        remedy="Enable actuation in configuration (actuation.enabled=true) or use manual mode.",
+        docs_anchor="error-e-act-disabled",
+    ),
+    "E_ACT_NOWINDOW": ErrorInfo(
+        code="E_ACT_NOWINDOW",
+        default_message="FL Studio window handle could not be located.",
+        retryable=True,
+        remedy="Ensure FL Studio is running and its main window is open and visible.",
+        docs_anchor="error-e-act-nowindow",
+    ),
+    "E_ACT_FOCUS": ErrorInfo(
+        code="E_ACT_FOCUS",
+        default_message="FL Studio is not the active foreground window.",
+        retryable=True,
+        remedy="Focus FL Studio main window or enable allow_focus_steal in actuation policy.",
+        docs_anchor="error-e-act-focus",
+    ),
+    "E_ACT_MODAL": ErrorInfo(
+        code="E_ACT_MODAL",
+        default_message="FL Studio is blocked by an active modal dialog popup.",
+        retryable=True,
+        remedy="Dismiss any open modal dialog or popup window in FL Studio before actuation.",
+        docs_anchor="error-e-act-modal",
+    ),
+    "E_ACT_USER_ACTIVE": ErrorInfo(
+        code="E_ACT_USER_ACTIVE",
+        default_message=(
+            "User input detected recently; actuation aborted to avoid fighting the user."
+        ),
+        retryable=True,
+        remedy="Wait for user input to pause or pass force=True to override idle guard.",
+        docs_anchor="error-e-act-user-active",
+    ),
+    "E_ACT_DISPATCH": ErrorInfo(
+        code="E_ACT_DISPATCH",
+        default_message="Failed to dispatch input events to target window.",
+        retryable=False,
+        remedy="Verify desktop station permissions and window handle validity.",
+        docs_anchor="error-e-act-dispatch",
+    ),
     # E_ENV*: Environment errors
     "E_ENV_PORT": ErrorInfo(
         code="E_ENV_PORT",
@@ -873,3 +918,46 @@ class InvalidOutputError(RenderError):
     """Raised when render output is empty, silent, or invalid."""
 
     default_code: str = "E_RND_INVALID"
+
+
+class ActuationError(StudioBridgeError):
+    """Base exception for Win32 UI actuation and focus guard failures."""
+
+    default_code: str = "E_ACT_DISABLED"
+
+
+class ActuationDisabledError(ActuationError):
+    """Raised when actuation is disabled by policy [ACT-11]."""
+
+    default_code: str = "E_ACT_DISABLED"
+
+
+class WindowNotFoundError(ActuationError):
+    """Raised when target FL Studio window handle cannot be found."""
+
+    default_code: str = "E_ACT_NOWINDOW"
+
+
+class FocusGuardError(ActuationError):
+    """Raised when FL Studio is not the foreground window [ACT-10]."""
+
+    default_code: str = "E_ACT_FOCUS"
+
+
+class ModalBlockedError(ActuationError):
+    """Raised when a modal child popup blocks the FL Studio window [ACT-10]."""
+
+    default_code: str = "E_ACT_MODAL"
+
+
+class UserInputActiveError(ActuationError):
+    """Raised when user input was recently detected and force is not set [ACT-10]."""
+
+    default_code: str = "E_ACT_USER_ACTIVE"
+
+
+ActuationDisabled = ActuationDisabledError
+WindowNotFound = WindowNotFoundError
+FocusGuard = FocusGuardError
+ModalBlocked = ModalBlockedError
+UserInputActive = UserInputActiveError

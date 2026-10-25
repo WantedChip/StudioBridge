@@ -59,12 +59,24 @@ class SafetyConfig:
 
 
 @dataclass(slots=True)
+class ActuationConfig:
+    """UI actuation, keystroke injection, and focus guard configuration [ACT-10, ACT-11]."""
+
+    enabled: bool = False  # [ACT-11]: default false for general actuation
+    piano_roll_enabled: bool = True  # [ACT-11]: default true for piano-roll keystrokes (Ctrl+Alt+Y)
+    allow_focus_steal: bool = False  # [ACT-10]: whether to temporarily steal and restore focus
+    user_idle_threshold_ms: float = 1000.0  # [ACT-10]: idle threshold before refusing actuation
+    key_delay_ms: float = 15.0  # 10-20 ms delay between modifier and key events
+
+
+@dataclass(slots=True)
 class StudioBridgeConfig:
     """Unified StudioBridge root configuration."""
 
     port: PortConfig = field(default_factory=PortConfig)
     broker: BrokerConfig = field(default_factory=BrokerConfig)
     safety: SafetyConfig = field(default_factory=SafetyConfig)
+    actuation: ActuationConfig = field(default_factory=ActuationConfig)
     toolsets: list[str] = field(
         default_factory=lambda: [
             "core",
@@ -193,6 +205,27 @@ def _parse_env_vars(env: Mapping[str, str]) -> dict[str, Any]:
                 ["safety", "protected_targets"],
                 [t.strip() for t in val_str.split(",") if t.strip()],
             )
+        elif var == "ACTUATION_ENABLED":
+            _set_nested(
+                ["actuation", "enabled"],
+                val_str.lower() in ("true", "1", "yes"),
+            )
+        elif var == "ACTUATION_PIANO_ROLL_ENABLED":
+            _set_nested(
+                ["actuation", "piano_roll_enabled"],
+                val_str.lower() in ("true", "1", "yes"),
+            )
+        elif var == "ACTUATION_ALLOW_FOCUS_STEAL":
+            _set_nested(
+                ["actuation", "allow_focus_steal"],
+                val_str.lower() in ("true", "1", "yes"),
+            )
+        elif var in ("ACTUATION_IDLE_THRESHOLD", "ACTUATION_IDLE_THRESHOLD_MS"):
+            with contextlib.suppress(ValueError):
+                _set_nested(["actuation", "user_idle_threshold_ms"], float(val_str))
+        elif var in ("ACTUATION_KEY_DELAY", "ACTUATION_KEY_DELAY_MS"):
+            with contextlib.suppress(ValueError):
+                _set_nested(["actuation", "key_delay_ms"], float(val_str))
 
     return extracted
 
@@ -229,6 +262,15 @@ def config_from_dict(data: dict[str, Any]) -> StudioBridgeConfig:
         tolerance=float(safety_data.get("tolerance", 0.005)),
     )
 
+    actuation_data = data.get("actuation", {})
+    actuation_cfg = ActuationConfig(
+        enabled=bool(actuation_data.get("enabled", False)),
+        piano_roll_enabled=bool(actuation_data.get("piano_roll_enabled", True)),
+        allow_focus_steal=bool(actuation_data.get("allow_focus_steal", False)),
+        user_idle_threshold_ms=float(actuation_data.get("user_idle_threshold_ms", 1000.0)),
+        key_delay_ms=float(actuation_data.get("key_delay_ms", 15.0)),
+    )
+
     toolsets = data.get("toolsets", ["core", "inspect", "control", "notes", "safety", "render"])
     log_dir_raw = data.get("log_dir")
     fl_user_dir_raw = data.get("fl_user_dir")
@@ -238,6 +280,7 @@ def config_from_dict(data: dict[str, Any]) -> StudioBridgeConfig:
         port=port_cfg,
         broker=broker_cfg,
         safety=safety_cfg,
+        actuation=actuation_cfg,
         toolsets=list(toolsets) if isinstance(toolsets, list) else [],
         log_level=str(data.get("log_level", "INFO")),
         log_dir=Path(log_dir_raw) if log_dir_raw else None,
@@ -306,6 +349,13 @@ def save_config(config: StudioBridgeConfig, path: Path) -> None:
             f"confirm_mutations = {str(config.safety.confirm_mutations).lower()}",
             f"max_batch_size = {config.safety.max_batch_size}",
             f"tolerance = {config.safety.tolerance}",
+            "",
+            "[actuation]",
+            f"enabled = {str(config.actuation.enabled).lower()}",
+            f"piano_roll_enabled = {str(config.actuation.piano_roll_enabled).lower()}",
+            f"allow_focus_steal = {str(config.actuation.allow_focus_steal).lower()}",
+            f"user_idle_threshold_ms = {config.actuation.user_idle_threshold_ms}",
+            f"key_delay_ms = {config.actuation.key_delay_ms}",
         ]
     )
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
