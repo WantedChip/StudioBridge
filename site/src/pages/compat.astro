@@ -3,6 +3,7 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import CapabilityMatrix from '../components/islands/CapabilityMatrix.tsx';
+import JsonLd from '../components/JsonLd.astro';
 import rawCompatData from '../data/compat.json';
 
 const compatData = rawCompatData;
@@ -34,11 +35,40 @@ const configurations = [
     <meta name="theme-color" content="#F3F0E8" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0F0F0D" media="(prefers-color-scheme: dark)" />
 
+    <link rel="canonical" href="https://studiobridge.dev/compat" />
+    <link rel="alternate" type="application/rss+xml" title="StudioBridge Releases RSS Feed" href="https://studiobridge.dev/rss.xml" />
+
+    <!-- OpenGraph & Twitter Card Metadata -->
+    <meta property="og:title" content="Compatibility Matrix &amp; Hardware Diagnostics — StudioBridge" />
+    <meta
+      property="og:description"
+      content="Comprehensive StudioBridge capability matrix, host compatibility test reports, and hardware diagnostic receipts for FL Studio on Windows ARM64 and x64."
+    />
+    <meta property="og:image" content="https://studiobridge.dev/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://studiobridge.dev/compat" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Compatibility Matrix &amp; Hardware Diagnostics — StudioBridge" />
+    <meta
+      name="twitter:description"
+      content="Comprehensive StudioBridge capability matrix, host compatibility test reports, and hardware diagnostic receipts for FL Studio on Windows ARM64 and x64."
+    />
+    <meta name="twitter:image" content="https://studiobridge.dev/og.png" />
+
     <link rel="preload" href="/fonts/bricolage-grotesque-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
     <link rel="preload" href="/fonts/inter-tight-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Compatibility Matrix &amp; Hardware Diagnostics — StudioBridge</title>
+
+    <!-- Schema.org SoftwareApplication JSON-LD -->
+    <JsonLd
+      title="Compatibility Matrix & Hardware Diagnostics — StudioBridge"
+      description="Comprehensive StudioBridge capability matrix, host compatibility test reports, and hardware diagnostic receipts for FL Studio on Windows ARM64 and x64."
+      url="https://studiobridge.dev/compat"
+    />
 
     <script is:inline>
       (function () {

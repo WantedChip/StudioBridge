@@ -61,9 +61,18 @@ jobs:
       - name: Validate Starlight documentation & API reference
         run: npm run test:docs
 
+      - name: Validate SEO, GEO, OpenGraph & metadata
+        run: npm run test:metadata
+
       - name: Verify build artifacts
         run: |
           test -d dist
           test -f dist/index.html
           test -f dist/_headers
           test -f dist/_redirects
+          test -f dist/og.png
+          test -f dist/og.svg
+          test -f dist/llms.txt
+          test -f dist/llms-full.txt
+          test -f dist/robots.txt
+          test -f dist/rss.xml

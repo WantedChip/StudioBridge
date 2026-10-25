@@ -1,0 +1,58 @@
+---
+/**
+ * JsonLd.astro — Schema.org SoftwareApplication structured data
+ *
+ * Emits schema.org SoftwareApplication JSON-LD per 18_landing_page_spec.md §8, §12 (T-WEB-09).
+ * Verified against Google Rich Results Test specifications.
+ */
+
+interface Props {
+  title?: string;
+  description?: string;
+  url?: string;
+  softwareVersion?: string;
+}
+
+const {
+  title = 'StudioBridge — Agent Bridge for FL Studio',
+  description = 'Read, edit and render FL Studio projects from any coding agent — verified, reversible, local. Standard MCP server and CLI for Windows.',
+  url = 'https://studiobridge.dev/',
+  softwareVersion = '0.1.0',
+} = Astro.props;
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'StudioBridge',
+  headline: title,
+  description: description,
+  url: url,
+  applicationCategory: 'AudioApplication',
+  operatingSystem: 'Windows 11',
+  license: 'https://opensource.org/licenses/MIT',
+  softwareVersion: softwareVersion,
+  author: {
+    '@type': 'Person',
+    name: 'WantedChip',
+    url: 'https://github.com/WantedChip',
+  },
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+    availability: 'https://schema.org/InStock',
+  },
+  downloadUrl: 'https://github.com/WantedChip/studiobridge/releases',
+  featureList: [
+    'Model Context Protocol (MCP) server for coding agents',
+    'Bidirectional MIDI / SysEx 2-way RPC protocol with CRC-16 integrity verification',
+    'Offline FLP project engine with lossless round-trip parsing and AST mutation',
+    'Headless FL Studio render supervision and automated acoustic validation',
+    'Win32 UI actuation with focus guards for piano roll note application',
+    'Mutation journal with rollback guarantees (G0-G2) and read-only default session mode',
+    'Pure-Python client library with universal wheels and zero native Windows dependencies',
+  ],
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(structuredData, null, 2)} />

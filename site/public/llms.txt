@@ -1,21 +1,97 @@
 # StudioBridge
-> Agent bridge for FL Studio. Read, edit, and render FL Studio projects from any coding agent — verified, reversible, local.
 
-## Overview
-- Project: StudioBridge
-- CLI: sbridge
-- Protocol: MIDI / SysEx 2-way RPC (Magic bytes 53 42)
-- Target Host: FL Studio 21-26 on Windows x64 and ARM64
-- License: MIT (Copyright (C) 2026 WantedChip)
-- Telemetry: Zero telemetry, 100% local
+> Agent bridge for FL Studio. Read, edit, and render FL Studio projects from any coding agent — verified, reversible, local. Standard MCP server and CLI for Windows.
 
-## Interfaces
-- Model Context Protocol (MCP): Standard tool suites for inspect, live control, offline FLP authoring, and headless rendering.
-- Command Line Interface: `sbridge` console script.
-- Python SDK: Pure-Python client libraries with universal wheels.
+StudioBridge patches language models and coding agents directly into FL Studio via a bidirectional MIDI/SysEx RPC protocol, an offline FLP binary project engine, a headless render supervisor, and Win32 UI actuation.
 
-## Documentation
-- Full Documentation: /docs/
-- Capability Matrix: /compat
-- Changelog: /changelog
-- Repository: https://github.com/WantedChip/studiobridge
+## Architecture & Control Planes
+
+StudioBridge provides 4 distinct control planes:
+- Plane 1: Live MIDI RPC (CH 01 // LIVE RPC)
+  Bidirectional SysEx protocol over MIDI loopback (Windows MIDI Services or loopMIDI) communicating with the FL Studio controller script runtime. Frame format: SOF (0xF0), Vendor (0x7D), Magic (0x53 0x42), Version (0x01), Sequence ID, Opcode, Payload, CRC-16 CCITT (0x1021), EOF (0xF7). p50 latency < 3ms.
+- Plane 2: Offline FLP Engine (CH 02 // OFFLINE FLP)
+  Lossless binary FLP project parser and AST mutator. Inspects and edits project titles, tempo, mixer tracks, channels, plugins, and pattern events offline without running FL Studio. Enforces structural invariants before saving.
+- Plane 3: Headless Render Supervisor (CH 03 // HEADLESS RENDER)
+  Automates background WAV/MP3 rendering via FL Studio command-line switches with timeout management, freeze detection, and acoustic validation (dBFS peak, RMS, clipping detection).
+- Plane 4: Win32 UI Actuation (CH 04 // UI ACTUATION)
+  Focus-guarded Win32 window actuation and keyboard macro injection for native FL Studio dialogs and piano-roll note entry where controller scripts have host-imposed limitations.
+
+## Supported Environments & Provenance
+
+- Supported DAWs: FL Studio 21.x, 25.x, 26.x (Producer Edition and higher).
+- Operating System: Windows 11 (ARM64 Snapdragon X Elite and x64 Intel/AMD).
+- Driver Architecture: Zero third-party proprietary kernel drivers required. Primary routing uses Windows MIDI Services (WMS) loopback.
+- License: MIT License (Copyright (C) 2026 WantedChip).
+- Privacy Posture: 100% local execution. Zero network calls, zero analytics, zero telemetry.
+- Clean-Room Provenance: Zero GPL contamination. Developed strictly from public clean-room documentation and live hardware experiments.
+
+## Model Context Protocol (MCP) Tools
+
+StudioBridge exposes standard MCP tools for coding agents:
+
+### Inspect & State Tools
+- `mixer_list`: Retrieve mixer track names, fader volumes, pan positions, routing destinations, and enabled status.
+- `mixer_get`: Get detailed state for a specific mixer track including volume dB, mute/solo flags, and slot effects.
+- `channel_list`: Enumerate all channels in the Channel Rack (instruments, samplers, audio clips, automation).
+- `channel_get`: Inspect channel properties (volume, pan, pitch, assigned mixer track, color, name).
+- `pattern_list`: List all project patterns and lengths.
+- `plugin_list`: Enumerate hosted generator and effect VST/CLAP plugins.
+- `transport_get`: Read DAW playback status (playing, recording, song position, BPM, tempo, time signature).
+- `project_info`: Retrieve project metadata (title, author, genre, bar count, render settings).
+
+### Live Control Tools
+- `mixer_set`: Set mixer fader volume, stereo panning, mute, or solo state. Read-back verified against tolerance.
+- `channel_set`: Modify channel volume, pan, pitch, or mute state.
+- `transport_set`: Trigger playback, pause, stop, song/pattern mode toggle, or BPM changes.
+- `notes_apply`: Apply MIDI notes to a designated pattern in the Piano Roll. Verified via piano-roll oracle read-back.
+
+### Safety & Mutation Journal Tools
+- `session_mode_set`: Switch between read-only (default) and write-permitted safety modes.
+- `checkpoint_create`: Capture an in-memory or disk project snapshot before mutations.
+- `checkpoint_rollback`: Rollback project state to a designated checkpoint ID.
+- `journal_list`: Inspect the append-only mutation journal (operation timestamp, target, pre-value, post-value, verification receipt).
+
+### Offline FLP Tools
+- `flp_inspect`: Parse an offline .flp project file into JSON AST without launching FL Studio.
+- `flp_mutate`: Apply declarative mutations to an offline .flp file with structural invariant validation.
+- `flp_template_instantiate`: Clone and configure a verified seed template with custom tracks and tempo.
+
+### Render Tools
+- `render_start`: Initiate a background audio export to WAV, MP3, or FLAC.
+- `render_status`: Monitor progress, render duration, and process health.
+- `render_analyze`: Validate exported audio file properties (dBFS peaks, loudness, clipped samples).
+
+## Installation & Setup
+
+StudioBridge provides automated agent configuration via the `sbridge` CLI:
+
+```bash
+# Run one-line automated installer for your agent:
+uvx studiobridge agent install [agent-id]
+```
+
+Supported agent IDs:
+- `claude-code`: Anthropic Claude Code CLI (.mcp.json)
+- `claude-desktop`: Anthropic Claude Desktop (claude_desktop_config.json)
+- `cursor`: Cursor IDE (.cursor/mcp.json)
+- `codex`: OpenAI Codex CLI (codex_config.json)
+- `antigravity`: Google Antigravity Agent (agy.config.json)
+- `gemini-cli`: Google Gemini CLI (gemini.json)
+- `windsurf`: Codeium Windsurf (mcp_config.json)
+- `zed`: Zed Editor (settings.json)
+- `vscode`: Visual Studio Code (settings.json)
+- `plain-cli`: Standard console execution via sbridge
+
+### Verification
+```bash
+# Run the 26-point diagnostic health suite:
+sbridge doctor
+```
+
+## Key Pointers
+- Full Documentation: https://studiobridge.dev/docs/
+- Full Consolidated LLM Text: https://studiobridge.dev/llms-full.txt
+- Hardware Compatibility Matrix: https://studiobridge.dev/compat
+- Releases & Changelog: https://studiobridge.dev/changelog
+- RSS Feed: https://studiobridge.dev/rss.xml
+- GitHub Repository: https://github.com/WantedChip/studiobridge
