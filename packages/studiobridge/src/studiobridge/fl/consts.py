@@ -1,7 +1,7 @@
 """Typed constants and enums for FL Studio MIDI scripting API.
 
 Exports FPT_* global transport commands, midi.* event constants, UF_* undo flags,
-PME_* flags, and REC_* flags per 05_l0c_device_script_manifest.md §16.
+PME_* flags, and REC_* flags.
 Generated deterministically by studiobridge.manifest.codegen. Do not edit manually.
 """
 

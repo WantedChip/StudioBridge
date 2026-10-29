@@ -1,7 +1,6 @@
 """FLP project mutation operators and audit journaling.
 
-Implements validated offline project modifications per 07_l0e_flp_engine.md §3.4,
-10_l2_interfaces.md §3, [FLP-21], and [FLP-30].
+Implements validated offline project modifications per [FLP-21] and [FLP-30].
 """
 
 from __future__ import annotations

@@ -1,8 +1,7 @@
 /**
  * Automated Visual Regression & Responsive Layout Test Suite
- * Sub-Phase v0.6.10 / T-WEB-10
  *
- * Requirements per 18_landing_page_spec.md §7, §10, §12:
+ * Requirements:
  * 1. Responsive Viewports & Horizontal Overflow:
  *    - Mobile (360px), Tablet (768px), Desktop (1280px), Widescreen (1920px).
  *    - Verifies zero horizontal scroll overflow across all viewports (body.scrollWidth === innerWidth).
@@ -45,7 +44,7 @@ function resolveDistDir(): string {
   throw new Error(`dist directory not found in candidates: ${candidates.join(', ')}. Run 'npm run build' first.`);
 }
 
-describe('Visual Regression & Responsive Layout Test Suite (v0.6.10 / T-WEB-10)', () => {
+describe('Visual Regression & Responsive Layout Test Suite', () => {
   const distDir = resolveDistDir();
 
   const pagesToTest = [

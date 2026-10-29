@@ -1,6 +1,6 @@
 """Unit tests for capability preflight checks and capability gating.
 
-Verifies [CAP-02], 09_l1_sdk.md §4, §10, and v0.2.3 Definition of Done:
+Verifies [CAP-02]:
 - gate_capability() raising UnavailableError carrying capability ID and alternatives.
 - fl.caps mapping protocol support.
 - Operation prefix routing to capabilities.

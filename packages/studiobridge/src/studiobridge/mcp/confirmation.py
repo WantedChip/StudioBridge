@@ -1,6 +1,6 @@
 """Confirmation flow engine and challenge-token validation for StudioBridge MCP.
 
-Implements human confirmation flows per spec 10_l2_interfaces.md §2.3 and [MCP-10]:
+Implements human confirmation flows [MCP-10]:
 - Multi Round-Trip Request (MRTR) / elicitation payload for 2026-07-28 clients.
 - One-time random challenge phrase with confirm_token fallback for older clients.
 - Single-use challenge token generation and verification with TTL expiration.

@@ -1,6 +1,6 @@
 """Central brand token mapping and constraints for StudioBridge.
 
-Per 00_INDEX.md §8:
+Brand tokens and naming conventions table:
 All brand-bearing strings are centralized so a rename is mechanical:
 
 | Token       | Working value                  | Where used                             |

@@ -1,6 +1,6 @@
 """Safety modes, confirmation gates, and protected target interlocks.
 
-Implements safety enforcement per spec 09_l1_sdk.md §5 and 12_crosscutting.md §1:
+Implements safety enforcement [SAF-01]:
 - Safety modes: 'read_only' (default), 'write_with_confirm', 'write_autonomous'
   (harmonized with 'write', 'unsafe').
 - Read-only mutation gating raising ReadOnlyError (subclass of SafetyError, E_READONLY).
@@ -54,7 +54,7 @@ DEFAULT_TOKEN_EXPIRY_SECONDS: float = 300.0  # 5 minutes
 
 
 def is_operation_mutating(op: str) -> bool:
-    """Check if an operation modifies FL Studio state per spec [SAF-01]."""
+    """Check if an operation modifies FL Studio state [SAF-01]."""
     if is_wire_mutating(op):
         return True
     if "." in op:

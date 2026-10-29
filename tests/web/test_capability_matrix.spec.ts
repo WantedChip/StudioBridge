@@ -1,7 +1,7 @@
 /**
- * Test Suite for Capability Matrix Explorer Island & Compatibility Page (v0.6.7 / T-WEB-07)
+ * Test Suite for Capability Matrix Explorer Island & Compatibility Page
  *
- * Requirements per 18_landing_page_spec.md §5, §6.2 and sub-phase v0.6.7:
+ * Requirements:
  * 1. Build-time compatibility compiler & authentic fixtures:
  *    - Ingests authentic test data from Machine A (Snapdragon X Elite ARM64) and Machine B (x64).
  *    - Validates compat.json mapping FL Studio builds (26.1.3, 25.2.3, 21.2) and architectures (ARM64, x64).
@@ -55,7 +55,7 @@ function resolveCompatJsonPath(): string {
   throw new Error(`compat.json not found. Checked: ${candidates.join(', ')}`);
 }
 
-describe('Capability Matrix Explorer Island & Compatibility Page (v0.6.7 / T-WEB-07)', () => {
+describe('Capability Matrix Explorer Island & Compatibility Page', () => {
   const compatJsonPath = resolveCompatJsonPath();
   const compatRaw = JSON.parse(fs.readFileSync(compatJsonPath, 'utf8'));
 
@@ -63,7 +63,7 @@ describe('Capability Matrix Explorer Island & Compatibility Page (v0.6.7 / T-WEB
     it('should have valid metadata with spec version and tested environments', () => {
       assert.ok(compatRaw.meta, 'meta section must exist');
       assert.strictEqual(compatRaw.meta.schemaVersion, '1.0.0');
-      assert.ok(compatRaw.meta.specVersion.includes('18 §5, §6.2'));
+      assert.strictEqual(compatRaw.meta.specVersion, '1.0.0');
       assert.ok(compatRaw.meta.testedEnvironments.machineA, 'Machine A metadata must exist');
       assert.ok(compatRaw.meta.testedEnvironments.machineB, 'Machine B metadata must exist');
 

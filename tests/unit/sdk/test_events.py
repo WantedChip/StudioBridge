@@ -2,7 +2,7 @@
 
 Tests typed event dataclasses, subscription filtering, backpressure handling
 (drop-oldest for high frequency events, guaranteed delivery for critical events),
-and async iterator / callback registration per spec 09_l1_sdk.md §9 and [v0.2.9].
+and async iterator / callback registration.
 """
 
 from __future__ import annotations

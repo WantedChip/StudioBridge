@@ -2,7 +2,7 @@
 
 Implements spec version negotiation (targeting 2026-07-28 with automatic fallbacks
 down to 2025-03-26) and stdio JSON-RPC transport with framework-agnostic tool
-dispatch per spec 10_l2_interfaces.md §2.1–§2.3 and [MCP-01..04].
+dispatch [MCP-01..04].
 """
 
 from __future__ import annotations
@@ -324,7 +324,7 @@ class McpHost:
             "prompts": {"listChanged": False},
         }
 
-        # Tasks extension capability included for 2026-07-28 spec per 10_l2_interfaces.md §2.1
+        # Tasks extension capability included for 2026-07-28 MCP protocol
         if self.negotiated_version == "2026-07-28":
             capabilities["tasks"] = {"listChanged": False}
 

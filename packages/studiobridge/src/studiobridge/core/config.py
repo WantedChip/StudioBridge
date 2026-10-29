@@ -71,7 +71,7 @@ class ActuationConfig:
 
 @dataclass(slots=True)
 class RenderConfig:
-    """Headless render orchestration configuration [06_l0d §11, §13]."""
+    """Headless render orchestration configuration."""
 
     timeout_s: float = 900.0  # total render timeout in seconds
     idle_timeout_s: float = 120.0  # idle timeout in seconds (no file growth)

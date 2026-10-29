@@ -1,7 +1,7 @@
 """Mock FL Studio builtins and API modules with realistic state.
 
 Provides simulated FL Studio embedded environment and sandbox audit hooks / import blockers
-restricting forbidden modules per [DEV-30] and 05_l0c_device_script_manifest.md §1, §9.
+restricting forbidden modules per [DEV-30].
 """
 
 from __future__ import annotations

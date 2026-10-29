@@ -1,6 +1,6 @@
 """FL Studio constants, flags, and types.
 
-Exports typed constants and enums per 05_l0c_device_script_manifest.md §16.
+Exports typed constants and enums.
 """
 
 from __future__ import annotations

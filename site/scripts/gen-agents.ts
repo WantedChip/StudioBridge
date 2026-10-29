@@ -38,7 +38,7 @@ export interface ProcessedAgent extends AgentDefinition {
   highlightedHtml: string;
 }
 
-// 11 supported agents in canonical display order per 18_landing_page_spec.md §5, §6.4
+// 11 supported agents in canonical display order
 const AGENT_SPECS: AgentDefinition[] = [
   {
     id: 'claude-code',

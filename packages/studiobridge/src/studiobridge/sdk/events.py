@@ -2,7 +2,7 @@
 
 Implements typed event models, async iterators, callback listeners, bounded queues,
 and backpressure handling (drop-oldest for high frequency events, guaranteed delivery
-for critical events) per spec 09_l1_sdk.md §9 and [v0.2.9].
+for critical events).
 """
 
 from __future__ import annotations
@@ -541,7 +541,7 @@ class AsyncEventManager:
         """Dispatch an event to all subscribers, callbacks, and cache invalidators."""
         event = create_event(topic, data=data, seq=seq, timestamp=timestamp)
 
-        # 1. Event-driven cache invalidation per [v0.2.9] & 09 §9
+        # 1. Event-driven cache invalidation
         if self.cache is not None:
             self.cache.on_event(event)
 

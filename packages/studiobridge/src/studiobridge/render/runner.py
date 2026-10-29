@@ -4,7 +4,7 @@ Launches FL Studio headless render (FL64.exe /R /E... staged_flp), supervises ex
 under a Windows Job Object to guarantee zero zombie child processes, detects blocking
 modal dialogs (missing plugins, project info popups), monitors file growth for idle
 timeouts, and scales timeouts under Windows ARM64 Prism emulation.
-Requirements: [RND-01], [RND-02], [RND-03], [RND-04], 06_l0d_pianoroll_actuation_render.md §9-§13.
+Requirements: [RND-01], [RND-02], [RND-03], [RND-04].
 """
 
 from __future__ import annotations
@@ -258,7 +258,7 @@ class RenderRunner:
         4. Supervision: poll for dialog popups, file growth (idle timeout), and total timeout.
         5. Collection: collect output audio files and generate sidecar metadata.
         """
-        # Acquire concurrency lock (max 1 active render job) [06_l0d §13]
+        # Acquire concurrency lock (max 1 active render job)
         lock = RenderJobLock(job.job_id)
         lock.acquire()
 
@@ -273,14 +273,14 @@ class RenderRunner:
             fl_install = self.resolve_fl_install(job)
             job.fl_install = fl_install
 
-            # Enforce instance collision policy [06_l0d §13]
+            # Enforce instance collision policy
             policy = job.instance_policy or self.config.render.default_policy
             self.policy_enforcer.enforce(policy, preferred_install=fl_install)
 
             # --- 2. Staging [RND-02] ---
             staged_flp = job.stage()
 
-            # Determine ARM64 Prism timeout scaling [Spike S11]
+            # Determine ARM64 Prism timeout scaling
             is_arm64_emulated = fl_install.is_emulated or self.discovery.is_prism_emulated()
             scale = self.config.render.timeout_multiplier if is_arm64_emulated else 1.0
             if job.timeout_multiplier > 1.0:

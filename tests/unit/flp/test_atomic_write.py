@@ -1,8 +1,7 @@
 """Unit tests for atomic FLP project writing, fsync, backups, and version gating.
 
 Verifies temporary file isolation, atomic replacement, backup generation on in-place writes,
-write-risk blocking for unknown versions ([FLP-32]), and invariant rollback per
-07_l0e_flp_engine.md §3.4 and [FLP-31].
+write-risk blocking for unknown versions ([FLP-32]), and invariant rollback [FLP-31].
 """
 
 from __future__ import annotations

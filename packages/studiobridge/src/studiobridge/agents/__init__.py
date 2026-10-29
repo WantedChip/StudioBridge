@@ -1,7 +1,7 @@
 """Agent skill installers and integrations.
 
 Provides automated MCP configuration installer, detection, templates, golden tests,
-and agent skill package management per spec 10_l2_interfaces.md §5, §6 and [AGT-01..04, SKL-01].
+and agent skill package management [AGT-01..04, SKL-01].
 """
 
 from __future__ import annotations

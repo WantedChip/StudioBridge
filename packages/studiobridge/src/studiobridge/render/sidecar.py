@@ -1,4 +1,4 @@
-"""Structured render metadata sidecar generator and reader [06_l0d §12].
+"""Structured render metadata sidecar generator and reader.
 
 Emits and parses `{filename}.render.json` sidecar metadata files alongside rendered
 audio files (and compatibility alias `{filename}.meta.json`), recording provenance

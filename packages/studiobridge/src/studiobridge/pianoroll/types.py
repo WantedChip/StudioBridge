@@ -1,6 +1,6 @@
 """Types, note representations, and musical unit conversions for piano-roll scripts.
 
-Per spec 06_l0d_pianoroll_actuation_render.md §1–§3 and [PR-01]..[PR-06].
+Implements piano-roll types and conversions [PR-01]..[PR-06].
 """
 
 from __future__ import annotations
@@ -263,7 +263,7 @@ def normalize_color(c: Any) -> int:
 
 @dataclass(frozen=True, slots=True)
 class Note:
-    """Complete 11-parameter piano roll note per spec 06_l0d §3.
+    """Complete 11-parameter piano roll note.
 
     Fields:
     1. pos: start position in project PPQ ticks
@@ -342,7 +342,7 @@ class Note:
         return midi_to_note_name(self.key)
 
     def to_tuple(self) -> tuple[int, int, int, float, float, float, int, int, float, float, bool]:
-        """Serialize note as canonical 11-parameter tuple per 06_l0d §3."""
+        """Serialize note as canonical 11-parameter tuple."""
         return (
             self.pos,
             self.length,

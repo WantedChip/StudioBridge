@@ -2,7 +2,7 @@
 
 Verifies mutation operators, untouched element serialization preservation ([FLP-21]),
 journaling ([FLP-30]), header channel count consistency ([FLP-05]), and invariant
-validation under Hypothesis property fuzzing per 07_l0e_flp_engine.md §3.4 and 12 §7.
+validation under Hypothesis property fuzzing.
 """
 
 from __future__ import annotations
@@ -332,7 +332,7 @@ def test_untouched_elements_preserve_original_bytes(tmp_path: Path) -> None:
 
 
 # =============================================================================
-# 7. Structural Invariant Checks & Violation Detection ([FLP-05], 12 §7)
+# 7. Structural Invariant Checks & Violation Detection ([FLP-05])
 # =============================================================================
 
 

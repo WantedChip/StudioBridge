@@ -2,7 +2,7 @@
 
 Provides machine-readable typed descriptors, parsing utilities, introspect-merge,
 quirks overlays, drift detection, API coverage analysis, and documentation card generation
-for FL Studio's MIDI scripting API per 05_l0c_device_script_manifest.md §11–§17.
+for FL Studio's MIDI scripting API.
 """
 
 from __future__ import annotations

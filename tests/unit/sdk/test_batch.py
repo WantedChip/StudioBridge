@@ -1,6 +1,6 @@
 """Unit tests for batch execution and WriteReport builder.
 
-Verifies 09_l1_sdk.md §3.1, §4, and v0.2.3 Definition of Done:
+Verifies:
 - fl.batch() collects multiple calls into a single wire batch and returns WriteReport.
 - Change dataclass records targets, values, and verification status.
 - Sync and async batch execution.

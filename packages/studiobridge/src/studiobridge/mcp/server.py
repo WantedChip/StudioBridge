@@ -1,8 +1,7 @@
 """Model Context Protocol (MCP) server foundation and toolset registry.
 
 Provides the StudioMcpServer runtime, framework-agnostic ToolDefinition and
-ToolResult structures, and toolset filtering per spec 10_l2_interfaces.md §2.1–§2.4
-and [MCP-04, MCP-11].
+ToolResult structures, and toolset filtering per [MCP-04, MCP-11].
 """
 
 from __future__ import annotations
@@ -27,7 +26,7 @@ from studiobridge.mcp.resources import (
     ResourceTemplate,
 )
 
-# All recognized toolset identifiers per spec 10_l2_interfaces.md §2.2
+# All recognized toolset identifiers
 VALID_TOOLSETS: frozenset[str] = frozenset(
     {
         "core",
@@ -139,7 +138,7 @@ def parse_toolsets(
             f"Invalid toolset(s): {unknown_sorted}. Valid toolsets are: {valid_sorted}"
         )
 
-    # Meta mode and unsafe/raw aliasing per spec 10_l2_interfaces.md §2.2
+    # Meta mode and unsafe/raw aliasing
     if "raw" in selected:
         selected.add("unsafe")
     if "unsafe" in selected:

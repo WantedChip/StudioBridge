@@ -1,4 +1,4 @@
-"""Musical and engineering unit conversions per spec 09_l1_sdk.md §3.3.
+"""Musical and engineering unit conversions.
 
 Provides strongly-typed domain units and conversions:
 - Volume: accepts raw 0.0..1.0, Db(float), or Percent(float)
@@ -79,7 +79,7 @@ class Percent:
 
 
 class Volume:
-    """Volume unit supporting raw 0.0..1.0, Db, and Percent conversions per 09 §3.3.
+    """Volume unit supporting raw 0.0..1.0, Db, and Percent conversions.
 
     Conversion curve adheres to FL Studio mixer fader behavior where:
     - 0.8 raw corresponds to 0.0 dB (unity gain)

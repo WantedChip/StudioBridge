@@ -1,7 +1,7 @@
 """CLI command handlers for 'sbridge agent'.
 
 Implements 'sbridge agent list', 'sbridge agent install', and 'sbridge agent snippet'
-per spec 10_l2_interfaces.md §5 and requirements [AGT-01] through [AGT-04].
+per requirements [AGT-01] through [AGT-04].
 """
 
 from __future__ import annotations

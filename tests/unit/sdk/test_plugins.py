@@ -1,4 +1,4 @@
-"""Unit and integration tests for Plugins namespace per 09_l1_sdk.md §4 and v0.2.5.
+"""Unit and integration tests for Plugins namespace.
 
 Tests both Studio (synchronous) and AsyncStudio (asynchronous) plugins interfaces:
 - get_plugin(track, slot), list_plugins(track)

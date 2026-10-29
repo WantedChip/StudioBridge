@@ -1,7 +1,7 @@
 """Quirks overlay parser and merger with [MAN-02] citation validation.
 
 Parses YAML/JSON quirks overlays specifying paired getters, verification tolerances,
-safety protections, and empirical hardware notes per 05_l0c_device_script_manifest.md §15.
+safety protections, and empirical hardware notes.
 """
 
 from __future__ import annotations

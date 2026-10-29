@@ -1,7 +1,7 @@
 """Unit tests for semantic FLP project diffing.
 
 Verifies detection of added/removed channels, modified tempos, altered notes,
-mixer routing, and metadata differences per 07_l0e_flp_engine.md §3.3 and 07 §8.
+mixer routing, and metadata differences.
 """
 
 from __future__ import annotations

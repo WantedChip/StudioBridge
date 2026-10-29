@@ -1,6 +1,6 @@
 """Unit and integration tests for StudioBridge transactions, checkpoints, and rollback guarantees.
 
-Verifies [TXN-01..02], 09_l1_sdk.md §6, and v0.2.8 DoD:
+Verifies [TXN-01..02]:
 - Exceptions inside with fl.transaction(): trigger automatic rollback to initial values.
 - Automatic rollback restores mixer volume, pan, and mute states cleanly.
 - Repeated mutations within a transaction restore to the initial before value.

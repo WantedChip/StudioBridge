@@ -1,6 +1,6 @@
 """Piano-roll note application orchestrator and tiered execution ladder.
 
-Per spec 06_l0d_pianoroll_actuation_render.md §4, §6, §7 and [ACT-01], [ACT-02]:
+Orchestrates piano-roll note application [ACT-01, ACT-02]:
 Orchestrates end-to-end note application across:
 - Stage 1: Target channel/pattern selection and piano-roll window focus via live API.
 - Stage 2: Generated SBridgeApply.pyscript generation and writing.
@@ -400,7 +400,7 @@ class NoteApplyOrchestrator:
     ) -> NoteApplyResult:
         """Fallback note application using 16-step sequencer grid (channels.setGridBit).
 
-        Per spec 06_l0d §7: Provides verified live application for simple rhythm patterns.
+        Provides verified live application for simple rhythm patterns.
         # req: ACT-01, ACT-02
         """
         ch_idx = _resolve_index(channel)
@@ -464,7 +464,7 @@ class NoteApplyOrchestrator:
         tempo_bpm: float = 120.0,
         job_id: str | None = None,
     ) -> Path:
-        """Export notes to standard MIDI file (.mid) fallback per spec 06_l0d §7."""
+        """Export notes to standard MIDI file (.mid) fallback."""
         note_objs = self.generator._to_note_objects(notes, ppq=ppq)
         actual_job_id = job_id or self.generator.generate_job_id()
 

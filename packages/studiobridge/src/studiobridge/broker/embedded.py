@@ -1,6 +1,6 @@
 """In-process broker facade for direct SDK execution and headless testing.
 
-Implements EmbeddedBroker per [BRK-20] and spec 04_l0b_ports_broker.md §8.7.
+Implements EmbeddedBroker per [BRK-20].
 Allows in-process scheduling, port arbitration, event multiplexing, and lease management
 without requiring a detached background daemon process.
 """
@@ -164,7 +164,7 @@ class EmbeddedBroker:
         return {"pong": True, "timestamp": time.time()}
 
     async def broker_status(self) -> dict[str, Any]:
-        """Comprehensive broker health and telemetry snapshot per §8.6."""
+        """Comprehensive broker health and telemetry snapshot."""
         now = self.clock()
         port_api = "embedded"
         stats = {}

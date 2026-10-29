@@ -2,7 +2,7 @@
 
 Implements multi-tier priority scheduling (control > read > write > bulk),
 client queue limits (256 requests per client), fair round-robin scheduling,
-and token-bucket rate limiting per [BRK-12] and spec 04_l0b_ports_broker.md §8.4.
+and token-bucket rate limiting per [BRK-12].
 """
 
 from __future__ import annotations

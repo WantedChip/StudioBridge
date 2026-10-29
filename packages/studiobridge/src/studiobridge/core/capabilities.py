@@ -1,6 +1,6 @@
 """StudioBridge capability status model, prerequisite resolution, and registry.
 
-Implements the capability data model per spec 02_architecture.md §6:
+Implements the capability data model:
 Capability { id, state, reason, requires[], alternatives[], evidence[] }
 state in {available, degraded, unavailable, unknown}
 and enforcement rule [CAP-02]: operations that would fail MUST fail early with E_UNAVAILABLE.
@@ -337,7 +337,7 @@ class CapabilityRegistry:
         return cls.from_json(path.read_text(encoding="utf-8"))
 
 
-# Standard capability IDs from specification
+# Standard capability IDs
 CAP_LIVE_TRANSPORT_CONTROL = "live.transport.control"
 CAP_LIVE_MIXER_WRITE = "live.mixer.write"
 CAP_LIVE_CHANNELS = "live.channels"

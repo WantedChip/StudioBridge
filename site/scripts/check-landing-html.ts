@@ -65,7 +65,7 @@ const checks = [
   { name: 'FAQ answers supported FL versions (FL 21–26)', test: faqIncludes('Which FL Studio versions are supported?') },
   { name: 'FAQ answers Windows on ARM64', test: faqIncludes('Does StudioBridge support Windows on ARM64') },
   { name: 'FAQ answers trademark non-affiliation', test: faqIncludes('What is the relationship between StudioBridge and Image-Line?') },
-  { name: 'Verbatim prominent non-affiliation statement in footer (18 §11)', test: html.includes('StudioBridge is an independent open-source project. FL Studio is a trademark of Image-Line. Not affiliated with or endorsed by Image-Line.') },
+  { name: 'Verbatim prominent non-affiliation statement in footer', test: html.includes('StudioBridge is an independent open-source project. FL Studio is a trademark of Image-Line. Not affiliated with or endorsed by Image-Line.') },
   { name: 'Footer links to llms.txt', test: html.includes('href="/llms.txt"') },
   { name: 'Numbered technical catalogue styling across sections', test: html.includes('01 /') && html.includes('02 /') && html.includes('03 /') && html.includes('04 /') && html.includes('05 /') && html.includes('06 /') && html.includes('07 /') && html.includes('08 /') && html.includes('09 /') },
 ];

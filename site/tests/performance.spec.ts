@@ -1,8 +1,7 @@
 /**
  * Automated Performance, Bundle Size & Lighthouse Lab Metrics Audit
- * Sub-Phase v0.6.10 / T-WEB-10
  *
- * Requirements per 18_landing_page_spec.md §10, §12:
+ * Requirements:
  * 1. JavaScript Bundle Budget:
  *    - Initial JavaScript on '/' <= 90 KB gzip (assert actual gzip size of client JS assets).
  * 2. Self-Hosted Font Budget:
@@ -55,7 +54,7 @@ function resolveFontsDir(): string {
   throw new Error(`fonts directory not found in candidates: ${candidates.join(', ')}`);
 }
 
-describe('Automated Performance & Bundle Budget Audit (v0.6.10 / T-WEB-10)', () => {
+describe('Automated Performance & Bundle Budget Audit', () => {
   const distDir = resolveDistDir();
   const fontsDir = resolveFontsDir();
 
@@ -114,12 +113,12 @@ describe('Automated Performance & Bundle Budget Audit (v0.6.10 / T-WEB-10)', () 
       assert.ok(fs.existsSync(astroDir), '_astro directory must exist');
 
       const islandBudgets: Record<string, number> = {
-        SignalPath: 12 * 1024, // <= 12 KB gzip (T-WEB-04)
-        ConsoleDemo: 15 * 1024, // <= 15 KB gzip (T-WEB-06)
-        CapabilityMatrix: 15 * 1024, // <= 15 KB gzip (T-WEB-07)
-        InstallTabs: 12 * 1024, // <= 12 KB gzip (T-WEB-05)
-        ThemeToggle: 5 * 1024, // <= 5 KB gzip (T-WEB-02)
-        CopyButton: 5 * 1024, // <= 5 KB gzip (T-WEB-04)
+        SignalPath: 12 * 1024, // <= 12 KB gzip
+        ConsoleDemo: 15 * 1024, // <= 15 KB gzip
+        CapabilityMatrix: 15 * 1024, // <= 15 KB gzip
+        InstallTabs: 12 * 1024, // <= 12 KB gzip
+        ThemeToggle: 5 * 1024, // <= 5 KB gzip
+        CopyButton: 5 * 1024, // <= 5 KB gzip
       };
 
       const jsFiles = fs.readdirSync(astroDir).filter((f) => f.endsWith('.js'));

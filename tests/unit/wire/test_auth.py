@@ -1,8 +1,7 @@
 """Unit tests for HMAC-SHA256, SipHash-2-4 fallback, and request authentication.
 
 Validates canonical JSON encoding, 16-hex signature truncation, timing attack resistance,
-tamper rejection, and unauthenticated operation bypass per spec
-03_l0a_wire_protocol.md §8 and [SEC-01], [SEC-03].
+tamper rejection, and unauthenticated operation bypass [SEC-01], [SEC-03].
 """
 
 from __future__ import annotations
@@ -192,7 +191,7 @@ class TestEnvelopeSigningAndVerification:
         assert verify_request(secret, req) is True
 
     def test_unauthenticated_ops_bypass_verification(self) -> None:
-        """'hello' and 'ping' operations bypass auth verification per §5.1."""
+        """'hello' and 'ping' operations bypass auth verification."""
         secret = secrets.token_bytes(32)
         hello_req = RequestEnvelope(op="hello", args={"client": {"name": "test"}})
         assert verify_request(secret, hello_req) is True

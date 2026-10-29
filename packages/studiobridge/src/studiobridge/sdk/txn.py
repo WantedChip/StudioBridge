@@ -1,7 +1,7 @@
 """Transactions, checkpoints, and multi-tier rollback guarantees (G0–G2).
 
 Implements atomic transaction blocks, undo checkpoints, read-before-write tracking,
-and inverse compensating operations per spec 09_l1_sdk.md §6 and [TXN-01..02]:
+and inverse compensating operations [TXN-01..02]:
 - Guarantee levels:
   - G0 ("none"): Operation has no safe inverse (e.g. save, render); reports not reversible.
   - G1 ("best_effort"): SDK rollback via inverse compensating calls or general.undo(),
@@ -40,7 +40,7 @@ logger = get_logger("sdk.txn")
 
 
 class RollbackGuarantee(str, Enum):
-    """Rollback guarantee tiers defined per 09_l1_sdk.md §6 and v0.2.8.
+    """Rollback guarantee tiers.
 
     - G0 ("none"): Operation has no safe inverse (e.g. save, render); not reversible.
     - G1 ("best_effort"): SDK rollback via inverse calls or general.undo(), not all verified.
@@ -84,7 +84,7 @@ class RollbackGuarantee(str, Enum):
         )
 
 
-# Operations with no safe inverse that degrade guarantee level to G0 per 09_l1_sdk.md §6
+# Operations with no safe inverse that degrade guarantee level to G0
 IRREVERSIBLE_OPERATIONS: frozenset[str] = frozenset(
     {
         "project.save",
@@ -185,7 +185,7 @@ class TargetRollback:
 
 @dataclass(frozen=True, slots=True)
 class RollbackReport:
-    """Structured report produced following a transaction rollback per 09_l1_sdk.md §6."""
+    """Structured report produced following a transaction rollback."""
 
     ok: bool
     guarantee: RollbackGuarantee
@@ -575,7 +575,7 @@ async def apply_inverse_operation(
 
 
 class Transaction:
-    """Transaction context manager supporting sync and async execution per spec 09_l1_sdk.md §6."""
+    """Transaction context manager supporting sync and async execution."""
 
     def __init__(
         self,
@@ -701,7 +701,7 @@ class Transaction:
         # Acquire writer lease for the duration of the transaction
         await self._session.acquire_lease(ttl=max(self.timeout, 15.0), purpose=f"txn:{self.name}")
 
-        # Native undo checkpoint via general.saveUndo per spec
+        # Native undo checkpoint via general.saveUndo
         checkpoint_name = f"StudioBridge: {self.name}"
         try:
             await self._session.call(

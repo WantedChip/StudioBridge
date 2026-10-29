@@ -1,4 +1,4 @@
-"""Unit tests for manifest overlay, introspect-merge, and code generation per v0.2.1.
+"""Unit tests for manifest overlay, introspect-merge, and code generation.
 
 Verifies:
 1. Negative allowlist tests (unlisted functions raise E_UNAVAILABLE, arg mismatches raise E_ARGS).

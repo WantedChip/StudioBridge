@@ -1,8 +1,7 @@
 """Offline FL Studio project (.flp) MCP tool suite.
 
 Implements offline project inspection, diffing, validation, editing, save-as,
-and template instantiation per spec 10_l2_interfaces.md §2.4, §2.8,
-12_crosscutting.md §1, [MCP §2.8], and [FLP-30..40].
+and template instantiation [MCP-SEC, FLP-30..40].
 """
 
 from __future__ import annotations

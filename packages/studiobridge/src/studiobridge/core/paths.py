@@ -1,8 +1,7 @@
 """Windows platform path resolution and FL Studio directory discovery.
 
 Implements path resolution for StudioBridge local storage (%LOCALAPPDATA%\\studiobridge)
-and FL Studio user data discovery (Documents\\Image-Line\\FL Studio) per spec
-02_architecture.md §8 and 08_l0f_setup_doctor_probe.md §2.
+and FL Studio user data discovery (Documents\\Image-Line\\FL Studio).
 """
 
 from __future__ import annotations
@@ -268,7 +267,7 @@ def validate_safe_path(
 ) -> Path:
     """Validate that path contains no traversal attacks and resolves within safe roots.
 
-    Per spec 10_l2_interfaces.md §2.8 and [MCP §2.8]:
+    Guarantees [MCP-SEC]:
     - Rejects path traversal sequences (e.g. '..')
     - Rejects unauthorized UNC network paths (e.g. '\\\\server\\share')
     - Confirms path resolves within allowed safe roots (project dir, Documents,

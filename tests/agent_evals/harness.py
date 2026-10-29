@@ -2,7 +2,7 @@
 
 Simulates multi-turn AI agent tool calling against emulator-backed or live sessions,
 asserting strict safety sequences (checkpoint -> mutate -> verify -> journal),
-tolerance adherence, and confirmation challenge protocols per spec 10_l2_interfaces.md §6.
+tolerance adherence, and confirmation challenge protocols.
 """
 
 from __future__ import annotations

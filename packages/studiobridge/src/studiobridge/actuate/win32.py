@@ -2,7 +2,7 @@
 
 Implements zero-dependency Win32 UI actuation primitives using ctypes calling
 user32.dll and kernel32.dll to locate FL Studio window handles, verify focus,
-track window visibility, and manage focus transitions per spec 06_l0d §4, §5.
+track window visibility, and manage focus transitions.
 """
 
 from __future__ import annotations

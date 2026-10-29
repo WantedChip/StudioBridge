@@ -1,7 +1,7 @@
 """Plugin parameter inspection and mutation namespace for StudioBridge Python SDK.
 
 Provides high-level typed plugin controllers (AsyncPlugins and SyncPlugins)
-mounted on AsyncStudio.plugins and Studio.plugins per spec 09_l1_sdk.md §4.
+mounted on AsyncStudio.plugins and Studio.plugins.
 """
 
 from __future__ import annotations

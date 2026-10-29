@@ -1,4 +1,4 @@
-"""Unit tests for DeviceScriptGenerator per v0.1.5 and [DEV-01]..[DEV-03]."""
+"""Unit tests for DeviceScriptGenerator per [DEV-01]..[DEV-03]."""
 
 from __future__ import annotations
 

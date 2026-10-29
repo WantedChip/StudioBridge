@@ -1,6 +1,6 @@
 """Command-line interface commands for headless FL Studio render orchestration.
 
-Implements CLI commands per spec 10_l2_interfaces.md §3:
+Implements CLI commands:
 - sbridge render <project.flp> [--format wav|mp3|flac] [--timeout seconds] [--watch] [--out dir]
 - sbridge render status <job_id>
 - sbridge render cancel <job_id>
@@ -18,7 +18,7 @@ from typing import Any
 from studiobridge.core.errors import StudioBridgeError
 from studiobridge.mcp.tools.render import RenderTools
 
-# CLI exit code constants per spec 10_l2_interfaces.md §3
+# CLI exit code constants
 EXIT_OK = 0
 EXIT_ERROR = 1
 EXIT_USAGE = 2

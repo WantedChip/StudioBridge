@@ -1,7 +1,7 @@
 /**
- * OpenGraph Social Sharing Card Generator (v0.6.9 / T-WEB-09)
+ * OpenGraph Social Sharing Card Generator
  *
- * Generates site/public/og.svg and site/public/og.png (1200x630) per 18_landing_page_spec.md §7, §8, §12.
+ * Generates site/public/og.svg and site/public/og.png (1200x630).
  * Design characteristics:
  * - Technical signal-path motif with patch cable curves and SysEx hex frames.
  * - Patchbay registration marks and hairline rack grid.
@@ -76,7 +76,7 @@ function generateSvg(): string {
 
   <!-- Spec Identification Header -->
   <text x="92" y="71" class="font-mono" font-size="12" font-weight="600" fill="#55524A" letter-spacing="1.5">
-    STUDIOBRIDGE // SPEC 18 §8 // RACK REF: SB-2026-OG // 01 / SIGNAL PATH
+    STUDIOBRIDGE // AUDIO AUTOMATION // RACK REF: SB-2026-OG // 01 / SIGNAL PATH
   </text>
 
   <!-- Architecture Badges on Top Right -->

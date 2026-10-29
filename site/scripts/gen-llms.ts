@@ -1,7 +1,7 @@
 /**
- * LLM Context Documentation Compiler (v0.6.9 / T-WEB-09)
+ * LLM Context Documentation Compiler
  *
- * Compiles site/public/llms-full.txt from site/src/content/docs/docs/ per 18_landing_page_spec.md §8, §12.
+ * Compiles site/public/llms-full.txt from site/src/content/docs/docs/.
  * Produces clean, consolidated Markdown for AI/LLM consumption with:
  * - Starlight frontmatter parsed and converted to clean markdown headers/blockquotes.
  * - All HTML tags (<details>, <summary>, <div>, <span>) stripped or converted.

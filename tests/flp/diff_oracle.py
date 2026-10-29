@@ -1,6 +1,6 @@
 """Dev-only differential testing oracle comparing StudioBridge parser against GPL fork.
 
-Complies strictly with clean-room provenance rules per 07_l0e_flp_engine.md §6 and §7:
+Complies strictly with clean-room provenance rules:
 - PyFLP / GPL code is strictly dev-only and never referenced or imported by src/
   or shipped in release wheels.
 - Skips gracefully if pyflp is not installed in the dev environment.

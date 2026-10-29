@@ -4,7 +4,7 @@ This directory contains executable hardware spike scripts, probes, and report te
 - **Machine A:** ARM64 Snapdragon X Plus (Lenovo Yoga Slim / Copilot+ PC), Windows 11 ARM64, running FL Studio under Prism x64 emulation.
 - **Machine B:** Native x86_64 (AMD64), Windows 11 x64, running FL Studio natively.
 
-> **Gating Rule (`13_spikes_roadmap_risks.md §1`):** A spike answers a specific unknown with empirical evidence on physical hardware. Results are recorded in `spikes/Sx/REPORT.md` using `spikes/REPORT_TEMPLATE.md`. Spikes gate architectural decisions; do not skip or simulate them.
+> **Gating Rule:** A spike answers a specific unknown with empirical evidence on physical hardware. Results are recorded in `spikes/Sx/REPORT.md` using `spikes/REPORT_TEMPLATE.md`. Spikes gate architectural decisions; do not skip or simulate them.
 
 ---
 

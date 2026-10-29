@@ -1,6 +1,6 @@
 # Audio Render Workflows, Job Tracking, and Audio Validation
 
-StudioBridge coordinates high-quality audio renders, stem bounces, and preview exports directly from FL Studio projects (`06_piano_roll_and_render.md §10..13`, `10_l2_interfaces.md §2.6`).
+StudioBridge coordinates high-quality audio renders, stem bounces, and preview exports directly from FL Studio projects.
 
 ## 1. The Render Pipeline
 

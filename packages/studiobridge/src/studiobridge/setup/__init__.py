@@ -1,6 +1,6 @@
 """Installation engine, hardware probe, and setup doctor.
 
-Exports public setup interfaces per spec 08_l0f_setup_doctor_probe.md.
+Exports public setup interfaces.
 """
 
 from __future__ import annotations

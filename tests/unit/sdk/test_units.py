@@ -1,4 +1,4 @@
-"""Unit tests for musical and engineering units per 09_l1_sdk.md §3.3.
+"""Unit tests for musical and engineering units.
 
 Tests strongly-typed domain units:
 - Db and Percent representations

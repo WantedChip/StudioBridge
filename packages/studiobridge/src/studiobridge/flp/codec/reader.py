@@ -1,6 +1,6 @@
 """Binary FLP chunk reader, event stream parser, and lazy streaming reader.
 
-Implements clean-room FLP container decoding per 07_l0e_flp_engine.md §3.1,
+Implements clean-room FLP container decoding,
 preserving exact byte layouts, unknown chunk IDs, non-standard alignments,
 and trailing data per [FLP-02], [FLP-03], [FLP-04], and [FLP-05].
 """

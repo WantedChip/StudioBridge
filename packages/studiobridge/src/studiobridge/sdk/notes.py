@@ -1,7 +1,7 @@
 """Piano roll notes namespace for StudioBridge Python SDK.
 
 Provides high-level typed note controllers (AsyncNotes and SyncNotes)
-mounted on AsyncStudio.notes and Studio.notes per spec 09_l1_sdk.md §4 and 06_l0d.
+mounted on AsyncStudio.notes and Studio.notes.
 """
 
 from __future__ import annotations
@@ -107,7 +107,7 @@ class AsyncNotes:
         ppq: int = DEFAULT_PPQ,
         tempo_bpm: float = 120.0,
     ) -> Path:
-        """Export notes to standard MIDI file (.mid) fallback per spec 06_l0d §7."""
+        """Export notes to standard MIDI file (.mid) fallback."""
         return self._orchestrator.export_midi(
             notes=notes,
             path=path,

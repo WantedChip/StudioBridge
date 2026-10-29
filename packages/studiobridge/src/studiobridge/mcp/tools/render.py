@@ -1,7 +1,6 @@
 """Headless render orchestration and audio analysis MCP tools for StudioBridge.
 
-Implements render tools per spec 06_l0d_pianoroll_actuation_render.md §15,
-10_l2_interfaces.md §2.4, §2.6, §2.8, and [RND-01..05]:
+Implements render tools [RND-01..05]:
 - render_start: Asynchronous headless render launch with path containment and MCP task handles.
 - render_status: Poll active job progress, output audio artifacts, and sidecar metrics.
 - render_cancel: Clean subprocess termination and job cancellation.
@@ -119,7 +118,7 @@ class RenderTools:
     ) -> ToolResult:
         """Initiate background headless render job with path security containment.
 
-        # req: RND-01, RND-02, MCP-20, MCP §2.8
+        # req: RND-01, RND-02, MCP-20, MCP-SEC
         """
         # 1. Enforce path containment on project source and output directory
         safe_source = validate_safe_path(source)

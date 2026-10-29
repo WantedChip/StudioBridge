@@ -1,16 +1,16 @@
-"""Unit tests for offline FLP MCP tools suite per spec 10_l2_interfaces.md §2.4, §2.8.
+"""Unit tests for offline FLP MCP tools suite.
 
 Verifies:
 1. Tool definitions and schemas for flp_inspect, flp_edit, flp_diff, flp_validate,
    flp_save_as, flp_new_from_template (# req: T-MCP-06).
-2. Schema snapshot validation against frozen JSON schemas (# req: MCP §2.4).
+2. Schema snapshot validation against frozen JSON schemas (# req: MCP-01).
 3. flp_inspect returns full structural project metadata with untrusted tags (# req: FLP-20, SEC-05).
 4. flp_diff semantic comparison between projects (# req: FLP-20).
 5. flp_validate structural invariant checks and static risk scoring (# req: FLP-50).
 6. flp_save_as atomic save to new destination without corrupting input (# req: FLP-31).
 7. flp_new_from_template instantiation producing openable projects (# req: FLP-40).
 8. flp_edit applying validated mutations atomically (# req: FLP-30, FLP-31).
-9. MCP path validation rejecting '..' traversal and unauthorized UNC paths (# req: MCP §2.8).
+9. MCP path validation rejecting '..' traversal and unauthorized UNC paths (# req: MCP-SEC).
 10. Tool dispatch via StudioMcpServer with toolset filtering (# req: MCP-11).
 """
 
@@ -392,7 +392,7 @@ class TestFlpEditTool:
 
 
 class TestFlpSecurityAndPathContainment:
-    """Verifies path containment, traversal rejection, and UNC restrictions per [MCP §2.8]."""
+    """Verifies path containment, traversal rejection, and UNC restrictions [MCP-SEC]."""
 
     def test_reject_directory_traversal(self) -> None:
         """Path traversal sequence '..' is forbidden."""

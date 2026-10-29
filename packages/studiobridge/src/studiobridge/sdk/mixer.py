@@ -1,7 +1,7 @@
 """Mixer management namespace for StudioBridge Python SDK.
 
 Provides high-level typed mixer controllers (AsyncMixer and SyncMixer)
-mounted on AsyncStudio.mixer and Studio.mixer per spec 09_l1_sdk.md §4.
+mounted on AsyncStudio.mixer and Studio.mixer.
 """
 
 from __future__ import annotations
@@ -602,7 +602,7 @@ class AsyncMixer:
         return tracks
 
     async def find(self, name: str, *, limit: int = 64) -> MixerTrack:
-        """Find mixer track by exact or case-insensitive name match per 09 §3.2.
+        """Find mixer track by exact or case-insensitive name match.
 
         Args:
             name: Track name to look up.
@@ -691,7 +691,7 @@ class SyncMixer:
         return self._portal.call(functools.partial(self._async.get_tracks, count=count))
 
     def find(self, name: str, *, limit: int = 64) -> MixerTrack:
-        """Find mixer track by name per 09 §3.2."""
+        """Find mixer track by name."""
         self._check_connection()
         return self._portal.call(functools.partial(self._async.find, name, limit=limit))
 

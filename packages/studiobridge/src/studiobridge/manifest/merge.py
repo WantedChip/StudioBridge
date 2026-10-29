@@ -1,7 +1,7 @@
 """Introspect merge and invariant validation pipeline.
 
-Merges scraped API manifests with live runtime inspection dumps (from Spike 15)
-and quirks overlays per 05_l0c_device_script_manifest.md §14.3–§14.5.
+Merges scraped API manifests with live runtime inspection dumps
+and quirks overlays.
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ def merge_introspect(manifest: Manifest, introspect_data: dict[str, Any]) -> Man
     """Merge live runtime inspection data with manifest.
 
     Marks existing functions as present_in_build (True/False) and adds
-    undocumented symbols discovered during runtime inspection per 05_l0c §14.3.
+    undocumented symbols discovered during runtime inspection.
     """
     if not isinstance(introspect_data, dict):
         raise ValueError("Introspect data must be a dictionary")
@@ -81,7 +81,7 @@ def merge_manifest(
 ) -> Manifest:
     """Pipeline stage: introspect merge -> quirks overlay -> invariant validation.
 
-    Enforces invariants ensuring every paired verify.getter exists in the manifest (05_l0c §14.5).
+    Enforces invariants ensuring every paired verify.getter exists in the manifest.
     """
     if introspect_data:
         merge_introspect(manifest, introspect_data)

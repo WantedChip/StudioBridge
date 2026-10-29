@@ -4,8 +4,7 @@ Executes automated FL-load test preflight (FL64.exe /R /Ewav) on isolated staged
 project copies, monitors process execution under a strict watchdog timer, detects
 unresponsive / frozen processes with zero CPU activity, identifies modal dialogs
 (blocking or crash), classifies outcomes (ok, blocking_dialog, freeze, crash), and
-terminates hung processes reliably with zero zombies per 07_l0e_flp_engine.md §5,
-06_l0d_pianoroll_actuation_render.md §10–§13, Spikes S7, S8, S9, and [FLP-50].
+terminates hung processes reliably with zero zombies per [FLP-50].
 """
 
 from __future__ import annotations
@@ -144,7 +143,7 @@ class FlLoadHarness:
 
     Validates that FL Studio project (.flp) files open cleanly in real FL Studio
     using headless render preflight (FL64.exe /R /Ewav) without freezing,
-    crashing, or blocking on modal dialogs per 07 §5, 06 §10–§13, and Spikes S7, S8.
+    crashing, or blocking on modal dialogs.
     """
 
     def __init__(
@@ -215,7 +214,7 @@ class FlLoadHarness:
         """
         fl_install = self.resolve_install()
 
-        # Scale timeout under Windows ARM64 Prism emulation (Spike S11)
+        # Scale timeout under Windows ARM64 Prism emulation
         is_emulated = fl_install.is_emulated or self.discovery.is_prism_emulated()
         scale = self.config.render.timeout_multiplier if is_emulated else 1.0
         effective_timeout_s = timeout_s * scale
@@ -482,7 +481,7 @@ class FlLoadHarness:
         client: Any = None,
         timeout_s: float = 15.0,
     ) -> LiveVerificationResult:
-        """Verify project integrity against active live FL Studio session [07 §5, S8, S9].
+        """Verify project integrity against active live FL Studio session.
 
         When a live bridge connection is available, verifies project integrity
         by reading live channel, pattern, and mixer counts and comparing them
@@ -497,7 +496,7 @@ def verify_live_project_load(
     client: Any = None,
     timeout_s: float = 15.0,
 ) -> LiveVerificationResult:
-    """Verify project integrity via live bridge connection [07 §5, Spikes S8, S9, FLP-50].
+    """Verify project integrity via live bridge connection [FLP-50].
 
     Compares offline Project element counts (channels, patterns, mixer) against
     the active FL Studio session state via live SDK namespaces (fl.channels.count(),

@@ -1,4 +1,4 @@
-"""Unit tests for CLI render and notes commands per spec 10_l2_interfaces.md §3.
+"""Unit tests for CLI render and notes commands.
 
 Verifies:
 1. 'sbridge notes apply <file> [--target channel:X,pattern:Y] [--mode append|replace] [--json]'
@@ -8,7 +8,7 @@ Verifies:
 4. 'sbridge render status <job_id> [--json]'.
 5. 'sbridge render cancel <job_id> [--json]'.
 6. 'sbridge render analyze <file.wav> [--json]' (# req: RND-05).
-7. Path containment security enforcement across CLI commands (# req: MCP §2.8).
+7. Path containment security enforcement across CLI commands (# req: MCP-SEC).
 """
 
 from __future__ import annotations
@@ -190,7 +190,7 @@ def test_cli_render_analyze(tmp_path: Path, capsys: pytest.CaptureFixture[str]) 
 
 
 def test_cli_path_traversal_rejection(capsys: pytest.CaptureFixture[str]) -> None:
-    """Verify CLI commands enforce path containment security (# req: MCP §2.8)."""
+    """Verify CLI commands enforce path containment security (# req: MCP-SEC)."""
     code_notes = cli_entry(["notes", "apply", "../forbidden.json", "--json"])
     assert code_notes != ExitCode.OK
 

@@ -1,11 +1,11 @@
-"""Unit tests for piano-roll notes MCP tools per spec 06_l0d §15 and 10_l2_interfaces §2.4, §2.8.
+"""Unit tests for piano-roll notes MCP tools.
 
 Verifies:
 1. Tool definitions and schemas for notes_apply, notes_read, notes_from_midi.
 2. Structured note array application returning honest trigger tiers (T1-T3) (# req: ACT-01, ACT-02).
 3. Mode support: append, replace_all, replace_range.
 4. Input notes file reading (JSON and MIDI).
-5. Path containment verification rejecting '..' traversal and UNC paths (# req: MCP §2.8).
+5. Path containment verification rejecting '..' traversal and UNC paths (# req: MCP-SEC).
 6. Oracle-backed notes_read and SMF notes_from_midi translation.
 7. Dispatch via StudioMcpServer.
 """
@@ -159,7 +159,7 @@ def test_notes_read(tmp_path: Path) -> None:
 
 
 def test_notes_from_midi(tmp_path: Path) -> None:
-    """Verify notes_from_midi parses MIDI file to note list (# req: MCP §2.8)."""
+    """Verify notes_from_midi parses MIDI file to note list (# req: ACT-01)."""
     midi_file = tmp_path / "arpeggio.mid"
     notes = [
         Note(pos=0, length=48, key=60),
@@ -181,7 +181,7 @@ def test_notes_from_midi(tmp_path: Path) -> None:
 
 
 def test_notes_path_traversal_rejection() -> None:
-    """Verify notes tools enforce containment and reject traversal (# req: MCP §2.8)."""
+    """Verify notes tools enforce containment and reject traversal (# req: MCP-SEC)."""
     tools = NotesTools()
 
     # Traversal attempts with '..'

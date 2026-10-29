@@ -1,8 +1,7 @@
 """HMAC-SHA256 and SipHash-2-4 request signing and authentication per [SEC-01].
 
 Implements canonical payload formatting, deterministic JSON encoding, constant-time
-signature verification, and pure-Python SipHash-2-4 fallback per spec
-03_l0a_wire_protocol.md §8.
+signature verification, and pure-Python SipHash-2-4 fallback.
 """
 
 from __future__ import annotations
@@ -26,7 +25,7 @@ ALG_SHA256: str = "sha256"
 ALG_SIPHASH24: str = "siphash24"
 SUPPORTED_ALGORITHMS: frozenset[str] = frozenset({ALG_SHA256, ALG_SIPHASH24})
 
-# Operations that are exempt from authentication per spec §5.1, §8
+# Operations that are exempt from authentication
 UNAUTHENTICATED_OPS: frozenset[str] = frozenset({"hello", "ping"})
 
 
@@ -225,7 +224,7 @@ def verify_request(
 ) -> bool:
     """Validate authentication of a RequestEnvelope.
 
-    Per [WIRE §5.1], 'hello' and 'ping' operations are unauthenticated and bypass checks.
+    'hello' and 'ping' operations are unauthenticated and bypass checks.
     All other operations must carry a valid HMAC signature matching the shared secret.
 
     Args:

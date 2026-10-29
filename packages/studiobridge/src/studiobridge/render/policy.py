@@ -26,7 +26,7 @@ PROCESS_TERMINATE: int = 0x0001
 
 
 class InstancePolicy(str, Enum):
-    """Instance collision policies for headless rendering [06_l0d §10, §13]."""
+    """Instance collision policies for headless rendering."""
 
     REQUIRE_CLOSED = "require_closed"
     CLOSE_GRACEFULLY = "close_gracefully"

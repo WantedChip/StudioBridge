@@ -1,7 +1,7 @@
 """FLP version-specific structural profiles, record layouts, and payload decoders.
 
 Defines schemas and layout models for FL Studio 26 and backward-compatible profiles
-for FL 21–25 per 07_l0e_flp_engine.md §3.2, clean-room provenance per §6, and [FLP-10].
+for FL 21–25, clean-room provenance, and [FLP-10].
 """
 
 from __future__ import annotations

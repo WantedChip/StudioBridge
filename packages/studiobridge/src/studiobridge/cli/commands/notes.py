@@ -1,6 +1,6 @@
 """Command-line interface commands for piano-roll notes operations.
 
-Implements CLI commands per spec 10_l2_interfaces.md §3:
+Implements CLI commands:
 - sbridge notes apply <file.json|.mid> [--target channel:X,pattern:Y] [--mode append|replace]
 - sbridge notes from-midi <file> [--ppq N]
 - sbridge notes read <project.flp> [--pattern N] [--channel M]
@@ -16,7 +16,7 @@ from typing import Any
 from studiobridge.core.errors import StudioBridgeError
 from studiobridge.mcp.tools.notes import NotesTools
 
-# CLI exit code constants per spec 10_l2_interfaces.md §3
+# CLI exit code constants
 EXIT_OK = 0
 EXIT_ERROR = 1
 EXIT_USAGE = 2

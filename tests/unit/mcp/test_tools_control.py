@@ -1,4 +1,4 @@
-"""Unit tests for StudioBridge control and safety MCP tools per 10_l2_interfaces.md §2.4.
+"""Unit tests for StudioBridge control and safety MCP tools.
 
 Verifies:
 1. Tool catalog, annotations, and token budget for all control and safety tools.

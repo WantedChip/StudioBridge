@@ -1,4 +1,4 @@
-"""Unit tests for inspection CLI commands per spec 10_l2_interfaces.md §3.
+"""Unit tests for inspection CLI commands.
 
 Verifies:
 1. 'sbridge api search <query>', 'sbridge api describe <fn>', 'sbridge api list [module]',

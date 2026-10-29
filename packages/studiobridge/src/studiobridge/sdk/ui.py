@@ -1,7 +1,7 @@
 """UI focus, window visibility, and hint display namespace for StudioBridge Python SDK.
 
 Provides high-level typed UI controllers (AsyncUi and SyncUi)
-mounted on AsyncStudio.ui and Studio.ui per spec 09_l1_sdk.md §4.
+mounted on AsyncStudio.ui and Studio.ui.
 """
 
 from __future__ import annotations

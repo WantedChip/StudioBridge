@@ -1,6 +1,6 @@
 """Binary FLP event representation, event ID classification, and varint encoding.
 
-Implements clean-room event structures per 07_l0e_flp_engine.md §3.1 and [FLP-01].
+Implements clean-room event structures per [FLP-01].
 """
 
 from __future__ import annotations

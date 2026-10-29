@@ -1,6 +1,6 @@
 """Batch call accumulator and WriteReport builder for StudioBridge SDK.
 
-Implements batch execution per spec 09_l1_sdk.md §3.1, §4.
+Implements batch execution.
 Collects operations into a single wire batch request (`device.batch`) and returns a WriteReport.
 """
 

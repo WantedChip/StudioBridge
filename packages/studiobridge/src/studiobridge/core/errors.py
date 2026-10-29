@@ -1,7 +1,7 @@
 """StudioBridge error taxonomy and structured exception hierarchy.
 
 Provides typed exceptions carrying machine-readable codes, remedies,
-retryable flags, and contextual details per spec 12_crosscutting.md §7.
+retryable flags, and contextual details.
 """
 
 from __future__ import annotations
@@ -22,7 +22,7 @@ class ErrorInfo:
     docs_anchor: str
 
 
-# Canonical error registry per 12_crosscutting.md §7
+# Canonical error registry
 ERROR_REGISTRY: dict[str, ErrorInfo] = {
     # E_PROTO*: Wire protocol errors
     "E_PROTO": ErrorInfo(
@@ -557,7 +557,7 @@ class BrokerError(ConnectionError):
     default_code: str = "E_NOBROKER"
 
 
-# Aliases per spec 09_l1_sdk.md §10
+# Aliases
 NoBroker = NoBrokerError
 NoDevice = NoDeviceError
 VersionMismatch = VersionMismatchError
@@ -614,7 +614,7 @@ class ArgumentError(StudioBridgeError):
 
 
 class SecurityError(ArgumentError):
-    """Raised when an action violates security constraints or path containment [MCP §2.8]."""
+    """Raised when an action violates security constraints or path containment [MCP-SEC]."""
 
     default_code: str = "E_SECURITY"
 
@@ -704,7 +704,7 @@ class OutOfRangeError(ArgumentError):
     default_code: str = "E_RANGE"
 
 
-# Aliases per spec 09_l1_sdk.md §10
+# Aliases
 BadRef = BadRefError
 AmbiguousRef = AmbiguousRefError
 OutOfRange = OutOfRangeError
@@ -782,7 +782,7 @@ class ExperimentalDisabledError(UnavailableError):
     default_code: str = "E_EXPERIMENTAL"
 
 
-# Aliases per spec 09_l1_sdk.md §10
+# Aliases
 Unavailable = UnavailableError
 TemplateFragmentUnavailable = TemplateFragmentUnavailableError
 Degraded = DegradedError
@@ -910,7 +910,7 @@ class ConfirmationRequiredError(SafetyError):
         return data
 
 
-# Aliases per spec 09_l1_sdk.md §10
+# Aliases
 ReadOnlyMode = ReadOnlyError
 ProtectedTarget = ProtectedTargetError
 PolicyDenied = PolicyDeniedError

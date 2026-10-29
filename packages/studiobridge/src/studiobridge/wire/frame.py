@@ -1,6 +1,6 @@
 """SysEx Frame serialization, deserialization, and header validation.
 
-Implements the StudioBridge SysEx frame layout per spec 03_l0a_wire_protocol.md §3:
+Implements the StudioBridge SysEx frame layout:
   Offset  Len  Field     Meaning
   0       1    0xF0      SysEx start
   1       1    0x7D      Manufacturer ID (non-commercial / research)

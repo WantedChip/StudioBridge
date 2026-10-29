@@ -1,8 +1,7 @@
 """Unit tests for headless FL-load verification harness and freeze watchdog.
 
 Validates process supervision, freeze detection, modal dialog detection,
-watchdog timeout termination, outcome classification, and live bridge verification
-per 07_l0e_flp_engine.md §5, 06_l0d §10–§13, and [FLP-50].
+watchdog timeout termination, outcome classification, and live bridge verification [FLP-50].
 # req: FLP-50
 """
 

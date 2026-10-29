@@ -1,7 +1,6 @@
 """Atomic FLP project writer with fsync, temporary files, and backup safety.
 
-Implements safe offline file writing per 07_l0e_flp_engine.md §3.4,
-12_crosscutting.md §1, §7, [FLP-31], and [FLP-32].
+Implements safe offline file writing with [FLP-31] and [FLP-32].
 """
 
 from __future__ import annotations

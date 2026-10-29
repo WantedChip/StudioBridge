@@ -1,6 +1,6 @@
 """Safety policy parser and boundary rule validator.
 
-Implements local policy enforcement per spec 09_l1_sdk.md §5 [SAF-04] and 12_crosscutting.md §1:
+Implements local policy enforcement [SAF-04]:
 - Local policy parsing from .sbridge-policy.toml / .sbridge_policy.toml.
 - Deny list (deny_ops) checking.
 - Parameter bounds: max_volume_db, max_volume, max_volume_delta_db, max_tempo, min_tempo.

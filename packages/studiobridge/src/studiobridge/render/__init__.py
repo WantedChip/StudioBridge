@@ -1,8 +1,7 @@
 """Headless render job supervisor, execution, and audio output validators.
 
 Provides FL Studio headless render orchestration, process supervision under Windows
-Job Objects, blocking dialog detection, job isolation staging, and collision policies
-per spec 06_l0d_pianoroll_actuation_render.md §9-§13 and [RND-01] through [RND-05].
+Job Objects, blocking dialog detection, job isolation staging, and collision policies [RND-01..05].
 """
 
 from __future__ import annotations

@@ -1,6 +1,6 @@
 """Inspect MCP tools for StudioBridge mixer, transport, rack, and playlist.
 
-Implements inspection tools per spec 10_l2_interfaces.md §2.4:
+Implements inspection tools:
 - transport_get: Current playback state, tempo, position, and signature.
 - mixer_list: List mixer tracks with volume, pan, peaks, and routing (paginated).
 - mixer_get: Get a single mixer track by index or name.

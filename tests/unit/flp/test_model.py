@@ -1,8 +1,7 @@
 """Unit tests for high-level FLP object model hydration and event tracking.
 
 Verifies Project, Channel, Pattern, Note, MixerTrack, Slot, PlaylistItem,
-Arrangement, and unmodeled event tail list per 07_l0e_flp_engine.md §3.3,
-09_l1_sdk.md §1–§2, [FLP-20], and [FLP-21].
+Arrangement, and unmodeled event tail list [FLP-20], [FLP-21].
 """
 
 from __future__ import annotations
@@ -105,7 +104,7 @@ def _build_test_project_bytes(
 
 
 # =============================================================================
-# 1. Project Hydration & Top-level Namespace Export ([FLP-20], 09 §1–§2)
+# 1. Project Hydration & Top-level Namespace Export ([FLP-20])
 # =============================================================================
 
 
@@ -308,7 +307,7 @@ def test_unmodeled_events_tail_list_retention() -> None:
 
 
 # =============================================================================
-# 7. Inspection Summaries & Dictionaries ([FLP-20], 07 §8)
+# 7. Inspection Summaries & Dictionaries ([FLP-20])
 # =============================================================================
 
 

@@ -5,7 +5,7 @@
 .DESCRIPTION
     Captures baseline operating system, CPU architecture, Python interpreters
     (detecting native win_arm64 vs Prism x64 emulation), uv, Node, midisrv status,
-    and FL Studio installation metadata per 13_spikes_roadmap_risks.md §1.
+    and FL Studio installation metadata.
     Compatible with Windows PowerShell 5.1 and PowerShell 7+.
 
 .PARAMETER Json

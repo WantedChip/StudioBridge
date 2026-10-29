@@ -1,6 +1,6 @@
 """Unit test suite for FLP static project health and risk scoring.
 
-Tests risk assessment criteria per 07_l0e_flp_engine.md §5 and [FLP-40]:
+Tests risk assessment criteria [FLP-40]:
 - Clean stock projects have low/zero risk
 - Unknown FL versions elevate risk
 - Modified opaque blobs elevate risk

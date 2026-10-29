@@ -1,6 +1,6 @@
 """Pure-Python Standard MIDI File (SMF Format 0) encoder and parser.
 
-Provides zero-dependency MIDI export fallback per spec 06_l0d_pianoroll_actuation_render.md §7.
+Provides zero-dependency MIDI export fallback.
 """
 
 from __future__ import annotations

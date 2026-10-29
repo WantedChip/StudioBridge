@@ -1,8 +1,7 @@
 /**
  * Automated Accessibility Test Suite (WCAG 2.2 AA / Axe-Core Rules)
- * Sub-Phase v0.6.10 / T-WEB-10
  *
- * Requirements per 18_landing_page_spec.md §10, §12:
+ * Requirements:
  * 1. Landmark structure: Semantic landmarks (<header>, <main id="main-content">, <nav>, <footer>),
  *    valid landmark roles, unique labels if multiple landmarks of the same type exist.
  * 2. Skip navigation links: Accessible skip-link (href="#main-content" or href="#_top") as the first
@@ -46,7 +45,7 @@ function resolveDistDir(): string {
   throw new Error(`dist directory not found in candidates: ${candidates.join(', ')}. Run 'npm run build' first.`);
 }
 
-describe('Automated Accessibility Test Suite (WCAG 2.2 AA / Axe-Core Rules) (v0.6.10 / T-WEB-10)', () => {
+describe('Automated Accessibility Test Suite (WCAG 2.2 AA / Axe-Core Rules)', () => {
   const distDir = resolveDistDir();
 
   const pagesToAudit = [

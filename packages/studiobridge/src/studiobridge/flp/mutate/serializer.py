@@ -1,6 +1,6 @@
 """FLP project re-serialization with partial re-serialization and untouched preservation.
 
-Implements clean-room re-serialization per 07_l0e_flp_engine.md §3.3, §3.4,
+Implements clean-room re-serialization,
 [FLP-05], and [FLP-21] (lossless byte preservation for untouched elements).
 """
 

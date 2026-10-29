@@ -380,7 +380,7 @@ export function generateCompatDataset(): CompatDataset {
     meta: {
       schemaVersion: '1.0.0',
       generatedAt: new Date().toISOString(),
-      specVersion: '18 §5, §6.2',
+      specVersion: '1.0.0',
       description: 'Authentic compatibility and capability matrix derived from real hardware test runs on Machine A and Machine B.',
       testedEnvironments: {
         machineA: MACHINE_A,

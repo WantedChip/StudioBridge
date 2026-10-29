@@ -2,8 +2,7 @@
 
 Normalizes function signatures, resolves type aliases, parses enum constants,
 handles per-argument version footnotes and optional arguments, and produces
-deterministic, byte-identical Manifest objects and JSON representations per
-05_l0c_device_script_manifest.md §13–§14.
+deterministic, byte-identical Manifest objects and JSON representations.
 """
 
 from __future__ import annotations

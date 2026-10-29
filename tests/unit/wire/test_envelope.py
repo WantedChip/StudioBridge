@@ -1,8 +1,7 @@
 """Unit tests for JSON envelopes, 7-bit ASCII serialization, and deserialization.
 
 Validates RequestEnvelope, ResponseEnvelope, EventEnvelope, and ControlEnvelope models,
-strict 7-bit ASCII cleanliness, Vector 1 alignment, and deserialization error handling
-per spec 03_l0a_wire_protocol.md §5.
+strict 7-bit ASCII cleanliness, Vector 1 alignment, and deserialization error handling.
 """
 
 from __future__ import annotations
@@ -43,7 +42,7 @@ class TestRequestEnvelope:
         assert decoded.opts.to_dict() == {}
 
     def test_full_request_serialization(self) -> None:
-        """Full mutating request matches wire specification §5.1."""
+        """Full mutating request matches wire specification."""
         req = RequestEnvelope(
             op="call",
             idem="c-7f3a",
@@ -103,7 +102,7 @@ class TestResponseEnvelope:
     """Test ResponseEnvelope success, failure, and metrics formatting."""
 
     def test_success_response_vector_2_style(self) -> None:
-        """Successful response matching spec §5.2."""
+        """Successful response matching wire format."""
         res = ResponseEnvelope.success(
             r=0.8,
             rb=0.8,
@@ -121,7 +120,7 @@ class TestResponseEnvelope:
         assert decoded.err is None
 
     def test_failure_response(self) -> None:
-        """Failure response matching wire specification §5.2."""
+        """Failure response matching wire specification."""
         res = ResponseEnvelope.failure(
             code="E_ARGS",
             message="track out of range",
@@ -156,7 +155,7 @@ class TestEventEnvelope:
     """Test EventEnvelope creation and serialization."""
 
     def test_event_serialization(self) -> None:
-        """Event envelope matching spec §5.3."""
+        """Event envelope matching wire format."""
         evt = EventEnvelope(
             ev="transport",
             seq=812,
@@ -182,7 +181,7 @@ class TestControlEnvelope:
     """Test ControlEnvelope factory methods and validation."""
 
     def test_control_variants(self) -> None:
-        """Verify all control message variants serialize per §5.4."""
+        """Verify all control message variants serialize."""
         nack = ControlEnvelope.nack(mid=12, missing=[3, 4])
         assert nack.to_json() == b'{"c":"nack","mid":12,"missing":[3,4]}'
 
@@ -209,7 +208,7 @@ class TestControlEnvelope:
 
 
 class TestSevenBitAsciiCleanliness:
-    """Definition of Done: strictly 7-bit clean ASCII JSON (all(b < 128))."""
+    """Verify strictly 7-bit clean ASCII JSON (all(b < 128))."""
 
     def test_ascii_cleanliness_with_unicode_strings(self) -> None:
         """All Unicode characters are escaped so all bytes are strictly < 128."""

@@ -1,7 +1,7 @@
 /**
- * Test Suite for Dynamic Agent Installation Tabs Island (v0.6.5 / T-WEB-05)
+ * Test Suite for Dynamic Agent Installation Tabs Island
  *
- * Requirements per 18_landing_page_spec.md §5, §6.4 and sub-phase v0.6.5:
+ * Requirements:
  * 1. Zero-drift template verification: Snippets match packages/studiobridge/src/studiobridge/agents/templates/.
  * 2. Architecture toggle: Windows ARM64 (Prism + WMS loopback) vs Windows x64 (WMS + loopMIDI fallback).
  * 3. 3-step setup structure: Step 1 (Loopback), Step 2 (Agent MCP), Step 3 (Doctor diagnostics).
@@ -72,7 +72,7 @@ function resolveTokensCss(): string {
   throw new Error(`tokens.css not found.`);
 }
 
-describe('Dynamic Agent Installation Tabs Island (v0.6.5 / T-WEB-05)', () => {
+describe('Dynamic Agent Installation Tabs Island', () => {
   const htmlPath = resolveDistHtml();
   const html = fs.readFileSync(htmlPath, 'utf8');
   const templatesDir = resolveTemplatesDir();

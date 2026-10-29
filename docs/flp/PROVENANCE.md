@@ -1,6 +1,6 @@
 # Clean-Room Provenance Registry for FLP Format
 
-> **Requirement Reference:** `[FLP-60]`, `07_l0e_flp_engine.md §6`, `01_vision_scope.md §9`.
+> **Requirement Reference:** `[FLP-60]`.
 
 This document records the clean-room provenance and factual sources for the binary `.flp` container format and event stream codec implemented in StudioBridge.
 
@@ -103,7 +103,7 @@ Mixer insert parameters stored in event ID 238 (`0xEE`) vary by major release:
 
 ### 5.3 Small Event Quirk: Event ID 172 (`[FLP-10]`)
 
-In FL Studio 25.2.3 and higher, event ID 172 (`0xAC`) appears in project streams. Under container classification rules (§3.2), event 172 falls within the 4-byte DWORD range (`128–191`). Statistical examination of binary streams revealed that only 3 bytes carry active data while the 4th byte is zero-padded or reserved. The StudioBridge codec preserves the 4-byte DWORD container framing, while profile `fl21_25` maps event 172 with `payload_effective_size=3`.
+In FL Studio 25.2.3 and higher, event ID 172 (`0xAC`) appears in project streams. Under DWORD container classification rules, event 172 falls within the 4-byte DWORD range (`128–191`). Statistical examination of binary streams revealed that only 3 bytes carry active data while the 4th byte is zero-padded or reserved. The StudioBridge codec preserves the 4-byte DWORD container framing, while profile `fl21_25` maps event 172 with `payload_effective_size=3`.
 
 ### 5.4 Text Encoding Decoupling (`[FLP-06]`)
 
@@ -111,4 +111,4 @@ Variable-length text events (event ID 199 version string, 201 title, 202 comment
 
 ### 5.5 Dev-Only Differential Oracle (`[FLP-60]`)
 
-In accordance with clean-room guidelines (`07_l0e_flp_engine.md §6`), GPL forks (e.g. PyFLP) are restricted to dev-only differential testing (`tests/flp/diff_oracle.py`). No GPL code is vendored, distributed, or imported in production packages. When pyflp is unavailable, the test harness automatically uses mock differential verification.
+In accordance with clean-room guidelines, GPL forks (e.g. PyFLP) are restricted to dev-only differential testing (`tests/flp/diff_oracle.py`). No GPL code is vendored, distributed, or imported in production packages. When pyflp is unavailable, the test harness automatically uses mock differential verification.

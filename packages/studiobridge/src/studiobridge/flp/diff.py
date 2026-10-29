@@ -1,6 +1,6 @@
 """Semantic diffing engine for FL Studio project files (.flp).
 
-Implements structural comparison per 07_l0e_flp_engine.md §3.3 and 07 §8,
+Implements structural comparison,
 detecting added/removed channels, modified tempos, altered notes, mixer routing,
 and metadata differences in structured and human-readable formats.
 """

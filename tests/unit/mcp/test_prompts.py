@@ -113,7 +113,7 @@ class TestPromptRendering:
         assert "Drums, Bass, Leads" in text
 
     def test_render_balance_mix_alias(self) -> None:
-        """Verify balance_mix aliases to balance_stems per spec 10_l2_interfaces.md §2.5."""
+        """Verify balance_mix aliases to balance_stems."""
         res = get_prompt("balance_mix")
         assert res.description == "Guided stem balancing workflow"
         text = res.messages[0].content["text"]

@@ -40,7 +40,7 @@ interface Palette {
   err: string;
 }
 
-// Canonical token specifications per 18_landing_page_spec.md §7.1
+// Canonical token specifications
 const EXPECTED_LIGHT: Palette = {
   bg: '#F3F0E8',
   surface: '#FBF9F4',
@@ -203,7 +203,6 @@ function main() {
 
   console.log('===============================================================');
   console.log(' StudioBridge Design System Contrast & Token Verification');
-  console.log(' Specification: 18_landing_page_spec.md §7.1, §7.1a (T-WEB-02)');
   console.log('===============================================================');
 
   // Verify CSS tokens exist on disk

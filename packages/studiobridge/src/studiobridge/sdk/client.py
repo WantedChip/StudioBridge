@@ -1,6 +1,6 @@
 """High-level client interfaces: Studio (synchronous) and AsyncStudio (asynchronous).
 
-Implements top-level SDK entry points per spec 09_l1_sdk.md §1–§4:
+Implements top-level SDK entry points:
 - AsyncStudio: asynchronous context manager over anyio.
 - Studio: synchronous context manager wrapping async core via
   anyio.from_thread.BlockingPortal [SDK-01].
@@ -253,7 +253,7 @@ class AsyncStudio:
         return _AsyncStudioConnectBuilder(coro_fn)
 
     def status(self) -> Status:
-        """Return structured session status snapshot per 09_l1_sdk.md §2."""
+        """Return structured session status snapshot."""
         return self._session.status()
 
     async def ping(self) -> float:
@@ -275,7 +275,7 @@ class AsyncStudio:
         *,
         allow_protected: bool = False,
     ) -> AsyncTransaction:
-        """Create an asynchronous transaction context manager per 09_l1_sdk.md §6."""
+        """Create an asynchronous transaction context manager."""
         return AsyncTransaction(
             self._session,
             name=name,
@@ -411,7 +411,7 @@ class Studio:
             raise
 
     def status(self) -> Status:
-        """Return structured session status snapshot per 09_l1_sdk.md §2."""
+        """Return structured session status snapshot."""
         return self._portal.call(self._async.status)
 
     def ping(self) -> float:
@@ -433,7 +433,7 @@ class Studio:
         *,
         allow_protected: bool = False,
     ) -> SyncTransaction:
-        """Create a synchronous transaction context manager per 09_l1_sdk.md §6."""
+        """Create a synchronous transaction context manager."""
         return SyncTransaction(
             self._portal,
             self._async.session,

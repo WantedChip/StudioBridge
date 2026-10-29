@@ -1,6 +1,6 @@
 """Unit tests for brand token management and rename tooling.
 
-Tests sub-phase v0.1.9 requirements:
+Tests brand token management requirements:
 - Definition of central brand tokens and validation constraints (tools/tokens.py).
 - Port root length constraint (<= 20 chars to prevent WinMM 31-char truncation).
 - Rename dry-run accuracy and non-destructive behavior (tools/rename.py).
@@ -32,7 +32,7 @@ from tools.tokens import (
 
 
 class TestPortRootValidation:
-    """Validate PORT_ROOT length constraints per 00_INDEX.md §8."""
+    """Validate PORT_ROOT length constraints."""
 
     def test_default_port_root_valid(self) -> None:
         """Default port root 'SBridge' (7 chars) must be valid and <= 20 chars."""

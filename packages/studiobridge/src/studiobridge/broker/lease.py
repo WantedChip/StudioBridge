@@ -1,6 +1,6 @@
 """Single-writer lease management, auto-renewal, and ownership enforcement.
 
-Implements single-writer lease arbitration per [BRK-10] and spec 04_l0b_ports_broker.md §8.4.
+Implements single-writer lease arbitration per [BRK-10].
 Enforces that state mutations require an active lease, auto-renews leases while requests
 are in-flight, and automatically revokes leases on client disconnection or TTL expiry.
 """

@@ -74,7 +74,7 @@ def test_runtime_dependencies_zero_native(workspace_root: Path) -> None:
     project_table = doc.get("project", {})
     deps = project_table.get("dependencies", [])
 
-    # Runtime dependencies budget <= 8 per spec 11_l3_distribution_ci.md §2
+    # Runtime dependencies budget <= 8
     assert len(deps) <= 8, f"Too many runtime dependencies ({len(deps)} > 8): {deps}"
 
     # Verify expected pure Python packages

@@ -1,6 +1,6 @@
 """Session lifecycle, connection management, handshake, and fingerprint tracking.
 
-Implements Session and Status per spec 09_l1_sdk.md §2 and [SDK-02]:
+Implements Session and Status [SDK-02]:
 - Connection management supporting both daemon mode (TCP via ensure_broker()) and embedded mode
   (EmbeddedBroker with real, fake, or direct handler).
 - Session fingerprint (fp) pinning and handshake negotiation.
@@ -50,7 +50,7 @@ from studiobridge.wire.session import is_mutating_operation as is_wire_mutating
 
 
 def is_operation_mutating(op: str) -> bool:
-    """Check if an operation modifies FL Studio state per spec [SAF-01]."""
+    """Check if an operation modifies FL Studio state [SAF-01]."""
     if is_wire_mutating(op):
         return True
     if "." in op:
@@ -82,7 +82,7 @@ def is_operation_mutating(op: str) -> bool:
 class Status:
     """Strongly typed snapshot of active FL Studio and StudioBridge session state.
 
-    Defined per spec 09_l1_sdk.md §2:
+    Fields:
     Status(fl_version, api, project, mode, caps_summary, rtt, sid, fp, lease_holder, backend, ...)
     """
 
@@ -565,7 +565,7 @@ class Session:
             confirm_token=confirm_token,
         )
 
-        # 3. Read-through cache lookup for slow-changing reads per 09 §9
+        # 3. Read-through cache lookup for slow-changing reads
         is_mutating = is_operation_mutating(op)
         if not is_mutating:
             cached_val = self.cache.get_call(op, call_args)
@@ -732,7 +732,7 @@ class Session:
         return self.last_rtt
 
     def status(self) -> Status:
-        """Return structured session status snapshot per 09_l1_sdk.md §2."""
+        """Return structured session status snapshot."""
         lease_holder: str | None = None
         if self.backend == "embedded" and self._broker is not None:
             lease_state = self._broker.lease_manager.get_state()

@@ -1,6 +1,6 @@
 """Safety MCP tools for StudioBridge: mode switching, checkpoints, rollback, journal.
 
-Implements safety and transaction tools per spec 10_l2_interfaces.md §2.4 and [SAF-01..04, TXN-01]:
+Implements safety and transaction tools [SAF-01..04, TXN-01]:
 - studio_set_mode: Switch between read_only, write, and unsafe (with human confirmation).
 - checkpoint_create: Create named rollback checkpoint.
 - checkpoint_rollback: Revert session mutations to checkpoint with verified state restoration.

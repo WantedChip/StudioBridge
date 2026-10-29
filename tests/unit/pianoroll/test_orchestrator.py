@@ -1,6 +1,6 @@
 """Unit tests for piano-roll note application orchestrator and tiered execution ladder.
 
-Per spec 06_l0d_pianoroll_actuation_render.md §4, §6, §7 and [ACT-01], [ACT-02].
+# req: ACT-01, ACT-02
 """
 
 from __future__ import annotations

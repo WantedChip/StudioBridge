@@ -2,7 +2,7 @@
 
 Implements read-through caching for slow-changing entities (names, colors, routing,
 counts, metadata) with 2-second default TTL, fast-changing parameter bypass
-(volume, peaks, positions) per spec 09_l1_sdk.md §9, and automatic event-driven
+(volume, peaks, positions), and automatic event-driven
 invalidation on project_load, refresh, and dirty.* events.
 """
 
@@ -23,7 +23,7 @@ logger = get_logger("sdk.cache")
 
 T = TypeVar("T")
 
-# Default TTL for slow-changing reads per 09_l1_sdk.md §9
+# Default TTL for slow-changing reads
 DEFAULT_CACHE_TTL: float = 2.0
 
 # Context variable for scoped TTL overrides: with fl.cache(ttl=...):
@@ -31,7 +31,7 @@ scoped_cache_ttl: contextvars.ContextVar[float | None] = contextvars.ContextVar(
     "scoped_cache_ttl", default=None
 )
 
-# Operations or suffixes that change rapidly and bypass cache by default per 09 §9
+# Operations or suffixes that change rapidly and bypass cache by default
 FAST_CHANGING_PATTERNS: tuple[str, ...] = (
     "volume",
     "peak",
@@ -158,7 +158,7 @@ class ScopedCacheContext:
 
 
 class CacheManager:
-    """Read-through entity cache with TTL and event-driven invalidation per 09 §9."""
+    """Read-through entity cache with TTL and event-driven invalidation."""
 
     def __init__(self, default_ttl: float = DEFAULT_CACHE_TTL) -> None:
         self.default_ttl: float = default_ttl
@@ -283,7 +283,7 @@ class CacheManager:
         self._tag_index.clear()
 
     def on_event(self, event: StudioEvent) -> None:
-        """Handle event-driven cache invalidation per [v0.2.9].
+        """Handle event-driven cache invalidation.
 
         - project_load: clears entire cache immediately.
         - refresh: clears entire cache or invalidates specified target subsystem.

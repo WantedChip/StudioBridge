@@ -1,6 +1,6 @@
 """Structured trace capture and in-process metrics accumulator for StudioBridge SDK.
 
-Implements observability hooks per spec 09_l1_sdk.md §11:
+Implements observability hooks:
 - TraceContext capturing wire frames and timings to logs/trace-*.jsonl with secret redaction.
 - fl.stats() runtime metrics accumulator.
 """

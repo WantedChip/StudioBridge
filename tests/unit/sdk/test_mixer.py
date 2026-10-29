@@ -1,4 +1,4 @@
-"""Unit and integration tests for Mixer namespace per 09_l1_sdk.md §4 and v0.2.4.
+"""Unit and integration tests for Mixer namespace.
 
 Tests both Studio (synchronous) and AsyncStudio (asynchronous) mixer interfaces:
 - get_track(), get_tracks()

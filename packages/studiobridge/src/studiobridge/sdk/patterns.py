@@ -1,7 +1,7 @@
 """Pattern management namespace for StudioBridge Python SDK.
 
 Provides high-level typed pattern controllers (AsyncPatterns and SyncPatterns)
-mounted on AsyncStudio.patterns and Studio.patterns per spec 09_l1_sdk.md §4.
+mounted on AsyncStudio.patterns and Studio.patterns.
 """
 
 from __future__ import annotations
@@ -255,7 +255,7 @@ class AsyncPatterns:
         return patterns
 
     async def find(self, name: str) -> Pattern:
-        """Find pattern by name per 09 §3.2.
+        """Find pattern by name.
 
         Args:
             name: Pattern name to look up.
@@ -313,7 +313,7 @@ class SyncPatterns:
         return self._portal.call(self._async.list)
 
     def find(self, name: str) -> Pattern:
-        """Find pattern by name per 09 §3.2."""
+        """Find pattern by name."""
         self._check_connection()
         return self._portal.call(functools.partial(self._async.find, name))
 

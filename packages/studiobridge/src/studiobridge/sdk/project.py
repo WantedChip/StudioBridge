@@ -1,7 +1,7 @@
 """Project metadata and save management namespace for StudioBridge Python SDK.
 
 Provides high-level typed project controllers (AsyncProject and SyncProject)
-mounted on AsyncStudio.project and Studio.project per spec 09_l1_sdk.md §4, §5.
+mounted on AsyncStudio.project and Studio.project.
 """
 
 from __future__ import annotations

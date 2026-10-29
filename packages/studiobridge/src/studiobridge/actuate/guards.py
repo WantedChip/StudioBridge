@@ -1,4 +1,4 @@
-"""Safety guards for Win32 UI actuation per spec 06_l0d §4, §5 and [ACT-10].
+"""Safety guards for Win32 UI actuation [ACT-10].
 
 Guards protect user flow and system state:
 1. FL Studio is the active foreground window OR policy allow_focus_steal=true.

@@ -2,7 +2,7 @@
 
 Tests cache hits, TTL expiration, fast-changing parameter bypass, scoped TTL overrides
 (with fl.cache(ttl=...):), and event-driven invalidation on project_load, refresh,
-and dirty.* events per spec 09_l1_sdk.md §9 and [v0.2.9].
+and dirty.* events.
 """
 
 from __future__ import annotations
@@ -82,7 +82,7 @@ class TestCacheBasics:
 
 
 class TestEventDrivenInvalidation:
-    """Verify automatic cache invalidation driven by events per [v0.2.9]."""
+    """Verify automatic cache invalidation driven by events."""
 
     def test_project_load_clears_entire_cache(self) -> None:
         cache = CacheManager()

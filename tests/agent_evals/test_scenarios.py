@@ -2,8 +2,7 @@
 
 Verifies that simulated AI coding agents correctly execute required safety sequences
 (checkpoint_create -> mutation -> verify -> journal), observe safety modes,
-handle confirmation challenges, and avoid destructive unverified operations per
-spec 10_l2_interfaces.md §6, §7 and 14_agent_playbook.md T-AGT-02 [SKL-01].
+handle confirmation challenges, and avoid destructive unverified operations [SKL-01].
 """
 
 from __future__ import annotations

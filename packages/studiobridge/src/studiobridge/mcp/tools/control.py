@@ -1,6 +1,6 @@
 """Mutating control MCP tools for StudioBridge.
 
-Implements control tools with verified writes per spec 10_l2_interfaces.md §2.4:
+Implements control tools with verified writes:
 - transport_control: Play, stop, record, seek, tempo adjustments.
 - mixer_set: Array of track adjustments (volume, pan, mute, solo, name).
 - channel_set: Volume, pan, mute, solo, name, and 16-step sequencer pattern.

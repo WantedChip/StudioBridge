@@ -1,8 +1,7 @@
 """Template-seeded project instantiation and stock fragment library [FLP-40].
 
 Implements clean-room fragment instantiation, relocation rules, seed integrity
-verification, and provenance tracking per 07_l0e_flp_engine.md §4,
-10_l2_interfaces.md §3, 11_l3_distribution_ci.md §2, and 12_crosscutting.md §7.
+verification, and provenance tracking.
 """
 
 from __future__ import annotations
@@ -116,7 +115,7 @@ def get_seed_path(name: str) -> Path:
 
 
 def verify_seed_integrity(seeds_dir: Path | None = None) -> bool:
-    """Verify SHA-256 hashes of all bundled seed templates against hashes.json [11 §2, 17 §4].
+    """Verify SHA-256 hashes of all bundled seed templates against hashes.json.
 
     Returns:
         True if all seed files exist and match their expected cryptographic hash.

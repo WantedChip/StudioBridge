@@ -1,8 +1,7 @@
 """Render job state machine, project isolation staging, disk checks, and concurrency locks.
 
 Implements RenderJob, staging isolation under %LOCALAPPDATA%\\studiobridge\\jobs\\,
-disk space preflight verification, and single-instance render concurrency locks
-per spec 06_l0d_pianoroll_actuation_render.md §11-§13 and [RND-01], [RND-02].
+disk space preflight verification, and single-instance render concurrency locks [RND-01, RND-02].
 """
 
 from __future__ import annotations
@@ -34,7 +33,7 @@ from studiobridge.render.validate import ValidationSpec
 
 
 class JobState(str, Enum):
-    """Lifecycle states of a headless render job [06_l0d §12]."""
+    """Lifecycle states of a headless render job."""
 
     CREATED = "created"
     PREFLIGHT = "preflight"
@@ -87,7 +86,7 @@ def is_pid_alive(pid: int) -> bool:
 
 
 class RenderJobLock:
-    """Single-instance render concurrency lock [06_l0d §13].
+    """Single-instance render concurrency lock.
 
     FL Studio headless render forwards commands to running instances, meaning only
     one render job may execute at any given time.
@@ -166,7 +165,7 @@ def generate_job_id() -> str:
 
 @dataclass
 class RenderJob:
-    """Headless render job specification and tracking [06_l0d §11].
+    """Headless render job specification and tracking.
 
     Attributes:
         source: Source project file (.flp).

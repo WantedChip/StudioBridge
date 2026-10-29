@@ -1,6 +1,6 @@
 """Project oracle verification for piano-roll note application.
 
-Per spec 06_l0d_pianoroll_actuation_render.md §4, §6 and [ACT-02]:
+Project oracle verification for piano-roll note application [ACT-02]:
 Verifies piano-roll note application by triggering project save-new-version
 and comparing extracted notes against expected note definitions.
 """
@@ -50,7 +50,7 @@ class NoteOracleParser(ABC):
 
 
 class MockNoteOracleParser(NoteOracleParser):
-    """Mockable oracle parser for testing and environments prior to v0.5 FLP engine."""
+    """Mockable oracle parser for testing and offline environments."""
 
     def __init__(
         self,

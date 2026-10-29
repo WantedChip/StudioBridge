@@ -1,6 +1,6 @@
 """Broker daemon, scheduling, lease management, and event routing.
 
-Implements L0.B Broker layer per spec 04_l0b_ports_broker.md §8:
+Implements Broker layer:
 - Prioritized request queues and rate limiting (scheduler.py)
 - Single-writer lease management and auto-renewal (lease.py)
 - In-process broker facade for direct SDK execution (embedded.py)

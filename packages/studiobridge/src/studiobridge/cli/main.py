@@ -1,7 +1,6 @@
 """StudioBridge command-line interface parser and dispatcher.
 
-Defines subcommands, standard exit codes, and machine-readable --json support
-per spec 10_l2_interfaces.md §3.
+Defines subcommands, standard exit codes, and machine-readable --json support.
 """
 
 from __future__ import annotations
@@ -50,7 +49,7 @@ from studiobridge.core.errors import StudioBridgeError
 
 
 class ExitCode(enum.IntEnum):
-    """Standard CLI exit codes per spec 10_l2_interfaces.md §3."""
+    """Standard CLI exit codes."""
 
     OK = 0
     ERROR = 1

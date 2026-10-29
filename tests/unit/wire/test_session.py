@@ -2,7 +2,7 @@
 
 Validates SID allocation, fingerprint rotation on project reload (V1-A1), precondition
 guards (V1-A2), monotonic mutating MID sequence, and the 64-item idempotency cache
-per spec 03_l0a_wire_protocol.md §7, §8 and [WIRE-20], [WIRE-31], [WIRE-32].
+[WIRE-20], [WIRE-31], [WIRE-32].
 """
 
 from __future__ import annotations
@@ -64,7 +64,7 @@ class TestSessionLifecycle:
 
 
 class TestFingerprintGuards:
-    """Definition of Done: Stale fingerprint triggers E_STALE error before mutation."""
+    """Stale fingerprint triggers E_STALE error before mutation."""
 
     def test_fingerprint_matching(self) -> None:
         """Matching fingerprint passes validation."""
@@ -231,7 +231,7 @@ class TestIdempotencyAndMonotonicMid:
         assert sess.next_mid() == 1
 
     def test_is_mutating_operation_helper(self) -> None:
-        """Verify mutating op categorization per spec §6."""
+        """Verify mutating op categorization."""
         assert is_mutating_operation("call") is True
         assert is_mutating_operation("batch") is True
         assert is_mutating_operation("txn") is True

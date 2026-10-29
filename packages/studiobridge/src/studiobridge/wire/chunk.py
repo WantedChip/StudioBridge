@@ -1,7 +1,7 @@
 """Payload chunking, splitting, and multi-chunk reassembly buffer.
 
 Implements message chunking and out-of-order reassembly with duplicate tolerance
-and two-stage timeout expiry per spec 03_l0a_wire_protocol.md §4.
+and two-stage timeout expiry.
 """
 
 from __future__ import annotations

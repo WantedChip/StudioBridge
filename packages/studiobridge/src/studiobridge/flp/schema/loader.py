@@ -1,7 +1,7 @@
 """Pure-Python YAML and JSON loader for FLP schema profiles with zero native C dependencies.
 
 Implements clean-room parsing of YAML profile specifications supporting nested
-mappings, integer keys, scalar types, and comments per 07_l0e_flp_engine.md §3.2 and [FLP-10].
+mappings, integer keys, scalar types, and comments per [FLP-10].
 """
 
 from __future__ import annotations

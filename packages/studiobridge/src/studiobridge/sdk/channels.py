@@ -1,7 +1,7 @@
 """Channel rack management namespace for StudioBridge Python SDK.
 
 Provides high-level typed channel rack controllers (AsyncChannels and SyncChannels)
-mounted on AsyncStudio.channels and Studio.channels per spec 09_l1_sdk.md §4.
+mounted on AsyncStudio.channels and Studio.channels.
 """
 
 from __future__ import annotations
@@ -641,7 +641,7 @@ class AsyncChannels:
         return channels
 
     async def find(self, name: str) -> Channel:
-        """Find channel rack item by name per 09 §3.2.
+        """Find channel rack item by name.
 
         Args:
             name: Channel name to look up.
@@ -699,7 +699,7 @@ class SyncChannels:
         return self._portal.call(self._async.list)
 
     def find(self, name: str) -> Channel:
-        """Find channel rack item by name per 09 §3.2."""
+        """Find channel rack item by name."""
         self._check_connection()
         return self._portal.call(functools.partial(self._async.find, name))
 

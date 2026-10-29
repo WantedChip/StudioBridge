@@ -1,7 +1,6 @@
 """Piano-roll note application and inspection MCP tools for StudioBridge.
 
-Implements piano-roll tools per spec 06_l0d_pianoroll_actuation_render.md §15,
-10_l2_interfaces.md §2.4, §2.8, and [ACT-01], [ACT-02]:
+Implements piano-roll tools [ACT-01, ACT-02]:
 - notes_apply: Structured note application returning status and trigger tier (T1-T3).
 - notes_read: Oracle-backed note reader returning patterns and notes from saved project state.
 - notes_from_midi: Convert standard MIDI file into normalized note payload with path containment.
@@ -272,7 +271,7 @@ class NotesTools:
     ) -> ToolResult:
         """Convert standard MIDI file into structured note payload with path containment.
 
-        # req: MCP §2.8
+        # req: MCP-SEC
         """
         safe_path = validate_safe_path(path)
         if not safe_path.exists():

@@ -1,7 +1,7 @@
 """CLI command handlers for 'sbridge skill'.
 
 Implements 'sbridge skill install', 'sbridge skill list', and 'sbridge skill info'
-per spec 10_l2_interfaces.md §6 and requirements [SKL-01].
+per requirements [SKL-01].
 """
 
 from __future__ import annotations

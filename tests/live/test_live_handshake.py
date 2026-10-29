@@ -130,7 +130,7 @@ def test_live_ping_latency(live_context: dict[str, Any]) -> None:
     rtts = anyio.run(_measure_pings)
     assert len(rtts) == 5
     avg_rtt = sum(rtts) / len(rtts)
-    # RTT budget per spec 12_crosscutting.md §5: p50 <= 25-50 ms, max <= 100 ms
+    # RTT budget: p50 <= 25-50 ms, max <= 100 ms
     assert avg_rtt < 100.0, f"Average live ping RTT too high: {avg_rtt:.2f} ms"
 
 

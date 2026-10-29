@@ -18,7 +18,7 @@ def _import_test_ports_module():
 
 
 def test_spikes_directory_structure() -> None:
-    """Verify all required spike directories and documents exist per v0.1.8."""
+    """Verify all required spike directories and documents exist."""
     # req: TST-05
     repo_root = Path(__file__).resolve().parents[2]
     spikes_dir = repo_root / "spikes"
@@ -42,7 +42,7 @@ def test_spikes_directory_structure() -> None:
 
 
 def test_report_template_sections() -> None:
-    """Verify REPORT_TEMPLATE.md matches 13_spikes_roadmap_risks.md §1 structure."""
+    """Verify REPORT_TEMPLATE.md matches required structure."""
     # req: TST-05
     repo_root = Path(__file__).resolve().parents[2]
     template_path = repo_root / "spikes" / "REPORT_TEMPLATE.md"

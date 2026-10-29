@@ -1,6 +1,6 @@
 """FLP seed template instantiation and fragment authoring CLI handlers.
 
-Implements CLI commands per spec 07_l0e_flp_engine.md §4, 10_l2_interfaces.md §3:
+Implements CLI commands:
 - sbridge flp new [--template <name>] <output.flp>
 - sbridge flp template list [--json]
 - sbridge flp template add <flp> --select channel:<id> [--name <name>] [--author <author>]

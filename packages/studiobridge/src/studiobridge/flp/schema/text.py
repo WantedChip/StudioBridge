@@ -1,7 +1,7 @@
 """Text encoding and decoding for FLP event strings across FL Studio versions.
 
 Implements clean-room text decoders handling modern UTF-16LE strings and
-legacy codepage/ASCII strings per 07_l0e_flp_engine.md §3.1, §3.2 and [FLP-06].
+legacy codepage/ASCII strings per [FLP-06].
 """
 
 from __future__ import annotations

@@ -1,4 +1,4 @@
-"""SDK models and dataclass re-exports per spec 09_l1_sdk.md §3."""
+"""SDK models and dataclass re-exports."""
 
 from __future__ import annotations
 

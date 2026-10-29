@@ -1,6 +1,5 @@
 """Unit tests for SDK notes namespace (fl.notes).
 
-Per spec 06_l0d_pianoroll_actuation_render.md §4, §6, §7 and 10_l2_interfaces.md §2.4.
 # req: ACT-01, ACT-02
 """
 

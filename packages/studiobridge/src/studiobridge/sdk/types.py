@@ -1,7 +1,7 @@
 """StudioBridge SDK core types, models, and verification dataclasses.
 
 Implements Verified[T] and identity reference objects (MixerTrack, Channel, Pattern,
-PlaylistTrack, Slot) per spec 09_l1_sdk.md §3.1, §3.2.
+PlaylistTrack, Slot).
 """
 
 from __future__ import annotations
@@ -24,7 +24,7 @@ T = TypeVar("T")
 
 @dataclass(frozen=True)
 class Verified(Generic[T]):
-    """Verified write result holding read-back verification evidence per 09_l1_sdk.md §3.1.
+    """Verified write result holding read-back verification evidence.
 
     Attributes:
         value: Value actually read back from FL Studio.
@@ -54,7 +54,7 @@ class Verified(Generic[T]):
 class UntrustedString(str):
     """String subclass tagging user-controlled project strings from FL Studio.
 
-    Carries untrusted=True metadata per 12_crosscutting.md §1 to defend against
+    Carries untrusted=True metadata to defend against
     downstream prompt injection in LLM agents and tools.
     """
 

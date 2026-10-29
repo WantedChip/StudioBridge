@@ -1,14 +1,12 @@
 """Unit tests for headless render MCP tools and resource streaming.
 
-Per spec 06_l0d §15 and 10_l2_interfaces §2.4, §2.5, §2.6, §2.8.
-
 Verifies:
 1. Tool definitions and schemas for render_start, render_status, render_cancel, render_analyze.
 2. Render start, asynchronous launch, and polling status (# req: RND-01, RND-02, MCP-20).
-3. Path containment verification rejecting '..' traversal and UNC paths (# req: MCP §2.8).
+3. Path containment verification rejecting '..' traversal and UNC paths (# req: MCP-SEC).
 4. Subprocess lifecycle cancellation (# req: RND-03).
 5. Audio validation analysis via render_analyze (# req: RND-05).
-6. Resource streaming via studio://render/{job_id} (# req: RND-05, MCP §2.5).
+6. Resource streaming via studio://render/{job_id} (# req: RND-05, MCP-RES).
 7. MCP Tasks extension handling (tasks/get, tasks/cancel, tasks/list).
 """
 
@@ -121,7 +119,7 @@ def test_render_start_and_status(tmp_path: Path) -> None:
 
 
 def test_render_path_traversal_rejection(tmp_path: Path) -> None:
-    """Verify render tools reject path traversal and unauthorized UNC paths (# req: MCP §2.8)."""
+    """Verify render tools reject path traversal and unauthorized UNC paths (# req: MCP-SEC)."""
     tools = RenderTools()
     flp_file = tmp_path / "song.flp"
     flp_file.write_bytes(b"FLhd\x06\x00\x00\x00")
@@ -182,7 +180,7 @@ def test_render_analyze(tmp_path: Path) -> None:
 
 
 def test_render_resource_streaming(tmp_path: Path) -> None:
-    """Verify MCP resource studio://render/{job_id} streams metrics (# req: RND-05, MCP §2.5)."""
+    """Verify MCP resource studio://render/{job_id} streams metrics (# req: RND-05, MCP-RES)."""
     flp_file = tmp_path / "stream_project.flp"
     flp_file.write_bytes(b"FLhd\x06\x00\x00\x00")
 

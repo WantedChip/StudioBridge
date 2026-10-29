@@ -1,6 +1,6 @@
 # Safety Modes and Confirmation Protocol
 
-StudioBridge implements defense-in-depth safety controls per specifications `09_l1_sdk.md §5`, `10_l2_interfaces.md §2.3`, and `12_crosscutting.md §1`.
+StudioBridge implements defense-in-depth safety controls across sessions and tool execution.
 
 ## 1. Safety Modes Overview
 

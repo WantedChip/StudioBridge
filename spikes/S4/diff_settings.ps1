@@ -5,7 +5,7 @@
 .DESCRIPTION
     Automates registry export (HKCU\Software\Image-Line) and FL Studio User
     Settings folder snapshot comparison to investigate where FL Studio stores
-    MIDI controller assignments and port configuration per 13_spikes_roadmap_risks.md §1.
+    MIDI controller assignments and port configuration.
 
 .PARAMETER Action
     Operation to perform: 'Snapshot' or 'Diff'. Default: 'Snapshot'.

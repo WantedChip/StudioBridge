@@ -1,6 +1,6 @@
 """Public error taxonomy and exception hierarchy for StudioBridge SDK.
 
-Re-exports typed exceptions per spec 09_l1_sdk.md §10.
+Re-exports typed exceptions and canonical error codes.
 """
 
 from __future__ import annotations

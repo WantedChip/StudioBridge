@@ -1,8 +1,7 @@
 """Documentation scraper and HTML table parser for FL Studio MIDI scripting API.
 
 Extracts factual function signatures, parameter descriptions, return types, version tags,
-and constants from official documentation tables while generating original summary text
-per [LEGAL-01] and 05_l0c_device_script_manifest.md §12.
+and constants from official documentation tables while generating original summary text [LEGAL-01].
 All raw HTML is cached strictly in .cache/ and never committed to version control.
 """
 
@@ -152,8 +151,7 @@ def fetch_or_cache(
 ) -> str:
     """Fetch an HTML page or retrieve from local .cache/ directory.
 
-    Strictly protects against committing raw HTML files per [LEGAL-01] and
-    05_l0c_device_script_manifest.md §14.
+    Strictly protects against committing raw HTML files [LEGAL-01].
     """
     cache_path_root = Path(cache_dir) if cache_dir else DEFAULT_CACHE_DIR
     cache_path_root.mkdir(parents=True, exist_ok=True)

@@ -2,8 +2,7 @@
 
 Calculates static health and risk scores for FL Studio project (.flp) files
 based on unknown FL versions, modified opaque binary blobs, template mismatches,
-size anomalies, and unconfirmed event formats per 07_l0e_flp_engine.md §5,
-12_crosscutting.md §7, and [FLP-40].
+size anomalies, and unconfirmed event formats per [FLP-40].
 """
 
 from __future__ import annotations

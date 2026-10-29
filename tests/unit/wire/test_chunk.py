@@ -1,8 +1,7 @@
 """Unit and property-based tests for payload chunking and multi-chunk reassembly.
 
 Tests 1,000 Hypothesis runs covering arbitrary payloads up to 96 KiB, random chunk sizes,
-out-of-order delivery, duplicate chunks, and boundary edge cases per spec
-03_l0a_wire_protocol.md §4.
+out-of-order delivery, duplicate chunks, and boundary edge cases.
 """
 
 from __future__ import annotations
@@ -228,7 +227,7 @@ class TestHypothesisReassembly:
     """Hypothesis property-based tests (1,000 runs) for chunking and reassembly.
 
     Verifies arbitrary payload bytes up to 96 KiB reassemble identically under
-    packet reordering and deduplication per Definition of Done.
+    packet reordering and deduplication.
     """
 
     @settings(max_examples=1000, deadline=None)

@@ -1,6 +1,6 @@
 """Unit and integration tests for Studio and AsyncStudio SDK client.
 
-Verifies [SDK-01], [SDK-02], [CAP-02], 09_l1_sdk.md §1–§4, §10, §11, and v0.2.3 DoD:
+Verifies [SDK-01], [SDK-02], [CAP-02]:
 - with Studio.connect(embedded=True) as fl: executes cleanly and returns Status.
 - async with AsyncStudio.connect(embedded=True) as fl: executes cleanly under anyio.
 - fl.status() returns complete structured session status.

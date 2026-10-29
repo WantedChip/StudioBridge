@@ -1,7 +1,7 @@
 """Agent skill installer and distribution engine.
 
 Implements canonical StudioBridge Agent Skill (`SKILL.md`) installation across
-project and user-level agent directories per spec 10_l2_interfaces.md §6 and [SKL-01].
+project and user-level agent directories [SKL-01].
 """
 
 from __future__ import annotations
@@ -38,7 +38,7 @@ class SkillTarget:
         return clean in [a.lower() for a in self.aliases]
 
 
-# Standard agent skill targets per spec 10_l2_interfaces.md §6
+# Standard agent skill targets
 SKILL_TARGETS: Final[tuple[SkillTarget, ...]] = (
     SkillTarget(
         id=".agents",

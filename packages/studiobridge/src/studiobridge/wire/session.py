@@ -1,8 +1,7 @@
 """Session state, sequence tracking, fingerprint validation, and idempotency cache.
 
 Implements session lifecycle management, fingerprint guards (V1-A1), precondition
-evaluation (V1-A2), and the 64-entry idempotency cache per spec
-03_l0a_wire_protocol.md §7, §8 and [WIRE-20], [WIRE-31], [WIRE-32].
+evaluation (V1-A2), and the 64-entry idempotency cache with [WIRE-20], [WIRE-31], and [WIRE-32].
 """
 
 from __future__ import annotations
@@ -27,7 +26,7 @@ MAX_SID_VALUE: int = 0x3FFF
 # Maximum 21-bit message ID value (0..2097151)
 MAX_MID_VALUE: int = 0x1FFFFF
 
-# Operations known to mutate FL Studio state per spec §6
+# Operations known to mutate FL Studio state
 MUTATING_OPERATIONS: frozenset[str] = frozenset({"call", "batch", "txn", "panic", "exec"})
 
 
@@ -37,7 +36,7 @@ def is_mutating_operation(op: str) -> bool:
 
 
 def evaluate_precondition(expect: dict[str, Any] | None, current_value: Any) -> None:
-    """Evaluate opts.expect precondition guard per [WIRE §5.1] and V1-A2.
+    """Evaluate opts.expect precondition guard with V1-A2.
 
     Supported comparison modes in expect dictionary:
     - 'eq': Expected target value.

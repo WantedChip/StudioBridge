@@ -1,7 +1,7 @@
 """Agent configuration templates, detection, and installation engine.
 
 Implements automated MCP server installer across all Tier-1 supported AI coding agents
-and IDEs per spec 10_l2_interfaces.md §5 and requirements [AGT-01] through [AGT-04].
+and IDEs per requirements [AGT-01] through [AGT-04].
 """
 
 from __future__ import annotations
@@ -116,7 +116,7 @@ def get_localappdata_dir() -> Path:
     return Path.home() / ".local" / "share"
 
 
-# Tier-1 and Tier-2 Agent Target Definitions per 10_l2_interfaces.md §5.2
+# Tier-1 and Tier-2 Agent Target Definitions
 TARGETS_LIST: Final[list[AgentTarget]] = [
     AgentTarget(
         id="claude-code",

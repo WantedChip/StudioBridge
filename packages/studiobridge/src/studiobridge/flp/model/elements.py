@@ -2,7 +2,7 @@
 
 Implements typed representations of Channel, Plugin, Pattern, Note, MixerTrack,
 Slot, PlaylistItem, Arrangement, Marker, and AutomationClip per
-07_l0e_flp_engine.md §3.3, [FLP-20], and [FLP-21].
+[FLP-20] and [FLP-21].
 """
 
 from __future__ import annotations

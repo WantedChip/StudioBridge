@@ -1,4 +1,4 @@
-"""Unit and integration tests for Patterns namespace per 09_l1_sdk.md §4 and v0.2.4.
+"""Unit and integration tests for Patterns namespace.
 
 Tests both Studio (synchronous) and AsyncStudio (asynchronous) patterns interfaces:
 - count(), list(), get_active()

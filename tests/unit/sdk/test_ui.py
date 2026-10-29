@@ -1,4 +1,4 @@
-"""Unit and integration tests for UI namespace per 09_l1_sdk.md §4 and v0.2.5.
+"""Unit and integration tests for UI namespace.
 
 Tests both Studio (synchronous) and AsyncStudio (asynchronous) UI interfaces:
 - focus(window)

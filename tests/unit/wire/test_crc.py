@@ -1,7 +1,7 @@
 """Unit tests for CRC-16/CCITT-FALSE and 7-bit septet packing routines.
 
 Validates check value 0x29B1, reference vs table equivalence, packing roundtrips,
-and edge case exception handling per spec 03_l0a_wire_protocol.md §3.
+and edge case exception handling.
 """
 
 from __future__ import annotations

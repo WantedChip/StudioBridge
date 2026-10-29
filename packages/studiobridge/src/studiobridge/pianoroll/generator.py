@@ -1,6 +1,6 @@
 """Piano-roll script generator and note serializer.
 
-Per spec 06_l0d_pianoroll_actuation_render.md §1–§3 and [PR-01]..[PR-06].
+Implements piano-roll script generation [PR-01]..[PR-06].
 """
 
 from __future__ import annotations
@@ -54,7 +54,7 @@ class PyscriptGenerator:
     def generate_job_id(self, prefix: str = "sbj") -> str:
         """Generate unique job identifier with UTC date and random hex entropy.
 
-        Format: sbj-YYYYMMDD-XXXX (e.g. 'sbj-20261025-a1b2') per 06_l0d §3.
+        Format: sbj-YYYYMMDD-XXXX (e.g. 'sbj-20261025-a1b2').
         """
         date_str = datetime.now(timezone.utc).strftime("%Y%m%d")
         token = secrets.token_hex(2)

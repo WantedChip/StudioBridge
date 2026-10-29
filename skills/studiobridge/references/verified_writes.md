@@ -2,7 +2,7 @@
 
 Digital Audio Workstations (DAWs) like FL Studio process parameters through non-linear curves, smoothing filters, internal decibel conversions, and GUI thread synchronization. Writing a parameter does not guarantee the DAW immediately or accurately reached that state.
 
-StudioBridge solves this with the **Verified Write Loop** (`[VER-01..04]`, `09_l1_sdk.md §3`).
+StudioBridge solves this with the **Verified Write Loop** (`[VER-01..04]`).
 
 ## 1. The Verified Write Architecture
 
@@ -80,7 +80,7 @@ Every mutating tool returns a receipt block:
 
 ## 5. Checkpoints and Rollback Guarantees
 
-StudioBridge provides checkpointing and atomic transactions (`09_l1_sdk.md §6`):
+StudioBridge provides checkpointing and atomic transactions:
 
 ### Checkpoint Operations:
 ```json

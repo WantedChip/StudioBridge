@@ -1,7 +1,7 @@
 """CLI handler for manifest subcommands: check-drift, coverage, cards, and live-diff.
 
 Implements CLI operations for API manifest verification, scheduled CI drift detection,
-and reference card generation per 05_l0c_device_script_manifest.md §17.
+and reference card generation.
 """
 
 from __future__ import annotations

@@ -1,6 +1,6 @@
 """Binary FLP chunk writer and lossless event stream serializer.
 
-Implements clean-room binary serialization per 07_l0e_flp_engine.md §3.1,
+Implements clean-room binary serialization,
 preserving original event order, non-canonical varints, and alignment padding
 per [FLP-02], [FLP-03], and [FLP-05].
 """

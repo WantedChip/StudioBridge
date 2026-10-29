@@ -1,6 +1,6 @@
 # StudioBridge Agent Rules
 
-When developing or interacting with StudioBridge and FL Studio projects, all coding agents MUST adhere to these 10 hard rules:
+When developing or interacting with StudioBridge and FL Studio projects, all coding agents MUST adhere to these 11 hard rules:
 
 1. **Zero native/compiled dependencies on Windows**: Runtime dependencies must provide universal pure-Python wheels or both `win_amd64` and `win_arm64` binary wheels. The Windows MIDI backend is our own `ctypes` WinMM binding.
 2. **Device-script sandbox rules**: Any code executing inside FL Studio's controller script context (`device/assets/*`) MUST be Python 3.9-compatible and import ONLY standard builtin modules and sibling script files. No sockets, no ctypes, no external packages.
@@ -12,3 +12,4 @@ When developing or interacting with StudioBridge and FL Studio projects, all cod
 8. **Capability honesty**: If real FL Studio behavior is unknown or unverified, gate behind a capability flag; do not guess or hallucinate API behavior.
 9. **Strict typing and validation**: Keep public APIs fully typed. Enforce linting with `ruff`, type-checking with `pyright`, and module layering with `import-linter`.
 10. **Concise reporting**: Output short summaries of operations including verification receipts, journal IDs, safety modes, and remedies for any failure.
+11. **Zero internal spec leakage:** Never reference internal planning artifacts, spec files (`XX_*_spec.md`, `00_INDEX.md`), phase numbers (`phase v0.X`, `sub-phase v0.X.Y`), section numbers (`per spec §X`), or the `.agents/` directory in public codebase files (source code, tests, docstrings, comments, website content, or public documentation). Public files must remain strictly self-contained.

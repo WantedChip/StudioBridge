@@ -1,7 +1,7 @@
 """Model Context Protocol (MCP) prompt templates and guided workflows.
 
 Implements conversational workflow prompts for stem balancing, session inspection,
-and preview export per 10_l2_interfaces.md §2.5 and [SEC-05].
+and preview export [SEC-05].
 """
 
 from __future__ import annotations
@@ -165,7 +165,7 @@ class PromptProvider:
         args = arguments or {}
         clean_name = name.strip().lower()
 
-        # Support balance_mix alias per 10_l2_interfaces.md §2.5
+        # Support balance_mix alias
         if clean_name in ("balance_stems", "balance_mix"):
             return self._render_balance_stems(args)
         if clean_name == "inspect_session":

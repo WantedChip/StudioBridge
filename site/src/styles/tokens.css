@@ -1,6 +1,5 @@
 /* =============================================================================
    StudioBridge Design System Tokens — "Patchbay" Technical Catalogue
-   Specification: .agents/spec/18_landing_page_spec.md §7, §7.1, §7.1a (T-WEB-02)
    ============================================================================= */
 
 /* -----------------------------------------------------------------------------
@@ -224,7 +223,6 @@
 
 /* -----------------------------------------------------------------------------
    Shiki Dual-Theme Code Block Tokens (Paper & Rack Adaptations)
-   Specification: .agents/spec/18_landing_page_spec.md §7.1a [THM-05]
    ----------------------------------------------------------------------------- */
 .shiki {
   background-color: var(--surface) !important;

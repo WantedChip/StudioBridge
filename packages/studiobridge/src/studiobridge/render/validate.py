@@ -2,8 +2,7 @@
 
 Provides pure-Python audio validation routines for exported render artifacts
 (WAV, MP3, FLAC, OGG), peak clipping analysis, silence ratio calculation,
-and IEEE float NaN/Inf detection per 06_l0d_pianoroll_actuation_render.md §12
-and [RND-05]. Zero third-party C/native dependencies.
+and IEEE float NaN/Inf detection [RND-05]. Zero third-party C/native dependencies.
 """
 
 from __future__ import annotations
@@ -103,7 +102,7 @@ class AudioMetrics:
 
 @dataclass
 class ValidationSpec:
-    """Validation thresholds and criteria for rendered audio [06_l0d §11].
+    """Validation thresholds and criteria for rendered audio.
 
     Attributes:
         min_duration_s: Minimum acceptable duration in seconds (default 0.5s).

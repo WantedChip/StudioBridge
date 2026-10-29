@@ -1,7 +1,6 @@
 """Unit tests for sbridge flp inspect, diff, and roundtrip CLI commands.
 
-Verifies CLI command parsing, standard exit codes, and JSON serialization
-per 10_l2_interfaces.md §3 and v0.5.2.
+Verifies CLI command parsing, standard exit codes, and JSON serialization.
 """
 
 from __future__ import annotations

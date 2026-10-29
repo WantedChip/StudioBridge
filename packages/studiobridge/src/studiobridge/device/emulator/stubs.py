@@ -1,7 +1,6 @@
 """Emulator module stubs generated from FL Studio API manifest.
 
-Provides default no-op stub implementations for all manifest functions per
-05_l0c_device_script_manifest.md §14.6.
+Provides default no-op stub implementations for all manifest functions.
 Isolated from higher layers per [DEV-30].
 """
 

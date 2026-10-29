@@ -1,8 +1,8 @@
 """Numeric tolerance comparison, proof level reporting, and verified mutation engine.
 
 Implements verified writes, tolerance comparison engine against declared per-parameter
-tolerances (defaulting to 0.005 per spec 09_l1_sdk.md §3), and proof levels
-("readback", "display_only", "none" per V1-A3).
+tolerances (defaulting to 0.005), and proof levels
+("readback", "display_only", "none").
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 T = TypeVar("T")
 
-# Default numeric tolerance for floating-point comparisons per 09_l1_sdk.md §3
+# Default numeric tolerance for floating-point comparisons
 DEFAULT_TOLERANCE: float = 0.005
 
 # Declared per-parameter and per-function tolerances from empirical quirks overlay

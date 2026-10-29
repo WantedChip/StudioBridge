@@ -2,7 +2,7 @@
 
 Verifies 100% byte-identical roundtrips, non-canonical varint preservation,
 trailing byte handling, streaming reader memory bounds, clean-room provenance,
-and performance budgets per 07_l0e_flp_engine.md and 12_crosscutting.md.
+and performance budgets.
 """
 
 from __future__ import annotations
@@ -414,7 +414,7 @@ def test_streaming_and_lazy_reader(tmp_path: Path) -> None:
 
 
 # =============================================================================
-# Performance Budget Benchmark Tests ([FLP-02], [FLP-04], 12 §5)
+# Performance Budget Benchmark Tests ([FLP-02], [FLP-04])
 # =============================================================================
 
 

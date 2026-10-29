@@ -1,7 +1,7 @@
 /**
- * Automated Test Suite for SEO, GEO, LLM Files & OpenGraph Metadata (v0.6.9 / T-WEB-09)
+ * Automated Test Suite for SEO, GEO, LLM Files & OpenGraph Metadata
  *
- * Requirements per 18_landing_page_spec.md §8, §12 and sub-phase v0.6.9:
+ * Requirements:
  * 1. JSON-LD SoftwareApplication Schema Validation:
  *    - Google Rich Results compliant schema.org SoftwareApplication structured data.
  *    - Validates name, applicationCategory, operatingSystem, license, author, offers, softwareVersion, description, url, featureList, downloadUrl.
@@ -36,7 +36,7 @@ function resolveDistDir(): string {
   throw new Error(`dist directory not found in candidates: ${candidates.join(', ')}. Run 'npm run build' first.`);
 }
 
-describe('SEO, GEO, OpenGraph & LLM Metadata Test Suite (v0.6.9 / T-WEB-09)', () => {
+describe('SEO, GEO, OpenGraph & LLM Metadata Test Suite', () => {
   const distDir = resolveDistDir();
 
   describe('1. Schema.org SoftwareApplication JSON-LD', () => {

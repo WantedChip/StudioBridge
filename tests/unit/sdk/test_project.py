@@ -1,4 +1,4 @@
-"""Unit and integration tests for Project namespace per 09_l1_sdk.md §4, §5 and v0.2.5.
+"""Unit and integration tests for Project namespace.
 
 Tests both Studio (synchronous) and AsyncStudio (asynchronous) project interfaces:
 - get_title(), get_author(), get_comment(), is_dirty(), info()

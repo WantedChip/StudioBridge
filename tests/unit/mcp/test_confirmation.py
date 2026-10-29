@@ -1,4 +1,4 @@
-"""Unit tests for ConfirmationManager and challenge-token verification per 10_l2_interfaces.md §2.3.
+"""Unit tests for ConfirmationManager and challenge-token verification.
 
 Verifies:
 1. One-time challenge token generation, validation, and single-use consumption.

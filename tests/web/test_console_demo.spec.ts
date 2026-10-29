@@ -1,7 +1,7 @@
 /**
- * Test Suite for Interactive Console Demo Island & Session Playback (v0.6.6 / T-WEB-06)
+ * Test Suite for Interactive Console Demo Island & Session Playback
  *
- * Requirements per 18_landing_page_spec.md §5, §6.3 and sub-phase v0.6.6:
+ * Requirements:
  * 1. Three authentic recorded session transcripts:
  *    - balance-drums.json: mixer_set, tolerance checks, read-back verification.
  *    - add-bassline.json: notes_apply, notes_read, piano roll oracle verification.
@@ -48,7 +48,7 @@ function resolveSessionsDir(): string {
   throw new Error(`sessions directory not found. Candidates checked: ${candidates.join(', ')}`);
 }
 
-describe('Interactive Console Demo Island & Session Playback (v0.6.6 / T-WEB-06)', () => {
+describe('Interactive Console Demo Island & Session Playback', () => {
   const htmlPath = resolveDistHtml();
   const html = fs.readFileSync(htmlPath, 'utf8');
   const sessionsDir = resolveSessionsDir();

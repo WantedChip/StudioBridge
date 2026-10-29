@@ -1,7 +1,7 @@
 """FLP structural invariant validator and consistency checker.
 
 Implements post-mutation and pre-save structural invariant checks per
-07_l0e_flp_engine.md §3.4, 12_crosscutting.md §7, [FLP-05], and [FLP-30].
+[FLP-05] and [FLP-30].
 """
 
 from __future__ import annotations

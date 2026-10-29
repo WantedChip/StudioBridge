@@ -1,6 +1,6 @@
 """Brand token substitution and integrity validation tooling.
 
-Per 00_INDEX.md §8 and sub-phase v0.1.9:
+Rebranding and token renaming utility:
 Scans tracked source files, documentation, and agent templates, substituting
 brand tokens consistently from old to new values while enforcing:
 1. Strict case-sensitive and token-boundary replacements.

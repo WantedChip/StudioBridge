@@ -1,8 +1,7 @@
 """API manifest schema models, JSON schema definition, and validators.
 
 Defines typed dataclasses and serialization for Manifest, ModuleDoc, FunctionDoc,
-ArgDoc, VerifySpec, CallbackDoc, and constant/flag mappings per
-05_l0c_device_script_manifest.md §13.
+ArgDoc, VerifySpec, CallbackDoc, and constant/flag mappings.
 """
 
 from __future__ import annotations
@@ -304,7 +303,7 @@ class ModuleDoc:
 class Manifest:
     """Full FL Studio API manifest representing a specific API version.
 
-    Supports both 'schema' and 'manifest_schema' (default 1) per spec §13.
+    Supports both 'schema' and 'manifest_schema' (default 1).
     """
 
     api_version: int

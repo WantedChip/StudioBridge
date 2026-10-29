@@ -1,7 +1,7 @@
 """FLP Project root model and typed deserialization loader.
 
-Implements Project per 07_l0e_flp_engine.md §3.3, 09_l1_sdk.md §1–§2,
-[FLP-20] (opaque tail list for unmodeled events), and [FLP-21] (source event handles).
+Implements Project with [FLP-20] (opaque tail list for unmodeled events)
+and [FLP-21] (source event handles).
 """
 
 from __future__ import annotations
@@ -360,7 +360,7 @@ class Project:
         raise IndexError(f"Mixer track index {index} out of range (0..{len(self.mixer) - 1})")
 
     def info(self) -> dict[str, Any]:
-        """Return standardized project inspection summary dictionary per 07 §8."""
+        """Return standardized project inspection summary dictionary."""
         return {
             "version": self.version,
             "title": self.title,
@@ -406,7 +406,7 @@ class Project:
 
     @classmethod
     def diff(cls, a: str | Path | Project, b: str | Path | Project) -> ProjectDiff:
-        """Compare two projects and return a ProjectDiff report per 07 §8."""
+        """Compare two projects and return a ProjectDiff report."""
         from studiobridge.flp.diff import diff_projects
 
         proj_a = a if isinstance(a, Project) else cls.load(a)
@@ -427,7 +427,7 @@ class Project:
         test_fl_load: bool = False,
         timeout_s: float = 30.0,
     ) -> ValidationReport:
-        """Validate project structural invariants and static risk assessment [07 §5, §8].
+        """Validate project structural invariants and static risk assessment.
 
         Optionally tests headless FL-load verification in real FL Studio if test_fl_load=True.
 

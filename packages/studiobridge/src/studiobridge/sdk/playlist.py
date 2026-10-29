@@ -1,7 +1,7 @@
 """Playlist management namespace for StudioBridge Python SDK.
 
 Provides high-level typed playlist controllers (AsyncPlaylist and SyncPlaylist)
-mounted on AsyncStudio.playlist and Studio.playlist per spec 09_l1_sdk.md §4.
+mounted on AsyncStudio.playlist and Studio.playlist.
 """
 
 from __future__ import annotations
@@ -280,7 +280,7 @@ class AsyncPlaylist:
         return tracks
 
     async def find(self, name: str, *, limit: int = 32) -> PlaylistTrack:
-        """Find playlist track by name per 09 §3.2.
+        """Find playlist track by name.
 
         Args:
             name: Track name to look up.
@@ -342,10 +342,10 @@ class AsyncPlaylist:
     ) -> Verified[bool]:
         """Place pattern clip onto playlist track at target time (experimental).
 
-        Gated behind capability 'experimental.playlist_place' per 09_l1_sdk.md §8.
+        Gated behind capability 'experimental.playlist_place' [CAP-02].
         Calling when disabled raises UnavailableError (ExperimentalDisabledError).
         """
-        # 1. Gate capability per [CAP-02] and spec 09_l1_sdk.md §8
+        # 1. Gate capability per [CAP-02]
         gate_capability(self._session.caps, "experimental.playlist_place")
 
         pat_num = pattern.number if isinstance(pattern, Pattern) else int(pattern)
@@ -407,7 +407,7 @@ class SyncPlaylist:
         return self._portal.call(functools.partial(self._async.list, limit=limit))
 
     def find(self, name: str, *, limit: int = 32) -> PlaylistTrack:
-        """Find playlist track by name per 09 §3.2."""
+        """Find playlist track by name."""
         self._check_connection()
         return self._portal.call(functools.partial(self._async.find, name, limit=limit))
 

@@ -1,4 +1,4 @@
-"""Unit tests for StudioBridge inspect MCP tools per spec 10_l2_interfaces.md §2.4.
+"""Unit tests for StudioBridge inspect MCP tools.
 
 Verifies:
 1. Tool catalog and annotations: readOnlyHint=True, idempotentHint=True, openWorldHint=False.

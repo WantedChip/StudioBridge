@@ -1,4 +1,4 @@
-"""Unit and integration tests for Transport namespace per 09_l1_sdk.md §4 and v0.2.4.
+"""Unit and integration tests for Transport namespace.
 
 Tests both Studio (synchronous) and AsyncStudio (asynchronous) transport interfaces:
 - play(), stop(), record(), is_playing()

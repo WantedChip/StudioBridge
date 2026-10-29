@@ -1,7 +1,7 @@
 /**
- * Playwright / Web Specification Test Suite for Hero Section & Signal-Path Island (T-WEB-04)
+ * Playwright / Web Specification Test Suite for Hero Section & Signal-Path Island
  *
- * Requirements per 18_landing_page_spec.md §5, §6.1 and sub-phase v0.6.4:
+ * Requirements:
  * 1. Hero layout & copy: Title, subhead, install command copy box, "See it work" jump link (#session-demo), badges.
  * 2. CopyButton functionality: Clipboard writeText, copied state ("COPIED"), accessible keyboard support, fallback.
  * 3. SignalPath interactive island: 5 hardware nodes, SVG schematic, cable flow, interactive drawer with authentic protocol data.
@@ -45,7 +45,7 @@ function resolveDistAstroDir(): string {
   throw new Error(`dist/_astro directory not found. Candidates checked: ${candidates.join(', ')}`);
 }
 
-describe('Hero Section & Signal-Path Island (v0.6.4 / T-WEB-04)', () => {
+describe('Hero Section & Signal-Path Island', () => {
   const htmlPath = resolveDistHtml();
   const html = fs.readFileSync(htmlPath, 'utf8');
   const astroDir = resolveDistAstroDir();

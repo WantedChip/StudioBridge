@@ -1,8 +1,7 @@
 """Markdown API reference card generator for documentation and MCP resource endpoints.
 
 Transforms normalized API manifest descriptors into clean, structured Markdown cards
-per 05_l0c_device_script_manifest.md §17 for documentation sites (Starlight)
-and MCP resource URIs (`studio://api/{module}/{function}`).
+for documentation sites (Starlight) and MCP resource URIs (`studio://api/{module}/{function}`).
 """
 
 from __future__ import annotations

@@ -1,6 +1,6 @@
 """Piano-roll script (.pyscript) template and renderer.
 
-Per spec 06_l0d_pianoroll_actuation_render.md §1–§3 and [PR-01]..[PR-06].
+Implements piano-roll script templates [PR-01]..[PR-06].
 """
 
 from __future__ import annotations

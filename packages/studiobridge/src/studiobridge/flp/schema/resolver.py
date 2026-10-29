@@ -3,7 +3,7 @@
 Detects FL Studio project versions from event streams (event ID 199) and selects
 the matching VersionProfile. For unknown or newer versions, provides read-only
 best-effort fallback, flags risk="unknown_version", and raises FlpVersionUnsupportedError
-(E_FLP_VERSION) on unsupported write operations per 12_crosscutting.md §7.
+(E_FLP_VERSION) on unsupported write operations.
 """
 
 from __future__ import annotations

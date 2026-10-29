@@ -6,8 +6,6 @@ Generates:
 3. packages/studiobridge/src/studiobridge/fl/__init__.py (constant exports).
 4. packages/studiobridge/src/studiobridge/device/emulator/stubs.py (emulator module stubs).
 5. packages/studiobridge/src/studiobridge/sdk/_generated/*.py and *.pyi (PEP 484/561 type stubs).
-
-Per 05_l0c_device_script_manifest.md §14.6, §15, §16.
 """
 
 from __future__ import annotations
@@ -272,7 +270,7 @@ def generate_fl_consts(manifest: Manifest) -> str:
         '"""Typed constants and enums for FL Studio MIDI scripting API.',
         "",
         "Exports FPT_* global transport commands, midi.* event constants, UF_* undo flags,",
-        "PME_* flags, and REC_* flags per 05_l0c_device_script_manifest.md §16.",
+        "PME_* flags, and REC_* flags.",
         "Generated deterministically by studiobridge.manifest.codegen. Do not edit manually.",
         '"""',
         "",
@@ -482,7 +480,7 @@ def generate_fl_init() -> str:
     return (
         '"""FL Studio constants, flags, and types.\n'
         "\n"
-        "Exports typed constants and enums per 05_l0c_device_script_manifest.md §16.\n"
+        "Exports typed constants and enums.\n"
         '"""\n'
         "\n"
         "from __future__ import annotations\n"
@@ -517,8 +515,7 @@ def generate_emulator_stubs(manifest: Manifest) -> str:
     lines: list[str] = [
         '"""Emulator module stubs generated from FL Studio API manifest.',
         "",
-        "Provides default no-op stub implementations for all manifest functions per",
-        "05_l0c_device_script_manifest.md §14.6.",
+        "Provides default no-op stub implementations for all manifest functions.",
         "Isolated from higher layers per [DEV-30].",
         '"""',
         "",

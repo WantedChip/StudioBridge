@@ -1,8 +1,7 @@
 """Unit tests for FLP version profiles, text decoders, and compatibility resolver.
 
 Verifies FL Studio 21–26 profile resolution, exact 88-byte playlist item offsets,
-text decoding, write safety gates (E_FLP_VERSION), and fixture expectations manifest
-per 07_l0e_flp_engine.md §3.2, §6, §7 and 12_crosscutting.md §7.
+text decoding, write safety gates (E_FLP_VERSION), and fixture expectations manifest.
 """
 
 from __future__ import annotations
@@ -229,7 +228,7 @@ def test_profile_resolution_missing_event_199() -> None:
 
 
 # =============================================================================
-# 3. Fallback Resolution & Write Gate Safety ([FLP-32], 12 §7)
+# 3. Fallback Resolution & Write Gate Safety ([FLP-32])
 # =============================================================================
 
 

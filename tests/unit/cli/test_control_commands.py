@@ -1,4 +1,4 @@
-"""Unit tests for control and safety CLI commands per spec 10_l2_interfaces.md §3.
+"""Unit tests for control and safety CLI commands.
 
 Verifies:
 1. 'sbridge transport play|stop|record|tempo|pos'.

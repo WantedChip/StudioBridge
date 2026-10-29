@@ -1,4 +1,4 @@
-"""Unit tests for Verified writes, proof levels, and tolerance engine per 09_l1_sdk.md §3.1.
+"""Unit tests for Verified writes, proof levels, and tolerance engine.
 
 Tests verification semantics:
 - tolerance_matches with numbers, unit types (Volume, Pan), booleans, strings

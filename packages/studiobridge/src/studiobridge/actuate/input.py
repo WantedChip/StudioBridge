@@ -3,7 +3,7 @@
 Dispatches guarded hotkeys (Ctrl+Alt+Y) using SendInput with hardware scancodes
 (KEYEVENTF_SCANCODE) for layout independence, inserts 10-20ms modifier delays,
 exercises temporary focus restoration, and records every actuation into the
-session mutation journal per spec 06_l0d §4, §5 and [ACT-11].
+session mutation journal [ACT-11].
 """
 
 from __future__ import annotations

@@ -2,8 +2,7 @@
 
 Implements append-only JSONL journal stored at
 %LOCALAPPDATA%\\studiobridge\\journal\\{session_id}.jsonl recording
-{ts, op, target, before, after, idem, user, proof, verified} per spec
-09_l1_sdk.md §5, §6 and 12_crosscutting.md §1.
+{ts, op, target, before, after, idem, user, proof, verified}.
 """
 
 from __future__ import annotations
@@ -34,7 +33,7 @@ def _sanitize_session_id(session_id: str | int) -> str:
 
 @dataclass(frozen=True, slots=True)
 class JournalEntry:
-    """Single mutation audit journal record per 09_l1_sdk.md §6 and 12_crosscutting.md §1.
+    """Single mutation audit journal record.
 
     Attributes:
         ts: Epoch timestamp of the write operation.

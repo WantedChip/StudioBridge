@@ -1,7 +1,6 @@
 """Device script emulator harness hosting controller scripts in simulated FL Studio sandbox.
 
-Runs device scripts under Python 3.9-constrained environment per [DEV-30] and
-05_l0c_device_script_manifest.md §9.
+Runs device scripts under Python 3.9-constrained environment per [DEV-30].
 """
 
 from __future__ import annotations

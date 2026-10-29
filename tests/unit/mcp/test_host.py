@@ -351,7 +351,7 @@ class TestToolsetFiltering:
             StudioMcpServer(toolsets="core,non_existent_toolset")
 
     def test_tool_annotations_in_mcp_dict(self) -> None:
-        """Tool definitions emit annotations per spec 10_l2_interfaces.md §2.2."""
+        """Tool definitions emit annotations."""
         tool = ToolDefinition(
             name="test_tool",
             description="Test tool",

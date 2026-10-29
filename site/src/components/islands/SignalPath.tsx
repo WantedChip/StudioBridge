@@ -543,7 +543,7 @@ export default function SignalPath(): React.JSX.Element {
         </section>
       )}
 
-      {/* Reduced-Motion Static Fallback Disclosures per 18_landing_page_spec.md §6.1 */}
+      {/* Reduced-Motion Static Fallback Disclosures */}
       {/* Automatically presented for screen readers & under prefers-reduced-motion: reduce */}
       <div className="mt-4 pt-4 border-t border-line">
         <div className="flex items-center justify-between mb-2">

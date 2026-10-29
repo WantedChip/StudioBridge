@@ -1,6 +1,6 @@
 """FLP project inspection, semantic diffing, and roundtrip CLI handlers.
 
-Implements CLI commands per spec 10_l2_interfaces.md §3 and v0.5.2:
+Implements CLI commands:
 - sbridge flp inspect <file> [--json]
 - sbridge flp diff <a.flp> <b.flp> [--json]
 - sbridge flp roundtrip <file> [--json]

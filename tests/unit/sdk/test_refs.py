@@ -1,4 +1,4 @@
-"""Unit tests for entity reference handles and resolvers per 09_l1_sdk.md §3.2.
+"""Unit tests for entity reference handles and resolvers.
 
 Tests named identity handles with strict index bases:
 - MixerTrack(index): 0-based (0 = Master, 1..126 = Inserts), ValueError on < 0

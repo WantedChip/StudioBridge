@@ -1,4 +1,4 @@
-"""Unit and integration tests for Channels namespace per 09_l1_sdk.md §4 and v0.2.4.
+"""Unit and integration tests for Channels namespace.
 
 Tests both Studio (synchronous) and AsyncStudio (asynchronous) channels interfaces:
 - count(), list(), get_channel()

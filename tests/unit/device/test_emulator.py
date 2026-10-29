@@ -1,7 +1,7 @@
 """Comprehensive unit tests for DeviceEmulator and device script wire protocol conformance.
 
 Verifies end-to-end SysEx message exchange, authentication, budgets, error wrapping,
-and sandbox enforcement per [DEV-10]..[DEV-30] and v0.1.5 Definition of Done.
+and sandbox enforcement per [DEV-10]..[DEV-30].
 """
 
 from __future__ import annotations

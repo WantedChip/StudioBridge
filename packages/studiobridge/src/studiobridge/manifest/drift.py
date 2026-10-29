@@ -2,7 +2,7 @@
 
 Compares newly scraped/candidate manifests against stored baseline fixtures,
 evaluates live runtime introspection against the manifest, and verifies 100%
-typing coverage for API functions and arguments per 05_l0c_device_script_manifest.md §17.
+typing coverage for API functions and arguments.
 """
 
 from __future__ import annotations
@@ -843,7 +843,7 @@ def compare_manifest_files(baseline_path: Path | str, candidate_path: Path | str
 def compare_with_introspection(
     manifest: Manifest, introspect_data: dict[str, Any]
 ) -> LiveDiffReport:
-    """Compare manifest with live runtime introspection per 05_l0c_device_script_manifest.md §17."""
+    """Compare manifest with live runtime introspection."""
     if not isinstance(introspect_data, dict):
         raise ValueError("Introspect data must be a dictionary")
 

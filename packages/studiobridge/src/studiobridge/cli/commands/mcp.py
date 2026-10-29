@@ -1,7 +1,6 @@
 """CLI command handler for 'sbridge mcp'.
 
-Runs the StudioBridge Model Context Protocol server over stdio transport
-per spec 10_l2_interfaces.md §2.1–§2.3 and §3.
+Runs the StudioBridge Model Context Protocol server over stdio transport.
 """
 
 from __future__ import annotations
@@ -16,7 +15,7 @@ from studiobridge.mcp.server import StudioMcpServer
 
 logger = logging.getLogger("studiobridge.cli.mcp")
 
-# Standard exit codes per spec 10_l2_interfaces.md §3
+# Standard exit codes
 EXIT_OK = 0
 EXIT_ERROR = 1
 EXIT_USAGE = 2

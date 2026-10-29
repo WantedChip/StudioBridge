@@ -1,6 +1,6 @@
 """Pure-Python CRC-16/CCITT-FALSE implementation and 7-bit septet packing routines.
 
-Implements CRC-16/CCITT-FALSE per wire protocol specification (03_l0a_wire_protocol.md §3):
+Implements CRC-16/CCITT-FALSE:
 - Polynomial: 0x1021 (x^16 + x^12 + x^5 + 1)
 - Initial value: 0xFFFF
 - RefIn: False
@@ -47,7 +47,7 @@ ByteData = bytes | bytearray | memoryview | Sequence[int]
 def crc16_bitwise(data: ByteData, init: int = CRC_INIT) -> int:
     """Compute CRC-16/CCITT-FALSE using the reference bitwise algorithm.
 
-    Matches reference implementation in 03_l0a_wire_protocol.md §3.2.
+    Matches reference bitwise implementation.
     """
     crc = init & 0xFFFF
     for b in data:

@@ -3,7 +3,7 @@
  * StudioBridge npm launcher shim.
  *
  * Dispatches command invocation to the underlying StudioBridge Python distribution
- * via uvx, pipx, or a local Python runtime per 11_l3_distribution_ci.md §3.
+ * via uvx, pipx, or a local Python runtime.
  *
  * Requirements: [NPM-01], [NPM-02], [REG-01].
  *

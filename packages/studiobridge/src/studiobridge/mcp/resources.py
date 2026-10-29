@@ -1,8 +1,7 @@
 """Model Context Protocol (MCP) read-only resource providers and URI handlers.
 
 Implements URI resource resolution for live bridge status, machine capabilities,
-project overview, API manifest cards, and recent journal records per
-10_l2_interfaces.md §2.5 and 12_crosscutting.md §1 [SEC-05].
+project overview, API manifest cards, and recent journal records [SEC-05].
 """
 
 from __future__ import annotations

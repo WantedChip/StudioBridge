@@ -845,7 +845,7 @@ class Doctor:
             name="Piano Roll Scripts Installation",
             severity="info",
             status="pass",
-            evidence=f"{evidence} (directory ready for Phase v0.4 note scripts)",
+            evidence=f"{evidence} (directory ready for piano-roll note scripts)",
             remedy="",
         )
 

@@ -1,7 +1,4 @@
-"""Unit tests for piano-roll script generator, templates, and idempotency.
-
-Per spec 06_l0d_pianoroll_actuation_render.md §1–§3 and [PR-01]..[PR-06].
-"""
+"""Unit tests for piano-roll script generator, templates, and idempotency [PR-01]..[PR-06]."""
 
 from __future__ import annotations
 

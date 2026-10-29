@@ -1,7 +1,7 @@
 /**
- * Automated Test Suite for Starlight Documentation & API Reference Integration (v0.6.8 / T-WEB-08)
+ * Automated Test Suite for Starlight Documentation & API Reference Integration
  *
- * Requirements per 18_landing_page_spec.md §5, §7.1a and sub-phase v0.6.8:
+ * Requirements:
  * 1. Internal Link Validity ([LNK-01]):
  *    - All internal links across all docs pages resolve to existing files and valid target anchors.
  *    - Zero broken internal links across the documentation collection.
@@ -75,7 +75,7 @@ function getAllHtmlFiles(dir: string, fileList: string[] = []): string[] {
   return fileList;
 }
 
-describe('Starlight Documentation & API Reference Integration (v0.6.8 / T-WEB-08)', () => {
+describe('Starlight Documentation & API Reference Integration', () => {
   const distDir = resolveDistDir();
   const docsDistDir = path.join(distDir, 'docs');
   const siteSrcDir = resolveSiteSrcDir();

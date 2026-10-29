@@ -1,7 +1,7 @@
 """Unit and security tests for prompt-injection defense metadata and system instructions.
 
 Verifies:
-1. UntrustedString tagging and metadata serialization per 12_crosscutting.md §1 [SEC-05].
+1. UntrustedString tagging and metadata serialization [SEC-05].
 2. User-controlled project strings (names, comments, presets) carry 'untrusted': true.
 3. Server instructions stay under the 120-word budget and mandate calling studio_status first.
 4. Prompt-injection defense warnings are wired into MCP initialize instructions

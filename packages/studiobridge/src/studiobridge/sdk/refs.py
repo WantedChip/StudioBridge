@@ -1,4 +1,4 @@
-"""Entity reference handles and resolvers per spec 09_l1_sdk.md §3.2.
+"""Entity reference handles and resolvers.
 
 Provides named identity handles with strict index bases:
 - MixerTrack(index): 0-based (0 = Master, 1..126 = Inserts)
@@ -24,7 +24,7 @@ T = TypeVar("T")
 
 @dataclass
 class MixerTrack:
-    """Mixer track identity reference object per 09_l1_sdk.md §3.2.
+    """Mixer track identity reference object.
 
     0-based indexing: 0 = Master track, 1..126 = Insert tracks.
     """
@@ -57,7 +57,7 @@ class MixerTrack:
 
 @dataclass
 class Channel:
-    """Channel rack channel identity reference object per 09_l1_sdk.md §3.2.
+    """Channel rack channel identity reference object.
 
     0-based indexing.
     """
@@ -86,7 +86,7 @@ class Channel:
 
 @dataclass
 class Pattern:
-    """Pattern identity reference object per 09_l1_sdk.md §3.2.
+    """Pattern identity reference object.
 
     1-based indexing per FL Studio conventions (Pattern 1, Pattern 2, ...).
     """
@@ -114,7 +114,7 @@ class Pattern:
 
 @dataclass
 class PlaylistTrack:
-    """Playlist track identity reference object per 09_l1_sdk.md §3.2.
+    """Playlist track identity reference object.
 
     1-based indexing per FL Studio conventions (Track 1, Track 2, ...).
     """
@@ -143,7 +143,7 @@ class PlaylistTrack:
 
 @dataclass(frozen=True)
 class Slot:
-    """Effect slot identity reference object per 09_l1_sdk.md §3.2.
+    """Effect slot identity reference object.
 
     0-based indexing: track = mixer track index (0..126), slot = effect slot index (0..9).
     """

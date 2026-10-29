@@ -2,7 +2,7 @@
 
 Implements TCP daemon on 127.0.0.1 (OS-assigned port), publishes broker.json metadata,
 enforces 256-bit token authentication within 2 seconds [BRK-02], provides NDJSON framing,
-handles event fan-out, and auto-exits on idle [BRK-04] per spec 04_l0b_ports_broker.md §8.
+handles event fan-out, and auto-exits on idle [BRK-04].
 """
 
 from __future__ import annotations

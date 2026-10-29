@@ -15,7 +15,7 @@ def test_package_version() -> None:
 
 
 def test_submodules_exist() -> None:
-    """Verify architectural submodules exist per 02_architecture.md §9."""
+    """Verify architectural submodules exist."""
     # req: REPO-01
     submodules = [
         "studiobridge.core",

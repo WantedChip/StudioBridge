@@ -1,7 +1,7 @@
 """Unit tests for SysEx Frame codec, golden test vectors, and error validation.
 
 Validates golden vector conformity, serialization round-trips, strict 7-bit cleanliness,
-and rejection of malformed frames per spec 03_l0a_wire_protocol.md §3.
+and rejection of malformed frames.
 """
 
 from __future__ import annotations
@@ -41,10 +41,10 @@ def golden_vectors() -> list[dict]:
 
 
 class TestGoldenVectors:
-    """Validate conformity with the official golden test vectors from §3.1."""
+    """Validate conformity with the official golden test vectors."""
 
     def test_framing_constants(self) -> None:
-        """Verify protocol wire constants match 03_l0a_wire_protocol.md §3."""
+        """Verify protocol wire constants."""
         assert SYSEX_START == 0xF0
         assert SYSEX_END == 0xF7
         assert MANUFACTURER_ID == 0x7D

@@ -1,7 +1,7 @@
 """Transport control namespace for StudioBridge Python SDK.
 
 Provides high-level typed transport controllers (AsyncTransport and SyncTransport)
-mounted on AsyncStudio.transport and Studio.transport per spec 09_l1_sdk.md §4.
+mounted on AsyncStudio.transport and Studio.transport.
 """
 
 from __future__ import annotations

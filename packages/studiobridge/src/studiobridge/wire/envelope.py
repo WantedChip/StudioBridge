@@ -1,8 +1,7 @@
 """Structured JSON envelope definitions, serialization, and deserialization.
 
 Provides strongly-typed request, response, event, and control envelope models
-with compact, deterministic 7-bit clean ASCII JSON serialization per
-spec 03_l0a_wire_protocol.md §5.
+with compact, deterministic 7-bit clean ASCII JSON serialization.
 """
 
 from __future__ import annotations
@@ -17,7 +16,7 @@ from studiobridge.wire.frame import FrameKind
 # Maximum allowed length for idempotency key per [WIRE-20]
 MAX_IDEM_LENGTH: int = 24
 
-# Allowed control commands per [WIRE §5.4]
+# Allowed control commands
 VALID_CONTROL_COMMANDS: frozenset[str] = frozenset({"ping", "pong", "ack", "nack", "busy", "panic"})
 
 
@@ -93,7 +92,7 @@ class RequestEnvelope:
             )
 
     def to_dict(self) -> dict[str, Any]:
-        """Convert request to dictionary matching wire format §5.1."""
+        """Convert request to dictionary matching wire format."""
         d: dict[str, Any] = {"op": self.op}
         if self.idem is not None:
             d["idem"] = self.idem
@@ -223,7 +222,7 @@ class ResponseEnvelope:
         )
 
     def to_dict(self) -> dict[str, Any]:
-        """Convert response to dictionary matching wire format §5.2."""
+        """Convert response to dictionary matching wire format."""
         d: dict[str, Any] = {"ok": self.ok}
         if self.ok:
             if self.r is not None:
@@ -280,7 +279,7 @@ class EventEnvelope:
     d: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        """Convert event to dictionary matching wire format §5.3."""
+        """Convert event to dictionary matching wire format."""
         return {"ev": self.ev, "seq": self.seq, "d": self.d}
 
     def to_json(self) -> bytes:
@@ -358,7 +357,7 @@ class ControlEnvelope:
         return cls(c="panic")
 
     def to_dict(self) -> dict[str, Any]:
-        """Convert control envelope to dictionary matching wire format §5.4."""
+        """Convert control envelope to dictionary matching wire format."""
         d: dict[str, Any] = {"c": self.c}
         if self.mid is not None:
             d["mid"] = self.mid

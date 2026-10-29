@@ -1,6 +1,6 @@
 """Core discovery and status MCP tools for StudioBridge.
 
-Implements always-on core tools per spec 10_l2_interfaces.md §2.4:
+Implements always-on core tools:
 - studio_status: Connection, FL/API versions, active mode, transport state, broker health.
 - studio_capabilities: Capability matrix, limits, and alternatives.
 - studio_doctor: Run diagnostics and return checks with remedies.

@@ -2,8 +2,7 @@
 
 Configures system guidance strings (<= 120 words) instructing agents to call
 studio_status first, respect safety modes, and verify writes, while tagging
-user-controlled project strings from FL Studio as untrusted data per spec
-10_l2_interfaces.md §2.5, §7 and 12_crosscutting.md §1 [SEC-05].
+user-controlled project strings from FL Studio as untrusted data [SEC-05].
 """
 
 from __future__ import annotations
@@ -12,7 +11,7 @@ from typing import Any
 
 from studiobridge.sdk.types import UntrustedString
 
-# Server instructions per spec 10_l2_interfaces.md §7 (summary in <= 120 words)
+# Server instructions (summary in <= 120 words)
 SERVER_INSTRUCTIONS: str = (
     "First tool call in any session SHOULD be studio_status to verify bridge health "
     "and FL Studio state. "

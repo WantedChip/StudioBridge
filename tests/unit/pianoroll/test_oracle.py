@@ -1,7 +1,4 @@
-"""Unit tests for piano-roll oracle verification engine.
-
-Per spec 06_l0d_pianoroll_actuation_render.md §4, §6 and [ACT-02].
-"""
+"""Unit tests for piano-roll oracle verification engine [ACT-02]."""
 
 from __future__ import annotations
 

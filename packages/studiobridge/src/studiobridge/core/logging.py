@@ -2,7 +2,6 @@
 
 Emits structured logs with standardized schema:
 {ts, lvl, comp, evt, sid, mid, dur_ms, code}
-per spec 12_crosscutting.md §4.
 """
 
 from __future__ import annotations
