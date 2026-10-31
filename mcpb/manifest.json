@@ -1,0 +1,1420 @@
+{
+  "$schema": "https://raw.githubusercontent.com/modelcontextprotocol/mcpb/main/schemas/mcpb-manifest-v0.4.schema.json",
+  "manifest_version": "0.4",
+  "name": "io.github.wantedchip.studiobridge",
+  "display_name": "StudioBridge",
+  "version": "0.1.0",
+  "description": "AI agent & developer bridge to Image-Line FL Studio (transport, mixer, channel rack, plugins, and project automation).",
+  "author": {
+    "name": "WantedChip",
+    "email": "ty121rt@gmail.com",
+    "url": "https://github.com/WantedChip"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/WantedChip/studiobridge",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WantedChip/studiobridge.git"
+  },
+  "icon": "icon.png",
+  "server": {
+    "type": "python",
+    "entry_point": "launcher.py",
+    "mcp_config": {
+      "command": "python",
+      "args": [
+        "${__dirname}/launcher.py"
+      ],
+      "env": {}
+    }
+  },
+  "compatibility": {
+    "platforms": [
+      "win32",
+      "darwin",
+      "linux"
+    ],
+    "runtimes": {
+      "python": ">=3.10,<3.15"
+    }
+  },
+  "capabilities": {
+    "tools": {
+      "listChanged": true
+    },
+    "resources": {
+      "subscribe": false,
+      "listChanged": true
+    },
+    "prompts": {
+      "listChanged": true
+    },
+    "logging": {}
+  },
+  "user_config": {
+    "toolsets": {
+      "type": "string",
+      "title": "Active Toolsets",
+      "description": "Comma-separated list of active toolsets (core, inspect, control, notes, safety, render, flp). Defaults to all default toolsets.",
+      "default": "core,inspect,control,notes,safety,render,flp",
+      "required": false
+    },
+    "mode": {
+      "type": "string",
+      "title": "Safety Mode",
+      "description": "Default safety mode for write operations (read_only, write, unsafe). Defaults to read_only.",
+      "default": "read_only",
+      "enum": [
+        "read_only",
+        "write",
+        "unsafe"
+      ],
+      "required": false
+    }
+  },
+  "tools": [
+    {
+      "name": "api_describe",
+      "description": "Retrieve full documentation, signature, since-version, parameters, return type, empirical quirks, and usage examples for an FL scripting function.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "function": {
+            "type": "string",
+            "description": "Function name (e.g. 'mixer.setTrackVolume' or 'setTrackVolume')"
+          },
+          "module": {
+            "type": "string",
+            "description": "Module name if not prefixed in function name (e.g. 'mixer')"
+          }
+        },
+        "required": [
+          "function"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "api_search",
+      "description": "Search FL Studio Python scripting API functions, modules, and constants by keyword or module filter.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Keyword to search in function names, summaries, or docstrings"
+          },
+          "module": {
+            "type": "string",
+            "description": "Filter by module name (e.g. 'mixer', 'transport', 'channels', 'patterns', 'general', 'playlist')"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 20,
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Maximum number of search results to return"
+          },
+          "include_constants": {
+            "type": "boolean",
+            "default": false,
+            "description": "Include module constants matching query"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "channel_get",
+      "description": "Get detailed properties of a single generator channel by index or name, including volume, pan, pitch, mute, solo, and step sequencer grid.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "channel": {
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Channel index (0-based) or channel name"
+          }
+        },
+        "required": [
+          "channel"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "channel_set",
+      "description": "Modify channel properties: volume, pan, mute, solo, name, and 16-step sequencer pattern.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "channel": {
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Channel index (0-based) or channel name"
+          },
+          "volume": {
+            "type": "number",
+            "description": "Normalized volume (0.0 to 1.0)"
+          },
+          "pan": {
+            "type": "number",
+            "description": "Normalized pan (-1.0 to 1.0)"
+          },
+          "mute": {
+            "type": "boolean",
+            "description": "Mute state"
+          },
+          "solo": {
+            "type": "boolean",
+            "description": "Solo state"
+          },
+          "name": {
+            "type": "string",
+            "description": "Channel display name"
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": [
+                "integer",
+                "boolean"
+              ]
+            },
+            "description": "16-step sequencer grid activation pattern"
+          },
+          "confirm_token": {
+            "type": "string",
+            "description": "One-time human confirmation challenge token"
+          },
+          "verify": {
+            "type": "boolean",
+            "description": "Whether to perform read-back verification after mutation"
+          }
+        },
+        "required": [
+          "channel"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "channels_list",
+      "description": "List generator channels in the channel rack with volume, pan, mute/solo states, and step bits. Supports limit/cursor pagination.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "default": 20,
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Maximum channels to return (default: 20)"
+          },
+          "cursor": {
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "description": "Starting channel index (0-based)"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Fields to include in each channel object or 'all'"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "checkpoint_create",
+      "description": "Record a named rollback checkpoint preserving current session state.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Descriptive checkpoint label (default: 'checkpoint')"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "checkpoint_rollback",
+      "description": "Revert session mutations and restore previous state toward a recorded checkpoint.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "checkpoint_id": {
+            "type": "string",
+            "description": "Checkpoint ID or label to restore toward (default: latest checkpoint)"
+          },
+          "confirm_token": {
+            "type": "string",
+            "description": "One-time human confirmation challenge token"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "events_recent",
+      "description": "Retrieve recent events dispatched by the broker and FL Studio device script with topic filtering and pagination.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "default": 20,
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Maximum events to return (default: 20)"
+          },
+          "cursor": {
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "description": "Starting event offset"
+          },
+          "topic": {
+            "type": "string",
+            "description": "Optional topic pattern filter (e.g. 'transport', 'dirty.*', 'beat')"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "fl_call",
+      "description": "Execute raw allowlisted FL Studio Python API function with safety and read-back verification.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "function": {
+            "type": "string",
+            "description": "Qualified API function name (e.g. 'mixer.setTrackVolume')"
+          },
+          "args": {
+            "type": [
+              "array",
+              "object"
+            ],
+            "description": "Arguments passed to function (positional list or keyword dict)"
+          },
+          "allow_protected": {
+            "type": "boolean",
+            "description": "Allow modifying protected targets"
+          },
+          "confirm_token": {
+            "type": "string",
+            "description": "One-time human confirmation challenge token"
+          },
+          "verify": {
+            "type": "boolean",
+            "description": "Whether to perform read-back verification after mutation"
+          }
+        },
+        "required": [
+          "function"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "flp_diff",
+      "description": "Compare two FL Studio project files (.flp) and return structured differences.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "file_a": {
+            "type": "string",
+            "description": "Path to the first project file (baseline)."
+          },
+          "file_b": {
+            "type": "string",
+            "description": "Path to the second project file (comparison)."
+          }
+        },
+        "required": [
+          "file_a",
+          "file_b"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "flp_edit",
+      "description": "Apply a validated list of mutations to an offline FL Studio project, writing atomically to a new or existing file.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "description": "Path to the source FL Studio project file (.flp)."
+          },
+          "destination": {
+            "type": "string",
+            "description": "Target destination path for the edited project. If omitted, requires in_place: true."
+          },
+          "in_place": {
+            "type": "boolean",
+            "description": "Allow in-place overwrite with automatic timestamped backup (default: false)."
+          },
+          "mutations": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "List of validated mutation operations (e.g. set_tempo, rename_channel, set_notes, add_marker)."
+          },
+          "force_unknown_version": {
+            "type": "boolean",
+            "description": "Bypass version protection for unknown or future FL Studio versions."
+          }
+        },
+        "required": [
+          "file",
+          "mutations"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "flp_inspect",
+      "description": "Inspect offline FL Studio project structure (metadata, tempo, channels, patterns, mixer routing, playlist) without launching FL.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "description": "Path to the FL Studio project file (.flp)."
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Optional list of sections to inspect ('all', 'metadata', 'channels', 'patterns', 'mixer', 'playlist')."
+          },
+          "max_channels": {
+            "type": "integer",
+            "description": "Maximum number of channel summaries to return (default: 100)."
+          },
+          "max_patterns": {
+            "type": "integer",
+            "description": "Maximum number of pattern summaries to return (default: 100)."
+          },
+          "include_empty_tracks": {
+            "type": "boolean",
+            "description": "Whether to include default/empty mixer tracks (default: false)."
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "flp_new_from_template",
+      "description": "Generate a clean FL Studio project file (.flp) from an existing seed template.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "destination": {
+            "type": "string",
+            "description": "Target destination path for the new project file."
+          },
+          "template": {
+            "type": "string",
+            "description": "Template seed name (e.g. 'minimal', 'one_each_stock', 'audio_clip', 'sampler', 'layer', 'automation'). Default: 'minimal'."
+          },
+          "title": {
+            "type": "string",
+            "description": "Optional initial project title."
+          },
+          "author": {
+            "type": "string",
+            "description": "Optional initial project author."
+          },
+          "tempo": {
+            "type": "number",
+            "description": "Optional initial project tempo in BPM (e.g. 128.0)."
+          },
+          "ppq": {
+            "type": "integer",
+            "description": "Optional project PPQ resolution (default: 96)."
+          }
+        },
+        "required": [
+          "destination"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "flp_save_as",
+      "description": "Atomically save an FL Studio project (.flp) to a new destination path with structural invariant validation.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "description": "Path to the source project file (.flp)."
+          },
+          "destination": {
+            "type": "string",
+            "description": "Target destination path for the saved file."
+          },
+          "force_unknown_version": {
+            "type": "boolean",
+            "description": "Bypass version protection for unknown or future FL Studio versions."
+          }
+        },
+        "required": [
+          "source",
+          "destination"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "flp_validate",
+      "description": "Execute structural invariant checks and static risk scoring on an FL Studio project file (.flp).",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "description": "Path to the FL Studio project file (.flp) to validate."
+          },
+          "test_fl_load": {
+            "type": "boolean",
+            "description": "Whether to run headless FL-load verification in real FL Studio (default: false)."
+          },
+          "timeout_s": {
+            "type": "number",
+            "description": "Timeout in seconds for headless FL-load verification (default: 30.0)."
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "journal_list",
+      "description": "Inspect recent session modification records from the append-only mutation journal.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "description": "Maximum number of recent entries to return (default: 50)"
+          },
+          "since": {
+            "type": "number",
+            "description": "Filter entries recorded at or after this epoch timestamp"
+          },
+          "op": {
+            "type": "string",
+            "description": "Filter entries by operation name prefix"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "mixer_get",
+      "description": "Get detailed status, levels, peak metering, and routing for a single mixer track by index or name.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "track": {
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Track index (0-126; 0=Master) or track name"
+          }
+        },
+        "required": [
+          "track"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "mixer_list",
+      "description": "List mixer tracks with volume, pan, peak meters, mute/solo states, and routing. Supports pagination with limit/cursor and field projection.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "default": 40,
+            "minimum": 1,
+            "maximum": 127,
+            "description": "Maximum number of tracks to return (default: 40)"
+          },
+          "cursor": {
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "maximum": 126,
+            "description": "Starting track index (0-based; 0 is Master)"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Fields to include in each track object or 'all'"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "mixer_set",
+      "description": "Adjust volume, pan, mute, solo, or name across one or more mixer tracks with verification.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "tracks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "track": {
+                  "type": "integer"
+                },
+                "volume": {
+                  "type": "number"
+                },
+                "pan": {
+                  "type": "number"
+                },
+                "mute": {
+                  "type": "boolean"
+                },
+                "solo": {
+                  "type": "boolean"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "track"
+              ]
+            },
+            "description": "Array of mixer track adjustments"
+          },
+          "track": {
+            "type": "integer",
+            "description": "Single track index (0-126) for convenience"
+          },
+          "volume": {
+            "type": "number",
+            "description": "Normalized volume (0.0 to 1.0) or dB value"
+          },
+          "pan": {
+            "type": "number",
+            "description": "Normalized pan (-1.0 to 1.0)"
+          },
+          "mute": {
+            "type": "boolean",
+            "description": "Mute state"
+          },
+          "solo": {
+            "type": "boolean",
+            "description": "Solo state"
+          },
+          "name": {
+            "type": "string",
+            "description": "Track display name"
+          },
+          "allow_protected": {
+            "type": "boolean",
+            "description": "Allow adjusting protected master track (track 0)"
+          },
+          "confirm_token": {
+            "type": "string",
+            "description": "One-time human confirmation challenge token"
+          },
+          "verify": {
+            "type": "boolean",
+            "description": "Whether to perform read-back verification after mutation"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "notes_apply",
+      "description": "Apply structured note arrays to the FL Studio piano roll with honest tier execution metadata.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "notes": {
+            "type": "array",
+            "description": "Array of note definitions (dicts with pos, length, key, velocity, or tuples).",
+            "items": {
+              "type": [
+                "object",
+                "array"
+              ]
+            }
+          },
+          "file": {
+            "type": "string",
+            "description": "Optional path to JSON or MIDI file containing notes."
+          },
+          "channel": {
+            "type": "integer",
+            "description": "Target channel index (0-based)."
+          },
+          "pattern": {
+            "type": "integer",
+            "description": "Target pattern index (1-based)."
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "append",
+              "replace_all",
+              "replace_range"
+            ],
+            "description": "Note application mode (default: 'append')."
+          },
+          "range": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Tick range [start_ticks, end_ticks] for 'replace_range' mode."
+          },
+          "ppq": {
+            "type": "integer",
+            "description": "Project pulses-per-quarter-note resolution (default: 96)."
+          },
+          "job_id": {
+            "type": "string",
+            "description": "Optional idempotency job ID."
+          },
+          "verify": {
+            "type": "string",
+            "enum": [
+              "none",
+              "oracle",
+              "covert"
+            ],
+            "description": "Verification method (default: 'none')."
+          },
+          "fallback": {
+            "type": "string",
+            "enum": [
+              "none",
+              "step_grid",
+              "midi"
+            ],
+            "description": "Fallback actuation path if piano roll actuation fails."
+          },
+          "allow_focus_steal": {
+            "type": "boolean",
+            "description": "Whether to bring FL Studio to foreground if in background."
+          },
+          "force": {
+            "type": "boolean",
+            "description": "Override user-idle guard check."
+          },
+          "dry_run": {
+            "type": "boolean",
+            "description": "Simulate note application without dispatching hotkey."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "notes_from_midi",
+      "description": "Convert a Standard MIDI File (.mid) into a structured note payload.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Path to standard MIDI file (.mid)."
+          },
+          "ppq": {
+            "type": "integer",
+            "description": "Target project PPQ for tick normalization (default: 96)."
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "notes_read",
+      "description": "Oracle-backed note reader returning patterns and notes from saved project state or MIDI files.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "flp_path": {
+            "type": "string",
+            "description": "Path to saved FL Studio project file (.flp) or MIDI file (.mid)."
+          },
+          "pattern": {
+            "type": "integer",
+            "description": "Pattern index to read notes from (default: 1)."
+          },
+          "channel": {
+            "type": "integer",
+            "description": "Channel index to read notes from (default: 0)."
+          }
+        },
+        "required": [
+          "flp_path"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "pattern_edit",
+      "description": "Select active pattern, rename, set color, or clear notes and automations.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "pattern": {
+            "type": "integer",
+            "description": "Pattern number (1-based index)"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "select",
+              "rename",
+              "color",
+              "clear"
+            ],
+            "description": "Edit action: select, rename, color, or clear"
+          },
+          "name": {
+            "type": "string",
+            "description": "New display name when action is 'rename'"
+          },
+          "color": {
+            "type": [
+              "string",
+              "integer"
+            ],
+            "description": "Color hex string ('#RRGGBB') or integer RGB value when action is 'color'"
+          },
+          "confirm_token": {
+            "type": "string",
+            "description": "One-time human confirmation challenge token"
+          },
+          "verify": {
+            "type": "boolean",
+            "description": "Whether to perform read-back verification after mutation"
+          }
+        },
+        "required": [
+          "pattern",
+          "action"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "patterns_list",
+      "description": "List patterns in the project with names, lengths, colors, and active pattern indicator. Supports pagination.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "default": 20,
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Maximum patterns to return (default: 20)"
+          },
+          "cursor": {
+            "type": "integer",
+            "default": 1,
+            "minimum": 1,
+            "description": "Starting pattern number (1-based per FL conventions)"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Fields to include in each pattern object or 'all'"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "playlist_edit",
+      "description": "Edit arrangement playlist track: rename, color, mute, or solo.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "track": {
+            "type": "integer",
+            "description": "Playlist track number (1-based)"
+          },
+          "name": {
+            "type": "string",
+            "description": "New playlist track label"
+          },
+          "color": {
+            "type": [
+              "string",
+              "integer"
+            ],
+            "description": "New color hex or RGB integer"
+          },
+          "mute": {
+            "type": "boolean",
+            "description": "Mute state"
+          },
+          "solo": {
+            "type": "boolean",
+            "description": "Solo state"
+          },
+          "confirm_token": {
+            "type": "string",
+            "description": "One-time human confirmation challenge token"
+          },
+          "verify": {
+            "type": "boolean",
+            "description": "Whether to perform read-back verification after mutation"
+          }
+        },
+        "required": [
+          "track"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "playlist_get",
+      "description": "Get playlist track information, track counts, names, mute/solo states, and performance mode settings.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "default": 40,
+            "minimum": 1,
+            "maximum": 500,
+            "description": "Maximum tracks to return (default: 40)"
+          },
+          "cursor": {
+            "type": "integer",
+            "default": 1,
+            "minimum": 1,
+            "description": "Starting track number (1-based)"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Fields to include in each track object or 'all'"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "playlist_place_pattern",
+      "description": "Place pattern clip onto arrangement playlist track at normalized time position (experimental).",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "track": {
+            "type": "integer",
+            "description": "Playlist track number (1-based)"
+          },
+          "pattern": {
+            "type": "integer",
+            "description": "Pattern number to place (1-based)"
+          },
+          "time": {
+            "type": "number",
+            "description": "Normalized timeline position (0.0 to 1.0) or bar position"
+          },
+          "confirm_token": {
+            "type": "string",
+            "description": "One-time human confirmation challenge token"
+          },
+          "verify": {
+            "type": "boolean",
+            "description": "Whether to perform read-back verification after mutation"
+          }
+        },
+        "required": [
+          "track",
+          "pattern",
+          "time"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "plugin_param_get",
+      "description": "Get the current value and metadata of a specific plugin parameter on a mixer track slot.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "track": {
+            "type": "integer",
+            "description": "Mixer track index (0-126)"
+          },
+          "slot": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9,
+            "description": "Effect slot index (0-9)"
+          },
+          "param_id": {
+            "type": "integer",
+            "description": "Parameter index / ID"
+          }
+        },
+        "required": [
+          "track",
+          "slot",
+          "param_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "plugin_param_set",
+      "description": "Set normalized parameter value (0.0 to 1.0) on an instrument or effect plugin.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "param_index": {
+            "type": "integer",
+            "description": "0-based parameter index within plugin"
+          },
+          "value": {
+            "type": "number",
+            "description": "Normalized target parameter value (0.0 to 1.0)"
+          },
+          "target": {
+            "type": "string",
+            "description": "Plugin target specifier (e.g. 'mixer.track.0.slot.0' or 'channel.0')"
+          },
+          "track": {
+            "type": "integer",
+            "description": "Mixer track index if targeting mixer effect plugin"
+          },
+          "slot": {
+            "type": "integer",
+            "description": "Mixer slot index (0-9) if targeting mixer effect plugin"
+          },
+          "channel": {
+            "type": "integer",
+            "description": "Channel index if targeting generator plugin"
+          },
+          "allow_protected": {
+            "type": "boolean",
+            "description": "Allow adjusting protected plugin parameters"
+          },
+          "confirm_token": {
+            "type": "string",
+            "description": "One-time human confirmation challenge token"
+          },
+          "verify": {
+            "type": "boolean",
+            "description": "Whether to perform read-back verification after mutation"
+          }
+        },
+        "required": [
+          "param_index",
+          "value"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "plugin_params_list",
+      "description": "List parameters of an effect plugin on a mixer track slot or generator plugin on a channel.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "track": {
+            "type": "integer",
+            "description": "Mixer track index (0-126)"
+          },
+          "slot": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9,
+            "description": "Effect slot index (0-9)"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 500,
+            "description": "Maximum parameters to return (default: 50)"
+          },
+          "cursor": {
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "description": "Starting parameter index"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Fields to include in each parameter object or 'all'"
+          }
+        },
+        "required": [
+          "track",
+          "slot"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "project_snapshot",
+      "description": "Compact overview of active project: tempo, time signature, playing state, channel count and names, pattern count, and active mixer tracks (<= 1.5k tokens).",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "include_empty": {
+            "type": "boolean",
+            "default": false,
+            "description": "Include unused/empty mixer tracks (default: active/named only)"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "render_analyze",
+      "description": "Run acoustic signal validation metrics and quality checks on a rendered audio file.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Path to audio file (.wav, .mp3, .flac, .ogg)."
+          },
+          "min_duration_s": {
+            "type": "number",
+            "description": "Minimum acceptable duration in seconds (default: 0.5)."
+          },
+          "max_silence_ratio": {
+            "type": "number",
+            "description": "Maximum allowed ratio of silence (default: 0.98)."
+          },
+          "allow_clipping": {
+            "type": "boolean",
+            "description": "Whether to allow clipped samples without failing validation (default: true)."
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "render_cancel",
+      "description": "Terminate an active headless render subprocess and supervisor cleanly.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "description": "Unique render job ID to cancel."
+          }
+        },
+        "required": [
+          "job_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "render_start",
+      "description": "Initiate a background headless FL Studio project render job.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "description": "Path to source FL Studio project file (.flp)."
+          },
+          "formats": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "wav",
+                "mp3",
+                "flac",
+                "ogg",
+                "mid"
+              ]
+            },
+            "description": "Output export formats (default: ['wav'])."
+          },
+          "out_dir": {
+            "type": "string",
+            "description": "Target directory for rendered audio files."
+          },
+          "instance_policy": {
+            "type": "string",
+            "enum": [
+              "require_closed",
+              "close_gracefully",
+              "force_kill"
+            ],
+            "description": "Instance collision policy (default: 'require_closed')."
+          },
+          "timeout_s": {
+            "type": "number",
+            "description": "Total timeout in seconds (default: 900.0)."
+          },
+          "idle_timeout_s": {
+            "type": "number",
+            "description": "Idle timeout in seconds with no output growth (default: 120.0)."
+          },
+          "min_duration_s": {
+            "type": "number",
+            "description": "Minimum acceptable duration in seconds (default: 0.5)."
+          },
+          "max_silence_ratio": {
+            "type": "number",
+            "description": "Maximum allowed ratio of silence (default: 0.98)."
+          }
+        },
+        "required": [
+          "source"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "render_status",
+      "description": "Poll progress, completion state, output file paths, and metrics for a render job.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "description": "Unique render job ID."
+          }
+        },
+        "required": [
+          "job_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "steps_set",
+      "description": "Set 16-step sequencer grid activation bits for a rhythm or generator channel.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "channel": {
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Channel index (0-based) or channel name"
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": [
+                "integer",
+                "boolean"
+              ]
+            },
+            "description": "Array of exactly 16 step values (0/1 or false/true)"
+          },
+          "confirm_token": {
+            "type": "string",
+            "description": "One-time human confirmation challenge token"
+          },
+          "verify": {
+            "type": "boolean",
+            "description": "Whether to perform read-back verification after mutation"
+          }
+        },
+        "required": [
+          "channel",
+          "steps"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "studio_capabilities",
+      "description": "Inspect the capability matrix, availability states (available, degraded, unavailable), prerequisites, and alternative workflows.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "capability": {
+            "type": "string",
+            "description": "Specific capability ID to inspect"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "available",
+              "degraded",
+              "unavailable",
+              "unknown"
+            ],
+            "description": "Filter by capability availability state"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "studio_doctor",
+      "description": "Run diagnostic health checks across environment, FL Studio installation, loopback MIDI ports, and scripts, returning status and remedies.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "skip_live": {
+            "type": "boolean",
+            "default": false,
+            "description": "Skip checks requiring live FL Studio connection"
+          },
+          "fix": {
+            "type": "boolean",
+            "default": false,
+            "description": "Attempt safe automatic repairs for failed checks"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "studio_set_mode",
+      "description": "Switch session safety mode: 'read_only' (default), 'write' (with confirmation), or 'unsafe'.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "read_only",
+              "write",
+              "unsafe"
+            ],
+            "description": "Target safety mode to switch to"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Human or agent rationale for requesting mode change"
+          },
+          "confirm_token": {
+            "type": "string",
+            "description": "One-time human confirmation challenge token"
+          }
+        },
+        "required": [
+          "mode"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "studio_status",
+      "description": "Report connection status, FL Studio and API versions, active safety mode, playback transport state, and background broker health.",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "transport_control",
+      "description": "Start, stop, record, seek song playback position, or adjust tempo with verification.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "play",
+              "stop",
+              "record",
+              "tempo",
+              "seek",
+              "pos"
+            ],
+            "description": "Transport action to perform: play, stop, record, tempo, seek, or pos"
+          },
+          "tempo": {
+            "type": "number",
+            "description": "Target project tempo in BPM (10.0 to 522.0). Requires allow_protected=true."
+          },
+          "position": {
+            "type": "number",
+            "description": "Song playback position (normalized 0.0 to 1.0, or tick index)"
+          },
+          "allow_protected": {
+            "type": "boolean",
+            "description": "Allow adjusting protected parameters such as tempo"
+          },
+          "confirm_token": {
+            "type": "string",
+            "description": "One-time human confirmation challenge token"
+          },
+          "verify": {
+            "type": "boolean",
+            "description": "Whether to perform read-back verification after mutation"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "transport_get",
+      "description": "Get current FL Studio transport state including playback status, tempo BPM, song position in ticks/beats/bars, loop mode, and time signature.",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      }
+    }
+  ]
+}
