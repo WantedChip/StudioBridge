@@ -11,9 +11,9 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from pathlib import Path
 
 from studiobridge.core.errors import StudioBridgeError
+from studiobridge.core.paths import validate_safe_path
 from studiobridge.flp.atomic import atomic_save
 from studiobridge.flp.codec.reader import FlpFile
 from studiobridge.flp.diff import diff_projects
@@ -45,7 +45,7 @@ def handle_flp(args: argparse.Namespace) -> int:
 
 def _handle_inspect(args: argparse.Namespace) -> int:
     """Handle `sbridge flp inspect <file> [--json]`."""
-    file_path = Path(args.file)
+    file_path = validate_safe_path(args.file)
     if not file_path.is_file():
         if getattr(args, "json", False):
             print(json.dumps({"status": "error", "message": f"File not found: {file_path}"}))
@@ -100,8 +100,8 @@ def _handle_inspect(args: argparse.Namespace) -> int:
 
 def _handle_diff(args: argparse.Namespace) -> int:
     """Handle `sbridge flp diff <a.flp> <b.flp> [--json]`."""
-    file_a = Path(args.file_a)
-    file_b = Path(args.file_b)
+    file_a = validate_safe_path(args.file_a)
+    file_b = validate_safe_path(args.file_b)
 
     for p in (file_a, file_b):
         if not p.is_file():
@@ -144,7 +144,7 @@ def _handle_diff(args: argparse.Namespace) -> int:
 
 def _handle_roundtrip(args: argparse.Namespace) -> int:
     """Handle `sbridge flp roundtrip <file> [--json]`."""
-    file_path = Path(args.file)
+    file_path = validate_safe_path(args.file)
     if not file_path.is_file():
         if getattr(args, "json", False):
             print(json.dumps({"status": "error", "message": f"File not found: {file_path}"}))
@@ -217,7 +217,7 @@ def _handle_roundtrip(args: argparse.Namespace) -> int:
 
 def _handle_edit(args: argparse.Namespace) -> int:
     """Handle `sbridge flp edit <file> [options...]`."""
-    file_path = Path(args.file)
+    file_path = validate_safe_path(args.file)
     if not file_path.is_file():
         if getattr(args, "json", False):
             print(json.dumps({"status": "error", "message": f"File not found: {file_path}"}))
@@ -340,7 +340,7 @@ def _handle_edit(args: argparse.Namespace) -> int:
     # Determine destination
     in_place = getattr(args, "in_place", False)
     if getattr(args, "out", None):
-        dest_path = Path(args.out)
+        dest_path = validate_safe_path(args.out)
     elif in_place:
         dest_path = file_path
     else:
@@ -398,7 +398,7 @@ def _handle_edit(args: argparse.Namespace) -> int:
 
 def _handle_validate(args: argparse.Namespace) -> int:
     """Handle `sbridge flp validate <file> [--in-fl] [--timeout SECONDS] [--json]` [FLP-50]."""
-    file_path = Path(args.file)
+    file_path = validate_safe_path(args.file)
     if not file_path.is_file():
         if getattr(args, "json", False):
             print(json.dumps({"status": "error", "message": f"File not found: {file_path}"}))

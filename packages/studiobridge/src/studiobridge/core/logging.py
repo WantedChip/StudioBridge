@@ -36,15 +36,27 @@ BEARER_PATTERN = re.compile(r"(?i)\bBearer\s+[A-Za-z0-9_\-\.]+")
 KV_SECRET_PATTERN = re.compile(
     r"(?i)\b(secret|token|broker_token|password|api_key|auth|key)\s*[:=]\s*['\"]?([^\s,'\"]+)['\"]?"
 )
+USER_PATH_PATTERN = re.compile(
+    r"(?i)([a-zA-Z]:[\\/]+Users[\\/]+)"
+    r"(?!(?:\[REDACTED\]|public|default|all users)\b)"
+    r"([^\\/\s\"',;:()\[\]]+)"
+)
+POSIX_USER_PATH_PATTERN = re.compile(
+    r"(/(?:Users|home)/)"
+    r"(?!(?:\[REDACTED\]|shared|default)\b)"
+    r"([^/\\\s\"',;:()\[\]]+)"
+)
 
 REDACTED_STR = "[REDACTED]"
 
 
 def redact_string(val: str) -> str:
-    """Mask credentials, 256-bit hex tokens, and secrets inside a string."""
+    """Mask credentials, 256-bit hex tokens, private user paths, and secrets inside a string."""
     val = KV_SECRET_PATTERN.sub(r"\1=" + REDACTED_STR, val)
     val = BEARER_PATTERN.sub("Bearer " + REDACTED_STR, val)
     val = HEX_SECRET_PATTERN.sub(REDACTED_STR, val)
+    val = USER_PATH_PATTERN.sub(r"\1" + REDACTED_STR, val)
+    val = POSIX_USER_PATH_PATTERN.sub(r"\1" + REDACTED_STR, val)
     return val
 
 

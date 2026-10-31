@@ -282,7 +282,15 @@ def validate_safe_path(
     if not raw:
         raise SecurityError("Path cannot be empty", code="E_SECURITY")
 
-    # 1. Reject unauthorized UNC paths
+    # 1. Reject embedded null bytes
+    if "\0" in raw:
+        raise SecurityError(
+            f"Embedded null byte in path is forbidden: {raw!r}",
+            code="E_SECURITY",
+            remedy="Provide a valid filesystem path without embedded null bytes.",
+        )
+
+    # 2. Reject unauthorized UNC paths
     if not allow_unc and (raw.startswith(("\\\\", "//")) or raw.startswith("\\\\?\\UNC\\")):
         raise SecurityError(
             f"Unauthorized UNC network path is forbidden: '{raw}'",
@@ -290,7 +298,16 @@ def validate_safe_path(
             remedy="Provide a local filesystem path within the project root or user Documents.",
         )
 
-    # 2. Reject directory traversal sequences
+    # 3. Reject URL-encoded path traversal sequences
+    raw_lower = raw.lower()
+    if "%2e" in raw_lower or "%252e" in raw_lower or "%2f" in raw_lower or "%5c" in raw_lower:
+        raise SecurityError(
+            f"URL-encoded path traversal sequence is forbidden: '{raw}'",
+            code="E_SECURITY",
+            remedy="Specify a standard decoded filesystem path without URL encoding.",
+        )
+
+    # 4. Reject directory traversal sequences
     parts = Path(raw).parts
     if (
         any(p == ".." for p in parts)

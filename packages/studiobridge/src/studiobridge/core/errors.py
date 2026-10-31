@@ -453,12 +453,14 @@ class StudioBridgeError(Exception):
 
     def to_dict(self) -> dict[str, Any]:
         """Serialize error attributes into a dictionary for status reporting or IPC."""
+        from studiobridge.core.logging import redact_sensitive_data, redact_string
+
         data: dict[str, Any] = {
             "code": self.code,
-            "message": self.message,
-            "details": self.details,
+            "message": redact_string(self.message),
+            "details": redact_sensitive_data(self.details),
             "retryable": self.retryable,
-            "remedy": self.remedy,
+            "remedy": redact_string(self.remedy),
         }
         if self.docs_anchor:
             data["docs_anchor"] = self.docs_anchor

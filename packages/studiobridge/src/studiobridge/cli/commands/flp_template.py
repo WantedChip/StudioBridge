@@ -11,10 +11,10 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from pathlib import Path
 from typing import Any
 
 from studiobridge.core.errors import TemplateFragmentUnavailableError
+from studiobridge.core.paths import validate_safe_path
 from studiobridge.flp.atomic import atomic_save
 from studiobridge.flp.model.project import Project
 from studiobridge.flp.templates.instantiator import (
@@ -47,7 +47,7 @@ def _handle_new(args: argparse.Namespace) -> int:
             print("Error: Missing required output file path", file=sys.stderr)
         return 1
 
-    dest_path = Path(out_arg).resolve()
+    dest_path = validate_safe_path(out_arg)
     template_name = getattr(args, "template", "minimal") or "minimal"
     force = getattr(args, "force", False)
 
@@ -172,7 +172,7 @@ def _handle_list(args: argparse.Namespace) -> int:
 
 def _handle_add(args: argparse.Namespace) -> int:
     """Handle `sbridge flp template add <flp> --select channel:<id>` [FLP-40]."""
-    file_path = Path(args.file).resolve()
+    file_path = validate_safe_path(args.file)
     if not file_path.is_file():
         if getattr(args, "json", False):
             print(json.dumps({"status": "error", "message": f"File not found: {file_path}"}))

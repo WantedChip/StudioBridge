@@ -66,13 +66,18 @@ class Project:
     _mutator: Any = field(default=None, repr=False, compare=False)
 
     @classmethod
-    def load(cls, path_or_bytes: Path | str | bytes) -> Project:
+    def load(cls, path_or_bytes: Path | str | bytes, *, validate_path: bool = False) -> Project:
         """Load and hydrate a Project object model from an FLP file or raw bytes [FLP-20]."""
         file_path: Path | None = None
         if isinstance(path_or_bytes, bytes):
             flp_file = parse(path_or_bytes)
         else:
-            file_path = Path(path_or_bytes).resolve()
+            if validate_path:
+                from studiobridge.core.paths import validate_safe_path
+
+                file_path = validate_safe_path(path_or_bytes)
+            else:
+                file_path = Path(path_or_bytes).resolve()
             flp_file = parse(file_path)
 
         project = cls._hydrate(flp_file)

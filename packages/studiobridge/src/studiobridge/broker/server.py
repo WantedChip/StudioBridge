@@ -73,6 +73,15 @@ class BrokerServer:
         auth_timeout: float = DEFAULT_AUTH_TIMEOUT,
         idle_exit_seconds: float = DEFAULT_IDLE_EXIT,
     ) -> None:
+        if host not in ("127.0.0.1", "localhost", "::1"):
+            from studiobridge.core.errors import SecurityError
+
+            raise SecurityError(
+                f"Broker daemon must bind exclusively to loopback interface: '{host}' is forbidden",
+                code="E_SECURITY",
+                remedy="Configure broker host to 127.0.0.1 or localhost.",
+            )
+
         self.host: str = host
         self.requested_port: int = port
         self.bound_port: int = 0
