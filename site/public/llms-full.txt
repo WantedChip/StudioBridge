@@ -284,7 +284,41 @@ Configure in `%APPDATA%\Zed\settings.json`:
 }
 ```
 
-### VS Code (with Cline / Roo Code / MCP extension)
+### GitHub Copilot
+
+Configure the StudioBridge MCP server in VS Code for GitHub Copilot Chat by editing `.vscode/mcp.json` or your global user settings:
+
+```json
+{
+  "mcpServers": {
+    "studiobridge": {
+      "command": "uvx",
+      "args": ["studiobridge", "mcp"]
+    }
+  }
+}
+```
+
+When querying Copilot Chat, you can ask questions like `@studiobridge is the master track muted?` or `@studiobridge set master volume to 0.8`.
+
+### Cline
+
+Configure the StudioBridge MCP server in Cline (VS Code extension) by editing `%APPDATA%\Code\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "studiobridge": {
+      "command": "uvx",
+      "args": ["studiobridge", "mcp"]
+    }
+  }
+}
+```
+
+Cline will discover all StudioBridge DAW control tools, resource schemas, and transport functions upon next prompt execution.
+
+### VS Code (Generic MCP Extension / Roo Code)
 
 Configure in `.vscode/settings.json`:
 
@@ -297,6 +331,39 @@ Configure in `.vscode/settings.json`:
     }
   }
 }
+```
+
+### Python SDK Quickstart
+
+In addition to AI agent interfaces, StudioBridge provides a fully-typed Python SDK for programmatic DAW automation and script execution:
+
+```python
+from studiobridge import Studio
+
+# Connect to the local DAW session
+studio = Studio()
+
+# Query transport state
+is_playing = studio.transport.is_playing()
+print(f"Transport playing: {is_playing}")
+
+# Query master mixer track volume (track index 0)
+master_vol = studio.mixer.get_track_volume(0)
+print(f"Master volume: {master_vol:.2f}")
+```
+
+For asynchronous automation pipelines (such as background event monitors or async web servers), use `AsyncStudio`:
+
+```python
+import asyncio
+from studiobridge import AsyncStudio
+
+async def main() -> None:
+    async with AsyncStudio() as studio:
+        tempo = await studio.general.get_tempo()
+        print(f"Current tempo: {tempo} BPM")
+
+asyncio.run(main())
 ```
 
 ### Plain CLI

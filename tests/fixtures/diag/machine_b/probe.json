@@ -1,0 +1,47 @@
+{
+  "timestamp": "2026-10-25T18:45:00Z",
+  "host": {
+    "os": "Windows",
+    "os_release": "11",
+    "os_version": "10.0.26100",
+    "os_build": 26100,
+    "machine": "AMD64",
+    "python_version": "3.12.7",
+    "python_implementation": "CPython",
+    "python_arch": "64bit",
+    "is_emulated": false
+  },
+  "fl_studio": {
+    "installs": [
+      "C:\\Program Files\\Image-Line\\FL Studio 2026",
+      "C:\\Program Files\\Image-Line\\FL Studio 2025",
+      "C:\\Program Files\\Image-Line\\FL Studio 21"
+    ],
+    "user_data_dir": "C:\\Users\\[REDACTED]\\Documents\\Image-Line\\FL Studio",
+    "hardware_dir": "C:\\Users\\[REDACTED]\\Documents\\Image-Line\\FL Studio\\Settings\\Hardware\\StudioBridge",
+    "is_running": true,
+    "pids": [9844]
+  },
+  "midi": {
+    "wms_status": "present",
+    "wms_service_running": true,
+    "wms_loopback_available": true,
+    "input_ports": [
+      "StudioBridge Out",
+      "Default App Loopback (B)"
+    ],
+    "output_ports": [
+      "StudioBridge In",
+      "Default App Loopback (A)"
+    ]
+  },
+  "studiobridge": {
+    "version": "0.1.0",
+    "app_data_dir": "C:\\Users\\[REDACTED]\\AppData\\Local\\studiobridge",
+    "secret_exists": true,
+    "device_script_installed": true,
+    "device_script_build_id": "20261025-x64",
+    "broker_running": true,
+    "broker_port": 50051
+  }
+}

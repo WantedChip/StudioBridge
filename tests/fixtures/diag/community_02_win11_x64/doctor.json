@@ -1,0 +1,83 @@
+{
+  "timestamp": "2026-10-27T09:15:30Z",
+  "fl_running": true,
+  "passed": 8,
+  "failed": 0,
+  "warned": 0,
+  "skipped": 0,
+  "has_errors": false,
+  "checks": [
+    {
+      "id": "D-ENV-01",
+      "name": "Python Version and Architecture",
+      "severity": "error",
+      "status": "pass",
+      "evidence": "Python 3.12.4 (win_amd64, 64-bit)",
+      "remedy": "None required.",
+      "requires_fl": false
+    },
+    {
+      "id": "D-ENV-02",
+      "name": "Windows OS Build for Windows MIDI Services",
+      "severity": "warn",
+      "status": "pass",
+      "evidence": "Windows 11 Build 22631 (WMS preview installed)",
+      "remedy": "None required.",
+      "requires_fl": false
+    },
+    {
+      "id": "D-ENV-03",
+      "name": "Python Emulation Status",
+      "severity": "info",
+      "status": "pass",
+      "evidence": "Native AMD64 execution",
+      "remedy": "None required.",
+      "requires_fl": false
+    },
+    {
+      "id": "D-FL-01",
+      "name": "FL Studio Installation Discovery",
+      "severity": "error",
+      "status": "pass",
+      "evidence": "Found FL Studio 25.2.3",
+      "remedy": "None required.",
+      "requires_fl": false
+    },
+    {
+      "id": "D-PORT-01",
+      "name": "Windows MIDI Services (midisrv) Status",
+      "severity": "warn",
+      "status": "pass",
+      "evidence": "midisrv service running",
+      "remedy": "None required.",
+      "requires_fl": false
+    },
+    {
+      "id": "D-PORT-03",
+      "name": "WinMM Bidirectional Loopback Visibility",
+      "severity": "error",
+      "status": "pass",
+      "evidence": "StudioBridge loopback endpoints visible",
+      "remedy": "None required.",
+      "requires_fl": false
+    },
+    {
+      "id": "D-DEV-01",
+      "name": "Device Script Asset Presence and Integrity",
+      "severity": "error",
+      "status": "pass",
+      "evidence": "device_sbridge.py verified",
+      "remedy": "None required.",
+      "requires_fl": false
+    },
+    {
+      "id": "D-WIRE-01",
+      "name": "Wire Round-Trip Latency (p50/p95)",
+      "severity": "warn",
+      "status": "pass",
+      "evidence": "p50: 0.44ms, p95: 1.05ms over 50 pings",
+      "remedy": "None required.",
+      "requires_fl": true
+    }
+  ]
+}
