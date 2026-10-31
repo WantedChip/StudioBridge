@@ -42,6 +42,7 @@ from studiobridge.cli.commands.safety import (
     handle_call,
     handle_safety,
 )
+from studiobridge.cli.commands.serve import handle_serve
 from studiobridge.cli.commands.setup import handle_setup
 from studiobridge.cli.commands.skill import handle_skill
 from studiobridge.cli.commands.status import handle_status
@@ -354,6 +355,53 @@ def build_parser() -> argparse.ArgumentParser:
         help="Emit output formatted as machine-readable JSON",
     )
     mcp_p.set_defaults(handler=handle_mcp)
+
+    # sbridge serve
+    serve_p = subparsers.add_parser(
+        "serve",
+        help="Run local HTTP REST and Streamable HTTP MCP server",
+        description="Serve local REST API and Streamable HTTP MCP endpoints on loopback interface.",
+    )
+    serve_p.add_argument(
+        "--http",
+        action="store_true",
+        default=True,
+        help="Enable HTTP REST and Streamable HTTP endpoints (default: enabled)",
+    )
+    serve_p.add_argument(
+        "--port",
+        type=int,
+        default=8080,
+        help="Port to bind (default: 8080, 0 for dynamic ephemeral port)",
+    )
+    serve_p.add_argument(
+        "--host",
+        default="127.0.0.1",
+        help="Loopback host interface (must be loopback, default: 127.0.0.1)",
+    )
+    serve_p.add_argument(
+        "--token",
+        default=None,
+        help="Explicit Bearer authentication token override",
+    )
+    serve_p.add_argument(
+        "--token-path",
+        default=None,
+        help="Path to Bearer token file",
+    )
+    serve_p.add_argument(
+        "--toolsets",
+        type=str,
+        default=None,
+        help="Comma-separated MCP toolsets to enable",
+    )
+    serve_p.add_argument(
+        "--json",
+        action="store_true",
+        default=False,
+        help="Emit output formatted as machine-readable JSON",
+    )
+    serve_p.set_defaults(handler=handle_serve)
 
     # 11. sbridge api
     api_p = subparsers.add_parser(
