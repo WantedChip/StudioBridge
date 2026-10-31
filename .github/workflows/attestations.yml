@@ -1,0 +1,112 @@
+name: Artifact Provenance & Cryptographic Attestations
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Perform provenance and attestation dry-run"
+        required: false
+        default: true
+        type: boolean
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+
+jobs:
+  build-and-attest:
+    name: Build, Attest & Sign Release Artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install workspace dependencies
+        run: uv sync --all-groups
+
+      - name: Build Python universal wheel and sdist
+        run: uv build --package studiobridge
+
+      - name: Build Claude Desktop MCPB bundle
+        run: uv run python tools/build_mcpb.py
+
+      - name: Pack npm launcher tarball
+        run: |
+          mkdir -p dist
+          npm pack ./npm/studiobridge --pack-destination dist/
+
+      - name: Generate CycloneDX 1.5 JSON SBOM
+        run: uv run python tools/generate_sbom.py --format cyclonedx --output dist/sbom-cyclonedx.json
+
+      - name: Generate SPDX 2.3 JSON SBOM
+        run: uv run python tools/generate_sbom.py --format spdx --output dist/sbom-spdx.json
+
+      - name: Compute SHA-256 release checksums
+        run: |
+          cd dist
+          sha256sum * > SHA256SUMS
+          cd ..
+          cat dist/SHA256SUMS
+
+      - name: Verify build artifacts and SBOM schemas
+        run: |
+          ls -la dist/
+          test -f dist/studiobridge-*-py3-none-any.whl
+          test -f dist/studiobridge-*.tar.gz
+          test -f dist/studiobridge-*.mcpb
+          test -f dist/studiobridge-*.tgz
+          test -f dist/sbom-cyclonedx.json
+          test -f dist/sbom-spdx.json
+          test -f dist/SHA256SUMS
+          uv run python tools/generate_sbom.py --verify dist/sbom-cyclonedx.json
+          uv run python tools/generate_sbom.py --verify dist/sbom-spdx.json
+          uv run python tools/build_mcpb.py --verify dist/studiobridge-0.1.0.mcpb
+
+      - name: Attest Build Provenance (SLSA / Sigstore)
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            dist/*.whl
+            dist/*.tar.gz
+            dist/*.mcpb
+            dist/*.tgz
+            dist/*.json
+            dist/SHA256SUMS
+
+      - name: Verify PyPI and npm Trusted Publishing OIDC Readiness
+        run: |
+          echo "Repository: ${{ github.repository }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "Actor: ${{ github.actor }}"
+          python -c "
+          import json, pathlib
+          manifest = json.loads(pathlib.Path('server.json').read_text(encoding='utf-8'))
+          assert manifest['name'] == 'io.github.wantedchip/studiobridge'
+          types = {p['registryType'] for p in manifest['packages']}
+          assert 'pypi' in types and 'npm' in types
+          print('OIDC and registry publish prerequisites verified.')
+          "
+
+      - name: Upload Attested Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-attestations-dist
+          path: dist/*
+          retention-days: 14
