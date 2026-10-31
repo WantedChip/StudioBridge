@@ -1,4 +1,15 @@
-/documentation    /docs/    301
-/documentation/*  /docs/:splat  301
-/github           https://github.com/WantedChip/studiobridge  302
-/repo             https://github.com/WantedChip/studiobridge  302
+# Canonical documentation & API redirects
+/documentation    /docs/              301
+/documentation/*  /docs/:splat        301
+/api              /docs/api/          301
+/api/*            /docs/api/:splat    301
+/compatibility    /compat/            301
+/compatibility/*  /compat/:splat      301
+
+# Community & Repository redirects
+/github           https://github.com/WantedChip/studiobridge            302
+/repo             https://github.com/WantedChip/studiobridge            302
+/releases         https://github.com/WantedChip/studiobridge/releases   302
+/issues           https://github.com/WantedChip/studiobridge/issues     302
+/pypi             https://pypi.org/project/studiobridge/                302
+/npm              https://www.npmjs.com/package/@studiobridge/mcp      302
