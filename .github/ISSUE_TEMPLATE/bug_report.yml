@@ -1,0 +1,85 @@
+name: Bug Report
+description: Create a report to help us improve StudioBridge
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report an issue!
+        Before filing, please make sure you have run `sbridge doctor` to check your environment.
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the Bug
+      description: A clear and concise description of what happened.
+      placeholder: When attempting to adjust track volume, the operation timed out...
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Detailed steps to reproduce the behavior.
+      placeholder: |
+        1. Run `sbridge serve --port 8080`
+        2. Dispatch POST /v1/mixer/1/volume with body {"volume": 0.8}
+        3. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: doctor-output
+    attributes:
+      label: Doctor Diagnostics Output
+      description: Run `sbridge doctor --json` and paste the output here.
+      render: json
+    validations:
+      required: false
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Operating System & Architecture
+      options:
+        - Windows 11 (x64)
+        - Windows 11 (ARM64 / Snapdragon X)
+        - Windows 10 (x64)
+        - Other (specify in comments)
+    validations:
+      required: true
+  - type: dropdown
+    id: midi-backend
+    attributes:
+      label: MIDI Loopback Backend
+      options:
+        - Windows MIDI Services (WMS native)
+        - loopMIDI (Tobias Erichsen driver)
+        - Hardware loopback interface
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: fl-version
+    attributes:
+      label: FL Studio Version
+      placeholder: e.g. FL Studio 24.1.2 (Build 4470) or FL Studio 21.2
+    validations:
+      required: true
+  - type: input
+    id: python-version
+    attributes:
+      label: Python Version
+      placeholder: e.g. Python 3.12.7 (64-bit)
+    validations:
+      required: true
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context, logs, or screenshots about the problem here.

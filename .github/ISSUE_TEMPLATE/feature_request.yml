@@ -1,0 +1,48 @@
+name: Feature Request
+description: Suggest an idea or enhancement for StudioBridge
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a feature for StudioBridge!
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: Is your feature request related to a problem or limitation?
+      placeholder: I'm always frustrated when...
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like to see implemented.
+      placeholder: Add an MCP tool for automating channel rack color palettes...
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Describe any alternative solutions or workarounds you have considered.
+  - type: dropdown
+    id: control-plane
+    attributes:
+      label: Affected Control Plane
+      options:
+        - Plane 1: Live MIDI SysEx RPC (Mixer, Transport, Channels)
+        - Plane 2: Win32 UI Actuator (Piano roll scripts, Windows)
+        - Plane 3: Headless Render Supervisor (Audio export, CLI)
+        - Plane 4: Offline FLP Binary Engine (Project parsing, AST)
+        - Interfaces: MCP Server / CLI / HTTP REST / Agent Templates
+        - Documentation / Website
+    validations:
+      required: false
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context, diagrams, or mockups here.

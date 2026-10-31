@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: StudioBridge Documentation
+    url: https://github.com/WantedChip/studiobridge/tree/main/docs
+    about: Please read our documentation before filing an issue.
+  - name: Doctor Troubleshooting Directory
+    url: https://github.com/WantedChip/studiobridge/blob/main/docs/troubleshooting.md
+    about: Look up error codes (D-*) and automated recovery commands.
