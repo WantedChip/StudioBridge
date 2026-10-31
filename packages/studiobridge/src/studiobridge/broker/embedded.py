@@ -261,6 +261,7 @@ class EmbeddedBroker:
             result = await self._execute_request(req, mid, timeout=timeout)
             return result
         finally:
+            self.scheduler.dequeue_nowait()
             if is_write:
                 self.lease_manager.end_request(client_id)
 

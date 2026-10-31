@@ -7,18 +7,82 @@ tolerance adherence, and confirmation challenge protocols.
 
 from __future__ import annotations
 
+import math
+import struct
 import time
+import wave
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 from studiobridge.core.errors import BrokerError, StudioBridgeError
-from studiobridge.mcp.server import StudioMcpServer, ToolResult
+from studiobridge.core.paths import get_jobs_dir
+from studiobridge.mcp.server import VALID_TOOLSETS, StudioMcpServer, ToolResult
 from studiobridge.mcp.tools.control import ControlTools
 from studiobridge.mcp.tools.core import CoreTools
+from studiobridge.mcp.tools.flp import FlpTools
 from studiobridge.mcp.tools.inspect import InspectTools
+from studiobridge.mcp.tools.notes import NotesTools
+from studiobridge.mcp.tools.render import RenderTools
 from studiobridge.mcp.tools.safety import SafetyTools
+from studiobridge.pianoroll.orchestrator import NoteApplyOrchestrator
+from studiobridge.render.job import JobState, RenderJob
+from studiobridge.render.runner import RenderRunner
 from studiobridge.sdk.client import Studio
+from tests.agent_evals.reporter import TranscriptRecorder
+
+
+def create_synthetic_wav(
+    path: Path,
+    duration_s: float = 1.0,
+    sample_rate: int = 44100,
+) -> Path:
+    """Generate a clean synthetic sine wave PCM 16-bit WAV file for testing."""
+    n_samples = int(duration_s * sample_rate)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with wave.open(str(path), "wb") as wf:
+        wf.setnchannels(1)
+        wf.setsampwidth(2)
+        wf.setframerate(sample_rate)
+        frames = bytearray()
+        for i in range(n_samples):
+            val = int(16384 * math.sin(2 * math.pi * 440.0 * i / sample_rate))
+            frames.extend(struct.pack("<h", val))
+        wf.writeframes(bytes(frames))
+    return path
+
+
+class MockRenderRunner(RenderRunner):
+    """Mock runner simulating headless export for test and evaluation environments."""
+
+    def __init__(self, output_wav: Path | None = None) -> None:
+        self.output_wav = output_wav
+
+    def run(self, job: RenderJob) -> RenderJob:
+        job.state = JobState.RENDERING
+        out_dir = job.out_dir or (get_jobs_dir() / job.job_id / "out")
+        out_dir.mkdir(parents=True, exist_ok=True)
+        job.out_dir = out_dir
+
+        dest = out_dir / f"{job.source.stem}.wav"
+        if self.output_wav and self.output_wav.exists():
+            dest.write_bytes(self.output_wav.read_bytes())
+        else:
+            create_synthetic_wav(dest)
+        job.output_files = [dest]
+
+        job.state = JobState.DONE
+        job.metrics = {
+            "duration_s": 1.0,
+            "peak_dbfs": -6.0,
+            "rms_dbfs": -9.0,
+            "silence_ratio": 0.0,
+        }
+        return job
+
+    def cancel(self, job_id: str) -> bool:
+        return True
 
 
 @dataclass
@@ -58,13 +122,38 @@ class ToolExecution:
 class ScriptedAgentHarness:
     """Test runner simulating multi-turn agent tool calls and asserting safety sequences."""
 
-    def __init__(self, studio: Studio, server: StudioMcpServer | None = None) -> None:
+    def __init__(
+        self,
+        studio: Studio,
+        server: StudioMcpServer | None = None,
+        recorder: TranscriptRecorder | None = None,
+        render_runner: RenderRunner | None = None,
+        pyscript_dir: Path | None = None,
+    ) -> None:
         self.studio = studio
-        self.server = server or StudioMcpServer(client=studio)
+        self.server = server or StudioMcpServer(client=studio, toolsets=VALID_TOOLSETS)
+        self.recorder = recorder
+
+        # Core and Inspect tool suites
         self.core_tools = CoreTools(client=studio, server=self.server)
         self.inspect_tools = InspectTools(client=studio, server=self.server)
         self.control_tools = ControlTools(client=studio, server=self.server)
         self.safety_tools = SafetyTools(client=studio, server=self.server)
+
+        # Extended tool suites
+        self.flp_tools = FlpTools(client=studio, server=self.server)
+        self.notes_orchestrator = NoteApplyOrchestrator(pyscript_dir=pyscript_dir)
+        self.notes_tools = NotesTools(
+            client=studio,
+            server=self.server,
+            orchestrator=self.notes_orchestrator,
+        )
+        self.render_runner = render_runner or MockRenderRunner()
+        self.render_tools = RenderTools(
+            client=studio,
+            server=self.server,
+            runner=self.render_runner,
+        )
 
         self.history: list[ToolExecution] = []
         self.current_turn: int = 0
@@ -107,6 +196,22 @@ class ScriptedAgentHarness:
             "checkpoint_create": self.safety_tools.checkpoint_create,
             "checkpoint_rollback": self.safety_tools.checkpoint_rollback,
             "journal_list": self.safety_tools.journal_list,
+            # Offline FLP
+            "flp_inspect": self.flp_tools.flp_inspect,
+            "flp_diff": self.flp_tools.flp_diff,
+            "flp_validate": self.flp_tools.flp_validate,
+            "flp_save_as": self.flp_tools.flp_save_as,
+            "flp_new_from_template": self.flp_tools.flp_new_from_template,
+            "flp_edit": self.flp_tools.flp_edit,
+            # Notes & Piano Roll
+            "notes_apply": self.notes_tools.notes_apply,
+            "notes_read": self.notes_tools.notes_read,
+            "notes_from_midi": self.notes_tools.notes_from_midi,
+            # Render
+            "render_start": self.render_tools.render_start,
+            "render_status": self.render_tools.render_status,
+            "render_cancel": self.render_tools.render_cancel,
+            "render_analyze": self.render_tools.render_analyze,
         }
 
     def call_tool(self, tool_name: str, **arguments: Any) -> ToolResult:
@@ -115,6 +220,7 @@ class ScriptedAgentHarness:
             raise ValueError(f"Unknown tool '{tool_name}' in scripted harness dispatcher.")
 
         fn = self._dispatch_map[tool_name]
+        start_t = time.time()
         try:
             result = fn(**arguments)
         except BrokerError as err:
@@ -140,7 +246,14 @@ class ScriptedAgentHarness:
                 },
                 is_error=True,
             )
+        except Exception as exc:
+            result = ToolResult(
+                content=[{"type": "text", "text": str(exc)}],
+                structured_content={"error": type(exc).__name__, "message": str(exc)},
+                is_error=True,
+            )
 
+        duration_ms = (time.time() - start_t) * 1000.0
         call_record = ToolCall(tool=tool_name, arguments=arguments)
         execution = ToolExecution(
             turn=self.current_turn,
@@ -148,11 +261,25 @@ class ScriptedAgentHarness:
             result=result,
         )
         self.history.append(execution)
+
+        if self.recorder is not None:
+            self.recorder.record_call(
+                tool=tool_name,
+                arguments=arguments,
+                result_content=result.content,
+                structured_content=result.structured_content,
+                is_error=result.is_error,
+                duration_ms=duration_ms,
+            )
+
         return result
 
     def step(self, user_message: str, calls: list[ToolCall]) -> list[ToolResult]:
         """Simulate a dialog turn with a user message and a sequence of tool calls."""
         self.current_turn += 1
+        if self.recorder is not None:
+            self.recorder.set_user_message(user_message, turn=self.current_turn)
+
         results: list[ToolResult] = []
         for c in calls:
             res = self.call_tool(c.tool, **c.arguments)
@@ -266,7 +393,9 @@ class ScriptedAgentHarness:
 
 
 __all__ = [
+    "MockRenderRunner",
     "ScriptedAgentHarness",
     "ToolCall",
     "ToolExecution",
+    "create_synthetic_wav",
 ]
