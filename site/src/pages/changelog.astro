@@ -6,10 +6,26 @@ import JsonLd from '../components/JsonLd.astro';
 
 const RELEASES = [
   {
+    version: 'v1.0.0',
+    date: '2026-10-31',
+    title: 'General Availability — HTTP Daemon, MCPB Bundle & Native ARM64',
+    tag: 'LATEST RELEASE',
+    summary:
+      'General Availability release introducing the local loopback HTTP REST server and Streamable HTTP transport, Claude Desktop MCPB bundle distribution, Cloudflare edge deployment with strict security headers, native ARM64 toolchain and differential parity testing, and zero-trust security audit enforcement.',
+    highlights: [
+      'Local HTTP REST daemon (sbridge serve) with constant-time Bearer token authentication',
+      'Streamable HTTP MCP JSON-RPC 2.0 transport over POST /mcp with SSE support',
+      'Claude Desktop .mcpb bundle packaging with verified launcher and 42 tool definitions',
+      'Production Cloudflare edge deployment (wrangler.jsonc) with immutable caching & CSP headers',
+      'Native ARM64/x64 C acceleration library with 100% bit-exact differential testing',
+      'Automated pre-release security audit gate enforcing path traversal and secret redaction rules',
+    ],
+  },
+  {
     version: 'v0.6.0',
     date: '2026-10-26',
     title: 'Landing Page, Starlight Docs & Design System',
-    tag: 'LATEST RELEASE',
+    tag: 'FEATURE COMPLETE',
     summary:
       'Official web launch featuring the interactive Signal-Path hero diagram, capability matrix explorer for Windows ARM64/x64, console demo island with authentic transcripts, complete Starlight documentation suite with 119 API function cards, automated llms.txt context compilation, OpenGraph social card generation, and comprehensive SEO/GEO schema.org metadata.',
     highlights: [

@@ -723,41 +723,45 @@ def generate_markdown_table(dataset: dict[str, Any]) -> str:
 
         lines.append("| " + " | ".join(row) + " |")
 
-    lines.extend([
-        "",
-        "---",
-        "",
-        "## Tested Hardware Platforms",
-        "",
-        "### Machine A (Windows on ARM64 Reference)",
-        f"- **Hardware Model:** {machine_a.get('hardware', 'Surface Pro 11')}",
-        f"- **CPU:** {machine_a.get('cpu', 'Snapdragon X Elite')}",
-        f"- **RAM:** {machine_a.get('ram', '32 GB')}",
-        f"- **Operating System:** {machine_a.get('os', 'Windows 11 24H2')}",
-        f"- **MIDI Loopback:** {machine_a.get('midiBackend', 'WMS Loopback')}",
-        f"- **Python Runtime:** {machine_a.get('pythonRuntime', 'Python 3.12 (ARM64 native)')}",
-        f"- **Diagnostic Health Status:** `{machine_a.get('doctorStatus', 'HEALTHY')}`",
-        f"- **Verified At:** `{machine_a.get('verifiedAt', '2026-10-25')}`",
-        "",
-        "### Machine B (Windows x64 Audio Workstation)",
-        f"- **Hardware Model:** {machine_b.get('hardware', 'Workstation Rig')}",
-        f"- **CPU:** {machine_b.get('cpu', 'AMD Ryzen 9 7950X')}",
-        f"- **RAM:** {machine_b.get('ram', '64 GB')}",
-        f"- **Operating System:** {machine_b.get('os', 'Windows 11 24H2')}",
-        f"- **MIDI Loopback:** {machine_b.get('midiBackend', 'WMS Loopback')}",
-        f"- **Python Runtime:** {machine_b.get('pythonRuntime', 'Python 3.12 (x64 native)')}",
-        f"- **Diagnostic Health Status:** `{machine_b.get('doctorStatus', 'HEALTHY')}`",
-        f"- **Verified At:** `{machine_b.get('verifiedAt', '2026-10-25')}`",
-    ])
+    lines.extend(
+        [
+            "",
+            "---",
+            "",
+            "## Tested Hardware Platforms",
+            "",
+            "### Machine A (Windows on ARM64 Reference)",
+            f"- **Hardware Model:** {machine_a.get('hardware', 'Surface Pro 11')}",
+            f"- **CPU:** {machine_a.get('cpu', 'Snapdragon X Elite')}",
+            f"- **RAM:** {machine_a.get('ram', '32 GB')}",
+            f"- **Operating System:** {machine_a.get('os', 'Windows 11 24H2')}",
+            f"- **MIDI Loopback:** {machine_a.get('midiBackend', 'WMS Loopback')}",
+            f"- **Python Runtime:** {machine_a.get('pythonRuntime', 'Python 3.12 (ARM64 native)')}",
+            f"- **Diagnostic Health Status:** `{machine_a.get('doctorStatus', 'HEALTHY')}`",
+            f"- **Verified At:** `{machine_a.get('verifiedAt', '2026-10-25')}`",
+            "",
+            "### Machine B (Windows x64 Audio Workstation)",
+            f"- **Hardware Model:** {machine_b.get('hardware', 'Workstation Rig')}",
+            f"- **CPU:** {machine_b.get('cpu', 'AMD Ryzen 9 7950X')}",
+            f"- **RAM:** {machine_b.get('ram', '64 GB')}",
+            f"- **Operating System:** {machine_b.get('os', 'Windows 11 24H2')}",
+            f"- **MIDI Loopback:** {machine_b.get('midiBackend', 'WMS Loopback')}",
+            f"- **Python Runtime:** {machine_b.get('pythonRuntime', 'Python 3.12 (x64 native)')}",
+            f"- **Diagnostic Health Status:** `{machine_b.get('doctorStatus', 'HEALTHY')}`",
+            f"- **Verified At:** `{machine_b.get('verifiedAt', '2026-10-25')}`",
+        ]
+    )
 
     if community:
-        lines.extend([
-            "",
-            "### Community Submissions",
-            "",
-            "| ID | Platform / CPU | OS Build | Architecture | Doctor Status |",
-            "| :--- | :--- | :--- | :---: | :--- |",
-        ])
+        lines.extend(
+            [
+                "",
+                "### Community Submissions",
+                "",
+                "| ID | Platform / CPU | OS Build | Architecture | Doctor Status |",
+                "| :--- | :--- | :--- | :---: | :--- |",
+            ]
+        )
         for comm in community:
             sub_id = comm.get("submissionId", "Community")
             cpu = comm.get("cpu", "N/A")
@@ -766,39 +770,45 @@ def generate_markdown_table(dataset: dict[str, Any]) -> str:
             status = comm.get("doctorStatus", "Passed")
             lines.append(f"| `{sub_id}` | {cpu} | {os_ver} | `{arch}` | {status} |")
 
-    lines.extend([
-        "",
-        "---",
-        "",
-        "## Detailed Capability Reference",
-        "",
-    ])
+    lines.extend(
+        [
+            "",
+            "---",
+            "",
+            "## Detailed Capability Reference",
+            "",
+        ]
+    )
 
     for cap in caps_list:
         cap_id = cap["id"]
         sample_cap = matrix.get("26.1.3-ARM64", {}).get("capabilities", {}).get(cap_id, {})
-        lines.extend([
-            f"### `{cap_id}` — {cap['name']}",
-            f"- **Category:** {cap['category']}",
-            f"- **Description:** {cap['description']}",
-            f"- **Technical Rationale:** {sample_cap.get('reason', 'N/A')}",
-            f"- **Alternatives & Fallbacks:** {sample_cap.get('alternatives', 'N/A')}",
-            "",
-        ])
+        lines.extend(
+            [
+                f"### `{cap_id}` — {cap['name']}",
+                f"- **Category:** {cap['category']}",
+                f"- **Description:** {cap['description']}",
+                f"- **Technical Rationale:** {sample_cap.get('reason', 'N/A')}",
+                f"- **Alternatives & Fallbacks:** {sample_cap.get('alternatives', 'N/A')}",
+                "",
+            ]
+        )
 
     disclaimer = (
         "StudioBridge is an independent open-source project. FL Studio is a registered "
         "trademark of Image-Line Software NV. StudioBridge is not affiliated with, "
         "endorsed by, or sponsored by Image-Line Software NV."
     )
-    lines.extend([
-        "---",
-        "",
-        "## Non-Affiliation Notice",
-        "",
-        disclaimer,
-        "",
-    ])
+    lines.extend(
+        [
+            "---",
+            "",
+            "## Non-Affiliation Notice",
+            "",
+            disclaimer,
+            "",
+        ]
+    )
 
     return "\n".join(lines)
 
@@ -952,9 +962,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.verify:
         if not args.quiet:
-            print(
-                f"[OK] Compatibility verification passed. Ingested from {args.fixtures_dir}."
-            )
+            print(f"[OK] Compatibility verification passed. Ingested from {args.fixtures_dir}.")
             print("  - 6/6 matrix configurations verified.")
             print("  - 12/12 capabilities verified per configuration.")
         return 0

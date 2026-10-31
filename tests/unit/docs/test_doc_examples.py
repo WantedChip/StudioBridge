@@ -178,15 +178,17 @@ class TestCompatGenerator:
         json_out = tmp_path / "compat.json"
         md_out = tmp_path / "compatibility.md"
 
-        code = compat_main([
-            "--fixtures-dir",
-            str(FIXTURES_DIR),
-            "--output",
-            str(json_out),
-            "--markdown-out",
-            str(md_out),
-            "--quiet",
-        ])
+        code = compat_main(
+            [
+                "--fixtures-dir",
+                str(FIXTURES_DIR),
+                "--output",
+                str(json_out),
+                "--markdown-out",
+                str(md_out),
+                "--quiet",
+            ]
+        )
         assert code == 0
         assert json_out.exists()
         assert md_out.exists()
@@ -406,13 +408,7 @@ class TestDoctorCheckCompleteness:
         # req: DOC-01
         """
         doctor_py_path = (
-            REPO_ROOT
-            / "packages"
-            / "studiobridge"
-            / "src"
-            / "studiobridge"
-            / "setup"
-            / "doctor.py"
+            REPO_ROOT / "packages" / "studiobridge" / "src" / "studiobridge" / "setup" / "doctor.py"
         )
         assert doctor_py_path.exists(), "doctor.py must exist"
         doctor_py_content = doctor_py_path.read_text(encoding="utf-8")

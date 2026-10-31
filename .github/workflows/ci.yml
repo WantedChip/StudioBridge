@@ -93,4 +93,4 @@ jobs:
       - name: Verify universal wheel
         run: |
           ls -la dist/
-          test -f dist/studiobridge-0.1.0-py3-none-any.whl
+          test -f dist/studiobridge-1.0.0-py3-none-any.whl

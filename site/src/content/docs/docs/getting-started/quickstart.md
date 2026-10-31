@@ -282,10 +282,12 @@ For asynchronous automation pipelines (such as background event monitors or asyn
 import asyncio
 from studiobridge import AsyncStudio
 
+
 async def main() -> None:
     async with AsyncStudio.connect() as studio:
         tempo = await studio.transport.get_tempo()
         print(f"Current tempo: {tempo} BPM")
+
 
 asyncio.run(main())
 ```

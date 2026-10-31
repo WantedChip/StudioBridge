@@ -664,9 +664,7 @@ def verify_cyclonedx_sbom(data: dict[str, Any]) -> list[str]:
         errors.append("Dependencies list is empty or invalid")
     else:
         refs = {
-            str(d.get("ref")): d.get("dependsOn", [])
-            for d in dependencies
-            if isinstance(d, dict)
+            str(d.get("ref")): d.get("dependsOn", []) for d in dependencies if isinstance(d, dict)
         }
         has_root_dep = any(r.startswith("pkg:pypi/studiobridge") for r in refs)
         if not has_root_dep:

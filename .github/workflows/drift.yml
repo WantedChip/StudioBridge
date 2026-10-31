@@ -43,7 +43,7 @@ jobs:
           uv run sbridge manifest cards --out docs/api
 
       - name: Open Automated PR if API Drift Detected
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "chore(manifest): sync api drift updates and regenerate cards"

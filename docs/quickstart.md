@@ -255,6 +255,7 @@ with Studio.connect() as studio:
 import asyncio
 from studiobridge import AsyncStudio
 
+
 async def main() -> None:
     async with AsyncStudio.connect() as studio:
         tempo = await studio.transport.get_tempo()
@@ -263,6 +264,7 @@ async def main() -> None:
         tracks = await studio.mixer.get_tracks(count=10)
         for track in tracks:
             print(f"Track {track.index}: {track.name} (Vol: {track.volume:.2f})")
+
 
 asyncio.run(main())
 ```

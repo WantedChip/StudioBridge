@@ -31,10 +31,12 @@ For asynchronous automation (asyncio event loops, FastAPI/aiohttp servers), use 
 import asyncio
 from studiobridge import AsyncStudio
 
+
 async def main() -> None:
     async with AsyncStudio.connect() as studio:
         tempo = await studio.transport.get_tempo()
         print(f"Tempo: {tempo} BPM")
+
 
 asyncio.run(main())
 ```
@@ -49,20 +51,20 @@ Controls playback state, song position, tempo, and loop modes:
 
 ```python
 # Playback state
-studio.transport.start()               # Start playback
-studio.transport.stop()                # Stop playback
-studio.transport.record()              # Toggle recording state
+studio.transport.start()  # Start playback
+studio.transport.stop()  # Stop playback
+studio.transport.record()  # Toggle recording state
 is_playing = studio.transport.is_playing()
 is_recording = studio.transport.is_recording()
 
 # Tempo (BPM)
-tempo = studio.transport.get_tempo()   # Returns float (e.g. 128.0)
-studio.transport.set_tempo(130.0)      # Sets tempo
+tempo = studio.transport.get_tempo()  # Returns float (e.g. 128.0)
+studio.transport.set_tempo(130.0)  # Sets tempo
 
 # Song Position & Markers
 pos = studio.transport.get_song_pos()  # Position in beats/bars
-studio.transport.set_song_pos(0.0)     # Rewind to start
-studio.transport.marker_jump(1)        # Jump to marker index
+studio.transport.set_song_pos(0.0)  # Rewind to start
+studio.transport.marker_jump(1)  # Jump to marker index
 ```
 
 ### `studio.mixer` — Mixer Strips & Master Bus
@@ -156,7 +158,7 @@ Auditions notes and injects multi-bar sequences:
 from studiobridge.pianoroll import Note
 
 # Audition note-on / note-off live
-studio.notes.note_on(channel=0, pitch=60, velocity=100) # Middle C
+studio.notes.note_on(channel=0, pitch=60, velocity=100)  # Middle C
 studio.notes.note_off(channel=0, pitch=60)
 
 # Batch note injection
@@ -242,5 +244,7 @@ job.wait_until_complete()
 
 # Validate acoustic signal properties
 metrics = runner.validate_audio("render/my_song.wav")
-print(f"Duration: {metrics.duration_seconds:.2f}s, RMS: {metrics.rms_db:.1f} dB, Peak: {metrics.peak_db:.1f} dB")
+print(
+    f"Duration: {metrics.duration_seconds:.2f}s, RMS: {metrics.rms_db:.1f} dB, Peak: {metrics.peak_db:.1f} dB"
+)
 ```

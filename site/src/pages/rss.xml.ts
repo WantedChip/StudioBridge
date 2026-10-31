@@ -5,6 +5,14 @@ export const GET: APIRoute = async (context) => {
 
   const releases = [
     {
+      version: 'v1.0.0',
+      title: 'StudioBridge v1.0.0 — General Availability: HTTP Daemon, MCPB Bundle & Native ARM64',
+      link: `${siteUrl}/changelog#v1.0.0`,
+      pubDate: 'Sat, 31 Oct 2026 12:00:00 GMT',
+      description:
+        'General Availability release introducing the local loopback HTTP REST server and Streamable HTTP transport, Claude Desktop MCPB bundle distribution, Cloudflare edge deployment with strict security headers, native ARM64 toolchain and differential parity testing, and zero-trust security audit enforcement.',
+    },
+    {
       version: 'v0.6.0',
       title: 'StudioBridge v0.6.0 — Landing Page, Starlight Docs & Design System',
       link: `${siteUrl}/changelog#v0.6.0`,

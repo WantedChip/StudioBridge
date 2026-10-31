@@ -63,9 +63,7 @@ def lock_packages(workspace_root: Path) -> list[dict[str, Any]]:
 
 
 @pytest.fixture(scope="session")
-def runtime_closure(
-    python_info: dict[str, Any], lock_packages: list[dict[str, Any]]
-) -> set[str]:
+def runtime_closure(python_info: dict[str, Any], lock_packages: list[dict[str, Any]]) -> set[str]:
     """Compute runtime dependency closure."""
     return determine_runtime_closure(python_info["dependencies"], lock_packages)
 

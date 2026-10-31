@@ -77,10 +77,10 @@ jobs:
           test -f dist/SHA256SUMS
           uv run python tools/generate_sbom.py --verify dist/sbom-cyclonedx.json
           uv run python tools/generate_sbom.py --verify dist/sbom-spdx.json
-          uv run python tools/build_mcpb.py --verify dist/studiobridge-0.1.0.mcpb
+          uv run python tools/build_mcpb.py --verify dist/studiobridge-1.0.0.mcpb
 
       - name: Attest Build Provenance (SLSA / Sigstore)
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v4
         with:
           subject-path: |
             dist/*.whl
