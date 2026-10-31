@@ -1,6 +1,6 @@
 {
   "name": "studiobridge",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Zero-dependency npm launcher shim for StudioBridge (FL Studio AI agent & developer bridge)",
   "bin": {
     "studiobridge": "./bin/sbridge.js",

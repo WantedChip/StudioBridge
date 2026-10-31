@@ -20,7 +20,7 @@ class DeviceScriptGenerator:
         self,
         device_name: str = "StudioBridge",
         port_root: str = "StudioBridge",
-        build_id: str = "0.1.0",
+        build_id: str = "1.0.0",
         secret: str = "",
         auth_alg: str = "sha256",
         max_frame: int = 512,
@@ -56,7 +56,7 @@ class DeviceScriptGenerator:
 
         # Replace default injected parameter values
         replacements: dict[str, Any] = {
-            'BUILD_ID = "0.1.0"': f'BUILD_ID = "{self.build_id}"',
+            'BUILD_ID = "1.0.0"': f'BUILD_ID = "{self.build_id}"',
             'SECRET = ""': f'SECRET = "{self.secret}"',
             'AUTH_ALG = "sha256"': f'AUTH_ALG = "{self.auth_alg}"',
             'PORT_ROOT = "StudioBridge"': f'PORT_ROOT = "{self.port_root}"',

@@ -74,7 +74,7 @@ def runtime_closure(
 def test_load_python_package_info(python_info: dict[str, Any]) -> None:
     """Verify python package info loaded from pyproject.toml."""
     assert python_info["name"] == "studiobridge"
-    assert python_info["version"] == "0.1.0"
+    assert python_info["version"] == "1.0.0"
     assert python_info["license"] == "MIT"
     assert len(python_info["authors"]) >= 1
     assert "WantedChip" in python_info["authors"][0]["name"]
@@ -89,7 +89,7 @@ def test_load_python_package_info(python_info: dict[str, Any]) -> None:
 def test_load_npm_package_info(npm_info: dict[str, Any]) -> None:
     """Verify npm package info loaded from package.json."""
     assert npm_info["name"] == "studiobridge"
-    assert npm_info["version"] == "0.1.0"
+    assert npm_info["version"] == "1.0.0"
     assert npm_info["license"] == "MIT"
     assert "WantedChip" in npm_info["author"]
     assert "https://github.com/WantedChip/studiobridge" in npm_info["repository"]
@@ -161,8 +161,8 @@ def test_cyclonedx_sbom_generation(
     # Metadata & root component
     meta = sbom["metadata"]
     assert meta["component"]["name"] == "studiobridge"
-    assert meta["component"]["version"] == "0.1.0"
-    assert meta["component"]["purl"] == "pkg:pypi/studiobridge@0.1.0"
+    assert meta["component"]["version"] == "1.0.0"
+    assert meta["component"]["purl"] == "pkg:pypi/studiobridge@1.0.0"
     assert meta["component"]["licenses"][0]["license"]["id"] == "MIT"
 
     # Components list
@@ -171,7 +171,7 @@ def test_cyclonedx_sbom_generation(
 
     # npm launcher component
     npm_comp = comp_map["studiobridge"]
-    assert npm_comp["purl"] == "pkg:npm/studiobridge@0.1.0"
+    assert npm_comp["purl"] == "pkg:npm/studiobridge@1.0.0"
     assert npm_comp["scope"] == "required"
     assert npm_comp["type"] == "application"
 
@@ -187,7 +187,7 @@ def test_cyclonedx_sbom_generation(
     dep_map = {d["ref"]: d["dependsOn"] for d in deps}
 
     # studiobridge python depends on anyio, platformdirs, tomlkit
-    py_ref = "pkg:pypi/studiobridge@0.1.0"
+    py_ref = "pkg:pypi/studiobridge@1.0.0"
     assert py_ref in dep_map
     root_targets = dep_map[py_ref]
     assert any("anyio" in t for t in root_targets)
@@ -195,7 +195,7 @@ def test_cyclonedx_sbom_generation(
     assert any("tomlkit" in t for t in root_targets)
 
     # npm launcher depends on studiobridge python package
-    npm_ref = "pkg:npm/studiobridge@0.1.0"
+    npm_ref = "pkg:npm/studiobridge@1.0.0"
     assert npm_ref in dep_map
     assert py_ref in dep_map[npm_ref]
 

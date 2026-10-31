@@ -510,12 +510,12 @@ def generate_sbom(repo_root: Path) -> dict[str, Any]:
     tool_info = {
         "vendor": "WantedChip",
         "name": "StudioBridge Security Auditor",
-        "version": "0.1.0",
+        "version": "1.0.0",
     }
     app_info = {
         "type": "application",
         "name": "studiobridge",
-        "version": "0.1.0",
+        "version": "1.0.0",
         "description": "StudioBridge control bridge and MCP server for FL Studio",
     }
     sbom: dict[str, Any] = {

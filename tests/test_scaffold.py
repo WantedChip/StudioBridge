@@ -11,7 +11,7 @@ def test_package_version() -> None:
     """Verify package version is exposed and matches expected scaffold version."""
     # req: REPO-01
     assert hasattr(studiobridge, "__version__")
-    assert studiobridge.__version__ == "0.1.0"
+    assert studiobridge.__version__ == "1.0.0"
 
 
 def test_submodules_exist() -> None:

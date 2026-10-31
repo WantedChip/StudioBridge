@@ -1,6 +1,7 @@
 <div align="center">
 
 # 🎛️ StudioBridge
+<!-- mcp-name: io.github.wantedchip/studiobridge -->
 
 **The Local-First AI Agent & Automation Bridge for Image-Line FL Studio**
 

@@ -30,7 +30,7 @@ def multi_file_bundle(tmp_path: pathlib.Path, secret: str) -> pathlib.Path:
     gen = DeviceScriptGenerator(
         device_name="TestDevice",
         port_root="TestDevice",
-        build_id="0.1.0",
+        build_id="1.0.0",
         secret=secret,
         budget_ms=10,
         budget_calls=10,
@@ -45,7 +45,7 @@ def single_file_script(tmp_path: pathlib.Path, secret: str) -> pathlib.Path:
     gen = DeviceScriptGenerator(
         device_name="TestDevice",
         port_root="TestDevice",
-        build_id="0.1.0",
+        build_id="1.0.0",
         secret=secret,
         budget_ms=10,
         budget_calls=10,
@@ -156,7 +156,7 @@ def test_hello_and_probe_operations(multi_file_bundle: pathlib.Path) -> None:
         hello_req = RequestEnvelope(op="hello")
         res_hello = _send_and_get_response(em, hello_req, sid=0, mid=2)
         assert res_hello.ok is True
-        assert res_hello.r["device"]["build"] == "0.1.0"
+        assert res_hello.r["device"]["build"] == "1.0.0"
         assert res_hello.r["device"]["port_root"] == "TestDevice"
         assert res_hello.r["fl"]["api_version"] == 44
 

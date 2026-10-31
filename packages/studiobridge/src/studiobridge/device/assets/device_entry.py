@@ -12,7 +12,7 @@ import sys
 from typing import Any
 
 # Injected parameters (configured by DeviceScriptGenerator)
-BUILD_ID = "0.1.0"
+BUILD_ID = "1.0.0"
 SECRET = ""
 AUTH_ALG = "sha256"
 PORT_ROOT = "StudioBridge"

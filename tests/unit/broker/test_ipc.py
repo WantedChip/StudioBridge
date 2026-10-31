@@ -356,7 +356,7 @@ def test_ensure_broker_recovers_stale_metadata(
     stale_meta = {
         "pid": 99999999,
         "port": 54321,
-        "version": "0.1.0",
+        "version": "1.0.0",
         "started": "2026-10-18T00:00:00Z",
     }
     meta_file.write_text(json.dumps(stale_meta), encoding="utf-8")
@@ -367,7 +367,7 @@ def test_ensure_broker_recovers_stale_metadata(
         new_meta = {
             "pid": 12345,
             "port": 54322,
-            "version": "0.1.0",
+            "version": "1.0.0",
             "started": "2026-10-18T01:00:00Z",
         }
         meta_file.write_text(json.dumps(new_meta), encoding="utf-8")

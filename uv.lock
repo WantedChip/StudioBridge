@@ -574,7 +574,7 @@ wheels = [
 
 [[package]]
 name = "studiobridge"
-version = "0.1.0"
+version = "1.0.0"
 source = { editable = "packages/studiobridge" }
 dependencies = [
     { name = "anyio" },
@@ -608,7 +608,7 @@ provides-extras = ["http", "analysis", "rtmidi", "dev"]
 
 [[package]]
 name = "studiobridge-workspace"
-version = "0.1.0"
+version = "1.0.0"
 source = { virtual = "." }
 dependencies = [
     { name = "studiobridge" },

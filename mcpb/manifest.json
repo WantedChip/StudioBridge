@@ -3,7 +3,7 @@
   "manifest_version": "0.4",
   "name": "io.github.wantedchip.studiobridge",
   "display_name": "StudioBridge",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "AI agent & developer bridge to Image-Line FL Studio (transport, mixer, channel rack, plugins, and project automation).",
   "author": {
     "name": "WantedChip",

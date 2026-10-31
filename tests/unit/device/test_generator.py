@@ -13,7 +13,7 @@ def test_generator_default_parameters() -> None:
     gen = DeviceScriptGenerator()
     assert gen.device_name == "StudioBridge"
     assert gen.port_root == "StudioBridge"
-    assert gen.build_id == "0.1.0"
+    assert gen.build_id == "1.0.0"
     assert len(gen.secret) == 64  # 32 bytes hex = 64 chars
     assert gen.auth_alg == "sha256"
     assert gen.max_frame == 512

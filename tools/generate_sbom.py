@@ -105,7 +105,7 @@ def load_python_package_info(pyproject_path: Path) -> dict[str, Any]:
     project_tbl = doc.get("project", {})
 
     name = str(project_tbl.get("name", "studiobridge"))
-    version = str(project_tbl.get("version", "0.1.0"))
+    version = str(project_tbl.get("version", "1.0.0"))
     description = str(project_tbl.get("description", ""))
     lic_field = project_tbl.get("license", "MIT")
     license_id = str(lic_field) if isinstance(lic_field, str) else "MIT"
@@ -142,7 +142,7 @@ def load_npm_package_info(package_json_path: Path) -> dict[str, Any]:
 
     data = json.loads(package_json_path.read_text(encoding="utf-8"))
     name = str(data.get("name", "studiobridge"))
-    version = str(data.get("version", "0.1.0"))
+    version = str(data.get("version", "1.0.0"))
     description = str(data.get("description", ""))
     license_id = str(data.get("license", "MIT"))
     author = str(data.get("author", ""))

@@ -119,7 +119,7 @@ class Dispatcher:
 
     def __init__(
         self,
-        build_id="0.1.0",
+        build_id="1.0.0",
         secret="",
         auth_alg="sha256",
         port_root="StudioBridge",

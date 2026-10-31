@@ -269,7 +269,7 @@ def build_mcpb(
     # Resolve output path
     if output_path is None:
         name = manifest_data.get("name", "studiobridge").split(".")[-1]
-        version = manifest_data.get("version", "0.1.0")
+        version = manifest_data.get("version", "1.0.0")
         out_file = _DEFAULT_DIST_DIR / f"{name}-{version}.mcpb"
     else:
         out_file = Path(output_path).resolve()
@@ -441,7 +441,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.verify is not None:
         target = args.verify if str(args.verify) else args.output
         if not target:
-            target = args.source_dir.parent / "dist" / "studiobridge-0.1.0.mcpb"
+            target = args.source_dir.parent / "dist" / "studiobridge-1.0.0.mcpb"
         is_valid, errors = verify_mcpb(target)
         if not is_valid:
             print(f"[FAIL] Bundle verification failed for '{target}':", file=sys.stderr)

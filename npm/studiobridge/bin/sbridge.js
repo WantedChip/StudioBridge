@@ -22,7 +22,7 @@ const path = require('node:path');
 const process = require('node:process');
 
 const DIST = 'studiobridge';
-const PINNED_VERSION = '0.1.0';
+const PINNED_VERSION = '1.0.0';
 const SPEC = `${DIST}==${PINNED_VERSION}`;
 
 /**

@@ -32,7 +32,7 @@
     ]
   },
   "studiobridge": {
-    "version": "0.1.0",
+    "version": "1.0.0",
     "app_data_dir": "C:\\Users\\[REDACTED]\\AppData\\Local\\studiobridge",
     "secret_exists": true,
     "device_script_installed": true,

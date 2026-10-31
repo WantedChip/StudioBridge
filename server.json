@@ -3,7 +3,7 @@
   "name": "io.github.wantedchip/studiobridge",
   "title": "StudioBridge",
   "description": "AI agent & developer bridge to Image-Line FL Studio (transport, mixer, channel rack, plugins, and project automation).",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/WantedChip/studiobridge.git"
@@ -24,7 +24,7 @@
     {
       "registryType": "pypi",
       "identifier": "studiobridge",
-      "version": "0.1.0",
+      "version": "1.0.0",
       "transport": {
         "type": "stdio"
       },
@@ -42,7 +42,7 @@
     {
       "registryType": "npm",
       "identifier": "studiobridge",
-      "version": "0.1.0",
+      "version": "1.0.0",
       "transport": {
         "type": "stdio"
       },
