@@ -14,7 +14,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'StudioBridge Docs',
-      customCss: ['./src/styles/tokens.css', './src/styles/global.css'],
+      customCss: ['./src/styles/tokens.css'],
       head: [
         {
           tag: 'meta',

@@ -341,15 +341,14 @@ In addition to AI agent interfaces, StudioBridge provides a fully-typed Python S
 from studiobridge import Studio
 
 # Connect to the local DAW session
-studio = Studio()
+with Studio.connect() as studio:
+    # Query transport state
+    is_playing = studio.transport.is_playing()
+    print(f"Transport playing: {is_playing}")
 
-# Query transport state
-is_playing = studio.transport.is_playing()
-print(f"Transport playing: {is_playing}")
-
-# Query master mixer track volume (track index 0)
-master_vol = studio.mixer.get_track_volume(0)
-print(f"Master volume: {master_vol:.2f}")
+    # Query master mixer track volume (track index 0)
+    master_vol = studio.mixer.get_volume(0)
+    print(f"Master volume: {master_vol:.2f}")
 ```
 
 For asynchronous automation pipelines (such as background event monitors or async web servers), use `AsyncStudio`:
@@ -358,10 +357,12 @@ For asynchronous automation pipelines (such as background event monitors or asyn
 import asyncio
 from studiobridge import AsyncStudio
 
+
 async def main() -> None:
-    async with AsyncStudio() as studio:
-        tempo = await studio.general.get_tempo()
+    async with AsyncStudio.connect() as studio:
+        tempo = await studio.transport.get_tempo()
         print(f"Current tempo: {tempo} BPM")
+
 
 asyncio.run(main())
 ```
